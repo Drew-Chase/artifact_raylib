@@ -1,4 +1,5 @@
 # Build Documentation
+[![Build and Test](https://github.com/Drew-Chase/artifact_raylib/actions/workflows/build.yml/badge.svg)](https://github.com/Drew-Chase/artifact_raylib/actions/workflows/build.yml)
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)

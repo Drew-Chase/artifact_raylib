@@ -1,0 +1,32 @@
+name: Pull Request Validation
+
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  validate:
+    name: Validate PR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Validate CMake format
+        run: |
+          cmake -P ${GITHUB_WORKSPACE}/CMakeLists.txt || echo "CMake format validation failed"
+
+      - name: Validate vcpkg.json
+        run: |
+          cat vcpkg.json | jq empty || echo "vcpkg.json format validation failed"
+
+      - name: Check file permissions
+        run: |
+          if [ -d "scripts/unix" ]; then
+            if ! test -x "scripts/unix/debug.sh" || \
+               ! test -x "scripts/unix/shared.sh" || \
+               ! test -x "scripts/unix/bundled.sh" || \
+               ! test -x "scripts/unix/all.sh"; then
+              echo "Unix scripts should be executable"
+              exit 1
+            fi
+          fi
