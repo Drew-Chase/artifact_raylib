@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeSharedSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" ENABLED="true" GENERATION_DIR="bin/obj/debug" CONFIG_NAME="Debug" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=F:/sdks/vcpkg/scripts/buildsystems/vcpkg.cmake -DPROFILE_NAME=debug" BUILD_OPTIONS="-j 32" />
+      <configuration PROFILE_NAME="Shared" ENABLED="true" GENERATION_DIR="bin/obj/shared" CONFIG_NAME="Release" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=F:/sdks/vcpkg/scripts/buildsystems/vcpkg.cmake -DPROFILE_NAME=shared -DREMOVE_DEBUG_INFO=ON -DSTRIPPED_VERSION=ON" BUILD_OPTIONS="-j 32" />
+      <configuration PROFILE_NAME="Bundled" ENABLED="true" GENERATION_DIR="bin/obj/bundled" CONFIG_NAME="Release" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=F:/sdks/vcpkg/scripts/buildsystems/vcpkg.cmake -DPROFILE_NAME=bundled -DREMOVE_DEBUG_INFO=ON" BUILD_OPTIONS="-j 32" />
+    </configurations>
+  </component>
+</project>
