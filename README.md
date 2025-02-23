@@ -36,12 +36,12 @@ Dependencies are automatically handled by vcpkg through the `vcpkg.json` manifes
 ### Windows
 
 1. **Install Prerequisites**
-```textmate
+```powershell
 # Install Chocolatey (if not installed)
-   Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-   # Install required tools
-   choco install cmake ninja git visualstudio2022-workload-vctools
+# Install required tools
+choco install cmake ninja git visualstudio2022-workload-vctools
 ```
 
 2. **Clone the Repository**
