@@ -32,10 +32,15 @@ on:
         description: 'Custom Release Tag (leave empty for auto-generated)'
         required: false
         type: string
+# Add this permissions block
+permissions:
+  contents: write
+  packages: write
+  deployments: write
 
 env:
   BUILD_TYPE: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type || 'Release' }}
-  VCPKG_COMMIT: '5a1b13ca83f32c01d40a779747b5cb59d359ac2f' # Matches builtin-baseline from vcpkg.json
+  VCPKG_COMMIT: '5a1b13ca83f32c01d40a779747b5cb59d359ac2f'
 
 jobs:
   build:
@@ -170,6 +175,8 @@ jobs:
           if-no-files-found: error
 
   release:
+    permissions:
+      contents: write
     needs: build
     if: >-
       (github.event_name == 'workflow_dispatch' && inputs.create_release) ||
@@ -192,11 +199,19 @@ jobs:
             echo "tag=v$(date +'%Y.%m.%d-%H%M')" >> $GITHUB_OUTPUT
           fi
 
+      - name: List artifacts
+        run: |
+          echo "Contents of artifacts directory:"
+          ls -R artifacts/
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           name: Release ${{ steps.tag.outputs.tag }}
           files: artifacts/**/*
           prerelease: ${{ github.event.inputs.release_type == 'prerelease' }}
           generate_release_notes: true
+          fail_on_unmatched_files: false
