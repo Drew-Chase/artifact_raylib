@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch: # Manual trigger with parameters
+  workflow_dispatch:  # Manual trigger with parameters
     inputs:
       build_type:
         description: 'Build Type (Release/Debug)'
@@ -100,21 +100,31 @@ jobs:
           key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}-${{ env.VCPKG_COMMIT }}
 
       - name: Setup vcpkg
+        shell: bash
         run: |
           git clone https://github.com/Microsoft/vcpkg.git
           cd vcpkg
           git checkout ${{ env.VCPKG_COMMIT }}
-          ./bootstrap-vcpkg${{ runner.os == 'Windows' && '.bat' || '.sh' }}
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            ./bootstrap-vcpkg.bat
+          else
+            ./bootstrap-vcpkg.sh
+          fi
 
       - name: Configure CMake
+        shell: bash
+        env:
+          CC: ${{ matrix.config.cc }}
+          CXX: ${{ matrix.config.cxx }}
         run: |
-          cmake -B ${{github.workspace}}/build -G Ninja `
-            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} `
-            -DPROFILE_NAME=shared `
+          cmake -B ${{github.workspace}}/build \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
+            -DPROFILE_NAME=shared \
             -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake
-        shell: pwsh
 
       - name: Build
+        shell: bash
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
       - name: Upload Artifacts
