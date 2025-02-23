@@ -170,10 +170,17 @@ jobs:
             -DSTRIPPED_VERSION=${{ matrix.profile.strip }} \
             -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
-      - name: Build
+      - name: Build Unix
+        if: runner.os != 'Windows'
         shell: bash
-        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+        run: |
+          cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
+      - name: Build Windows
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
       - name: Test
         shell: bash
         run: |
