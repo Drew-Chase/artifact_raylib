@@ -1,4 +1,13 @@
 cmake_minimum_required(VERSION 3.30)
+
+# Enable vcpkg manifest mode
+set(VCPKG_MANIFEST_MODE ON)
+
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg.json")
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+            CACHE STRING "")
+endif ()
+
 project(artifact_raylib)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -20,7 +29,6 @@ option(REMOVE_DEBUG_INFO "Remove debug information from the build" OFF) # Defaul
 # Add -DSTRIPPED_VERSION=ON/OFF to the compiler
 option(STRIPPED_VERSION "Create a stripped version of the build without certain flags" OFF) # Default is OFF
 
-
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/${CMAKE_PROJECT_NAME}/${PROFILE_NAME}")
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES INTERMEDIATE_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/obj/${CMAKE_PROJECT_NAME}/${PROFILE_NAME}")
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME "${CMAKE_PROJECT_NAME}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${PROFILE_NAME}")
@@ -35,3 +43,15 @@ endif ()
 if (NOT STRIPPED_VERSION)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static-libgcc -static-libstdc++ -static -lpthread")
 endif ()
+
+if (PROFILE_NAME STREQUAL "debug")
+    set(CMAKE_BUILD_TYPE Debug)
+else ()
+    set(CMAKE_BUILD_TYPE Release)
+    if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,--subsystem,windows")
+    endif ()
+endif ()
+# Add automatic linking for vcpkg packages
+find_package(raylib CONFIG REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE raylib)
