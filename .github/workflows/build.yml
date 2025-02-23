@@ -32,7 +32,7 @@ on:
         description: 'Custom Release Tag (leave empty for auto-generated)'
         required: false
         type: string
-# Add this permissions block
+
 permissions:
   contents: write
   packages: write
@@ -44,7 +44,7 @@ env:
 
 jobs:
   build:
-    name: ${{ matrix.config.name }}
+    name: ${{ matrix.config.name }}-${{ matrix.profile.name }}
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
@@ -68,6 +68,17 @@ jobs:
             os: macos-latest,
             cc: "clang",
             cxx: "clang++"
+          }
+        profile:
+          - {
+            name: "minimal",
+            cmake_name: "minimal",
+            strip: true
+          }
+          - {
+            name: "standalone",
+            cmake_name: "standalone",
+            strip: false
           }
 
     steps:
@@ -138,8 +149,11 @@ jobs:
           cmake -B ${{github.workspace}}/build ^
           -G Ninja ^
           -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} ^
-          -DPROFILE_NAME=shared ^
-          -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake
+          -DPROFILE_NAME=${{ matrix.profile.cmake_name }} ^
+          -DREMOVE_DEBUG_INFO=ON ^
+          -DSTRIPPED_VERSION=${{ matrix.profile.strip }} ^
+          -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake ^
+          -DVCPKG_TARGET_TRIPLET=x64-windows-static
 
       - name: Configure CMake Unix
         if: runner.os != 'Windows'
@@ -151,27 +165,32 @@ jobs:
           cmake -B ${{github.workspace}}/build \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-            -DPROFILE_NAME=shared \
+            -DPROFILE_NAME=${{ matrix.profile.cmake_name }} \
+            -DREMOVE_DEBUG_INFO=ON \
+            -DSTRIPPED_VERSION=${{ matrix.profile.strip }} \
             -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
-      - name: Build Windows
-        if: runner.os == 'Windows'
-        shell: cmd
-        run: |
-          call "%PROGRAMFILES%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-
-      - name: Build Unix
-        if: runner.os != 'Windows'
+      - name: Build
         shell: bash
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+      - name: Test
+        shell: bash
+        run: |
+          cd ${{github.workspace}}/build
+          ctest -C ${{env.BUILD_TYPE}} --output-on-failure
+
+      - name: Prepare artifacts
+        shell: bash
+        run: |
+          cd ${{github.workspace}}/bin/artifact_raylib/${{ matrix.profile.cmake_name }}
+          zip -r ../../artifact_raylib-${{ runner.os }}-${{ matrix.profile.name }}.zip ./*
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: artifact_raylib-${{ runner.os }}-${{ env.BUILD_TYPE }}
-          path: |
-            ${{github.workspace}}/bin/artifact_raylib/**/*
+          name: artifact_raylib-${{ runner.os }}-${{ matrix.profile.name }}
+          path: ${{github.workspace}}/bin/artifact_raylib-${{ runner.os }}-${{ matrix.profile.name }}.zip
           if-no-files-found: error
 
   release:
@@ -199,11 +218,6 @@ jobs:
             echo "tag=v$(date +'%Y.%m.%d-%H%M')" >> $GITHUB_OUTPUT
           fi
 
-      - name: List artifacts
-        run: |
-          echo "Contents of artifacts directory:"
-          ls -R artifacts/
-
       - name: Create Release
         uses: softprops/action-gh-release@v1
         env:
@@ -211,7 +225,7 @@ jobs:
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           name: Release ${{ steps.tag.outputs.tag }}
-          files: artifacts/**/*
+          files: artifacts/**/*.zip
           prerelease: ${{ github.event.inputs.release_type == 'prerelease' }}
           generate_release_notes: true
           fail_on_unmatched_files: false
