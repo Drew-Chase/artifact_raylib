@@ -3,6 +3,14 @@
 # Change to project root directory
 cd "$(dirname "$0")/../.."
 
+# Determine OS type and number of CPU cores
+OS_TYPE=$(uname -s)
+if [ "$OS_TYPE" = "Darwin" ]; then
+    NUM_CORES=$(sysctl -n hw.ncpu)
+else
+    NUM_CORES=$(nproc)
+fi
+
 # Check if VCPKG_ROOT environment variable is set and valid
 if [ -n "$VCPKG_ROOT" ] && [ -f "$VCPKG_ROOT/vcpkg" ]; then
     echo "Using VCPKG from environment: $VCPKG_ROOT"
@@ -34,12 +42,21 @@ fi
 mkdir -p bin/obj/shared
 cd bin/obj/shared
 
+# Set macOS-specific flags if needed
+if [ "$OS_TYPE" = "Darwin" ]; then
+    export MACOSX_DEPLOYMENT_TARGET=10.15
+    CMAKE_EXTRA_FLAGS="-DCMAKE_OSX_ARCHITECTURES='arm64;x86_64'"
+else
+    CMAKE_EXTRA_FLAGS=""
+fi
+
 # Configure and build
 cmake -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
       -DPROFILE_NAME=shared \
       -DREMOVE_DEBUG_INFO=ON \
       -DSTRIPPED_VERSION=ON \
+      $CMAKE_EXTRA_FLAGS \
       -G "Ninja" ../../..
-cmake --build . -j $(nproc)
+cmake --build . -j $NUM_CORES
 
 cd ../../..
