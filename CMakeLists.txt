@@ -41,8 +41,13 @@ if (REMOVE_DEBUG_INFO)
 endif ()
 
 if (NOT STRIPPED_VERSION)
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static-libgcc -static-libstdc++ -static -lpthread")
-endif ()
+    if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static-libgcc -static-libstdc++ -static")
+    elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static-libgcc -static-libstdc++ -static -lpthread")
+    endif()
+    # macOS doesn't need these flags and they cause issues
+endif()
 
 if (PROFILE_NAME STREQUAL "debug")
     set(CMAKE_BUILD_TYPE Debug)
@@ -52,6 +57,9 @@ else ()
         set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,--subsystem,windows")
     endif ()
 endif ()
+
+
 # Add automatic linking for vcpkg packages
 find_package(raylib CONFIG REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE raylib)
+find_package(glfw3 CONFIG REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE raylib glfw)
