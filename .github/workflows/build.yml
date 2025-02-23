@@ -5,10 +5,36 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch: # Allow manual triggers
+  workflow_dispatch: # Manual trigger with parameters
+    inputs:
+      build_type:
+        description: 'Build Type (Release/Debug)'
+        required: true
+        default: 'Release'
+        type: choice
+        options:
+          - Release
+          - Debug
+      create_release:
+        description: 'Create GitHub Release'
+        required: true
+        default: false
+        type: boolean
+      release_type:
+        description: 'Release Type'
+        required: true
+        default: 'prerelease'
+        type: choice
+        options:
+          - prerelease
+          - release
+      custom_tag:
+        description: 'Custom Release Tag (leave empty for auto-generated)'
+        required: false
+        type: string
 
 env:
-  BUILD_TYPE: Release
+  BUILD_TYPE: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type || 'Release' }}
   VCPKG_COMMIT: '5a1b13ca83f32c01d40a779747b5cb59d359ac2f' # Matches builtin-baseline from vcpkg.json
 
 jobs:
@@ -40,7 +66,7 @@ jobs:
           }
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install Linux Dependencies
         if: runner.os == 'Linux'
@@ -64,7 +90,7 @@ jobs:
           choco install ninja
 
       - name: Cache vcpkg
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ${{ github.workspace }}/vcpkg
@@ -92,31 +118,42 @@ jobs:
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: artifact_raylib-${{ runner.os }}
+          name: artifact_raylib-${{ runner.os }}-${{ env.BUILD_TYPE }}
           path: |
             ${{github.workspace}}/bin/artifact_raylib/**/*
           if-no-files-found: error
 
   release:
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && inputs.create_release)
     runs-on: ubuntu-latest
     steps:
       - name: Download All Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: artifacts
+
+      - name: Generate Release Tag
+        id: tag
+        run: |
+          if [ "${{ github.event.inputs.custom_tag }}" != "" ]; then
+            echo "tag=${{ github.event.inputs.custom_tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=build-${{ env.BUILD_TYPE }}-$(date +'%Y%m%d-%H%M%S')-${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          name: "Automated Build ${{ github.sha }}"
-          tag_name: "build-${{ github.sha }}"
+          name: "${{ env.BUILD_TYPE }} Build ${{ steps.tag.outputs.tag }}"
+          tag_name: ${{ steps.tag.outputs.tag }}
           draft: false
-          prerelease: true
+          prerelease: ${{ github.event.inputs.release_type == 'prerelease' }}
           files: artifacts/**/*
           generate_release_notes: true
         env:
