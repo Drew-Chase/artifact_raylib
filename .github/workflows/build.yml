@@ -103,18 +103,41 @@ jobs:
         shell: bash
         run: |
           if [ ! -d "vcpkg" ]; then
-          git clone https://github.com/Microsoft/vcpkg.git
+            git clone https://github.com/Microsoft/vcpkg.git
           fi
           cd vcpkg
           git fetch
           git checkout ${{ env.VCPKG_COMMIT }}
           if [ "${{ runner.os }}" = "Windows" ]; then
-          ./bootstrap-vcpkg.bat
+            ./bootstrap-vcpkg.bat
           else
-          ./bootstrap-vcpkg.sh
+            ./bootstrap-vcpkg.sh
           fi
 
-      - name: Configure CMake
+      - name: Verify vcpkg setup
+        shell: bash
+        run: |
+          if [ ! -f "${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake" ]; then
+            echo "vcpkg toolchain file not found!"
+            exit 1
+          fi
+
+      - name: Configure CMake Windows
+        if: runner.os == 'Windows'
+        shell: cmd
+        env:
+          CC: ${{ matrix.config.cc }}
+          CXX: ${{ matrix.config.cxx }}
+        run: |
+          call "%PROGRAMFILES%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cmake -B ${{github.workspace}}/build ^
+          -G Ninja ^
+          -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} ^
+          -DPROFILE_NAME=shared ^
+          -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+      - name: Configure CMake Unix
+        if: runner.os != 'Windows'
         shell: bash
         env:
           CC: ${{ matrix.config.cc }}
@@ -126,7 +149,15 @@ jobs:
             -DPROFILE_NAME=shared \
             -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
-      - name: Build
+      - name: Build Windows
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          call "%PROGRAMFILES%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+      - name: Build Unix
+        if: runner.os != 'Windows'
         shell: bash
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
@@ -141,33 +172,31 @@ jobs:
   release:
     needs: build
     if: >-
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'workflow_dispatch' && inputs.create_release)
+      (github.event_name == 'workflow_dispatch' && inputs.create_release) ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     steps:
-      - name: Download All Artifacts
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
 
-      - name: Generate Release Tag
+      - name: Generate release tag
         id: tag
         run: |
-          if [ "${{ github.event.inputs.custom_tag }}" != "" ]; then
+          if [[ "${{ github.event.inputs.custom_tag }}" != "" ]]; then
             echo "tag=${{ github.event.inputs.custom_tag }}" >> $GITHUB_OUTPUT
           else
-            echo "tag=build-${{ env.BUILD_TYPE }}-$(date +'%Y%m%d-%H%M%S')-${{ github.sha }}" >> $GITHUB_OUTPUT
+            echo "tag=v$(date +'%Y.%m.%d-%H%M')" >> $GITHUB_OUTPUT
           fi
 
       - name: Create Release
-        id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          name: "${{ env.BUILD_TYPE }} Build ${{ steps.tag.outputs.tag }}"
           tag_name: ${{ steps.tag.outputs.tag }}
-          draft: false
-          prerelease: ${{ github.event.inputs.release_type == 'prerelease' }}
+          name: Release ${{ steps.tag.outputs.tag }}
           files: artifacts/**/*
+          prerelease: ${{ github.event.inputs.release_type == 'prerelease' }}
           generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
