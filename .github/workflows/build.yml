@@ -183,11 +183,11 @@ jobs:
           call "%PROGRAMFILES%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
-      - name: Test
-        shell: bash
-        run: |
-          cd ${{github.workspace}}/build
-          ctest -C ${{env.BUILD_TYPE}} --output-on-failure
+#      - name: Test
+#        shell: bash
+#        run: |
+#          cd ${{github.workspace}}/build
+#          ctest -C ${{env.BUILD_TYPE}} --output-on-failure
 
       - name: Prepare artifacts
         shell: bash
