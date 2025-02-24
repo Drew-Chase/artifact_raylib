@@ -189,13 +189,13 @@ jobs:
         shell: cmd
         run: |
           cd ${{github.workspace}}\build
-          ctest -C %BUILD_TYPE% --output-on-failure
+          ctest -C ${{env.BUILD_TYPE}} --output-on-failure
       - name: Prepare artifacts
         if: runner.os == 'Windows'
         shell: cmd
         run: |
-          cd ${{github.workspace}}\bin\artifact_raylib\%matrix.profile.cmake_name%
-          powershell Compress-Archive -Path * -DestinationPath ..\..\artifact_raylib-%runner.os%-%matrix.profile.name%.zip
+          cd ${{github.workspace}}\bin\artifact_raylib\${{ matrix.profile.cmake_name }}
+          powershell Compress-Archive -Path * -DestinationPath ..\..\artifact_raylib-${{ runner.os }}-${{ matrix.profile.name }}.zip
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
