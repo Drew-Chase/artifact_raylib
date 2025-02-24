@@ -79,6 +79,10 @@ else ()
     endif ()
 endif ()
 
+if(WIN32)
+    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE winmm)
+endif()
+
 
 # Add automatic linking for vcpkg packages
 find_package(raylib CONFIG REQUIRED)
