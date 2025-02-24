@@ -176,6 +176,7 @@ jobs:
         run: |
           cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
+
       - name: Build Windows
         if: runner.os == 'Windows'
         shell: cmd
@@ -183,25 +184,24 @@ jobs:
           call "%PROGRAMFILES%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
-#      - name: Test
-#        shell: bash
-#        run: |
-#          cd ${{github.workspace}}/build
-#          ctest -C ${{env.BUILD_TYPE}} --output-on-failure
-
-      - name: Prepare artifacts
-        shell: bash
+      - name: Test
+        if: runner.os == 'Windows'
+        shell: cmd
         run: |
-          cd ${{github.workspace}}/bin/artifact_raylib/${{ matrix.profile.cmake_name }}
-          zip -r ../../artifact_raylib-${{ runner.os }}-${{ matrix.profile.name }}.zip ./*
-
+          cd ${{github.workspace}}\build
+          ctest -C %BUILD_TYPE% --output-on-failure
+      - name: Prepare artifacts
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          cd ${{github.workspace}}\bin\artifact_raylib\%matrix.profile.cmake_name%
+          powershell Compress-Archive -Path * -DestinationPath ..\..\artifact_raylib-%runner.os%-%matrix.profile.name%.zip
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: artifact_raylib-${{ runner.os }}-${{ matrix.profile.name }}
           path: ${{github.workspace}}/bin/artifact_raylib-${{ runner.os }}-${{ matrix.profile.name }}.zip
           if-no-files-found: error
-
   release:
     permissions:
       contents: write
