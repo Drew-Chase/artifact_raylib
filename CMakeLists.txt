@@ -29,6 +29,8 @@ option(REMOVE_DEBUG_INFO "Remove debug information from the build" OFF) # Defaul
 # Add -DSTRIPPED_VERSION=ON/OFF to the compiler
 option(STRIPPED_VERSION "Create a stripped version of the build without certain flags" OFF) # Default is OFF
 
+# Setting up the bin and obj directories as the good lord intended.
+# Non of that `cmake-build-*` crap.
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/${CMAKE_PROJECT_NAME}/${PROFILE_NAME}")
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES INTERMEDIATE_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/obj/${CMAKE_PROJECT_NAME}/${PROFILE_NAME}")
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME "${CMAKE_PROJECT_NAME}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${PROFILE_NAME}")
@@ -40,6 +42,7 @@ if (REMOVE_DEBUG_INFO)
     target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE -Oz)
 endif ()
 
+# I swear to god, if the github workflow fails one more time due to different compiler options, I'm going to force delete this project 😠
 if (NOT STRIPPED_VERSION)
     if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         if (MSVC)
@@ -52,13 +55,13 @@ if (NOT STRIPPED_VERSION)
                 endif()
             endforeach()
         else()
-            # For MinGW
+            # For GCC/CLang
             set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static-libgcc -static-libstdc++ -static")
         endif()
     elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static-libgcc -static-libstdc++ -static -lpthread")
     endif()
-    # macOS doesn't need these flags and they cause issues
+    # macOS doesn't need these flags and they cause issues, this is because macOS is a precious little flower that doesn't want any of those icky `flags` 😭
 endif()
 
 if (PROFILE_NAME STREQUAL "debug")
@@ -66,7 +69,13 @@ if (PROFILE_NAME STREQUAL "debug")
 else ()
     set(CMAKE_BUILD_TYPE Release)
     if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-        set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,--subsystem,windows")
+        if (MSVC)
+            set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
+        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+            set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-mwindows")
+        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+            set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,--subsystem,windows")
+        endif ()
     endif ()
 endif ()
 
