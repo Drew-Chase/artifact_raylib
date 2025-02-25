@@ -8,11 +8,11 @@ namespace artifact
     class ResourceManager
     {
     public:
-        static Resource get_resource(const char *identifier, const ResourceType &type);
-        static Resource get_texture(const char *identifier);
-        static Resource get_json(const char *identifier);
-        static Resource get_text(const char *identifier);
-        static Resource get_binary(const char *identifier);
-        static ResourceType get_type(const std::string &path);
+        static Resource getResource(const char *identifier, const ResourceType &type);
+        static Resource getTexture(const char *identifier);
+        static Resource getJson(const char *identifier);
+        static Resource getText(const char *identifier);
+        static Resource getBinary(const char *identifier);
+        static ResourceType getType(const std::string &path);
     };
 } // namespace artifact
