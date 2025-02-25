@@ -1,8 +1,9 @@
 #pragma once
+#include "stage.h"
 
 namespace artifact
 {
-    class TitleScreen
+    class TitleScreen : public Stage
     {
     public:
     };
