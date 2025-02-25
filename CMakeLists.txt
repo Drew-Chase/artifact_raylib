@@ -34,6 +34,7 @@ option(STRIPPED_VERSION "Create a stripped version of the build without certain 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/${CMAKE_PROJECT_NAME}/${PROFILE_NAME}")
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES INTERMEDIATE_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/obj/${CMAKE_PROJECT_NAME}/${PROFILE_NAME}")
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME "${CMAKE_PROJECT_NAME}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${PROFILE_NAME}")
+set(CMAKE_BINARY_DIR "${CMAKE_SOURCE_DIR}/bin/obj/${PROFILE_NAME}")
 set(CMAKE_CACHEFILE_DIR ${PROJECT_SOURCE_DIR}/bin/obj/cmake/${CMAKE_PROJECT_NAME})
 
 if (REMOVE_DEBUG_INFO)
@@ -68,10 +69,6 @@ if (NOT STRIPPED_VERSION)
     elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static-libgcc -static-libstdc++ -static -lpthread")
     endif ()
-    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "C:/Windows/System32/vcruntime140.dll"
-            $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>)
     # macOS doesn't need these flags and they cause issues, this is because macOS is a precious little flower that doesn't want any of those icky `flags` 😭
 endif ()
 if (PROFILE_NAME STREQUAL "debug")
@@ -93,6 +90,11 @@ if (WIN32)
     target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE winmm)
 endif ()
 
+
+add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_HOME_DIRECTORY}/assets"
+        $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>/game)
 
 # Add automatic linking for vcpkg packages
 find_package(raylib CONFIG REQUIRED)
