@@ -3,10 +3,7 @@ cmake_minimum_required(VERSION 3.30)
 # Enable vcpkg manifest mode
 set(VCPKG_MANIFEST_MODE ON)
 
-if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg.json")
-    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
-            CACHE STRING "")
-endif ()
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 
 project(artifact_raylib)
 
@@ -99,4 +96,7 @@ add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
 # Add automatic linking for vcpkg packages
 find_package(raylib CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE raylib glfw)
+find_package(spdlog CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
+
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE raylib glfw spdlog::spdlog fmt::fmt)
