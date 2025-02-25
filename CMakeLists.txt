@@ -37,33 +37,43 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME "${CMAKE_PROJ
 set(CMAKE_CACHEFILE_DIR ${PROJECT_SOURCE_DIR}/bin/obj/cmake/${CMAKE_PROJECT_NAME})
 
 if (REMOVE_DEBUG_INFO)
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -s")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
-    target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE -Oz)
+    if (MSVC)
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /RTC- /D NDEBUG /DEBUG:NONE")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /RTC- /D NDEBUG /DEBUG:NONE")
+        target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE /O2 /GL)
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -s")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
+        target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE -Oz)
+    endif ()
 endif ()
-
 # I swear to god, if the github workflow fails one more time due to different compiler options, I'm going to force delete this project 😠
 if (NOT STRIPPED_VERSION)
     if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
         if (MSVC)
             # Static linking for MSVC runtime
             set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-            foreach(flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+            foreach (flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
                     CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-                if(${flag_var} MATCHES "/MD")
+                if (${flag_var} MATCHES "/MD")
                     string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-                endif()
-            endforeach()
-        else()
+                endif ()
+            endforeach ()
+            target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE /MT) # Ensure static runtime linking
+        else ()
             # For GCC/CLang
             set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static-libgcc -static-libstdc++ -static")
-        endif()
+            target_link_options(${CMAKE_PROJECT_NAME} PRIVATE -static -static-libgcc -static-libstdc++)
+        endif ()
     elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static-libgcc -static-libstdc++ -static -lpthread")
-    endif()
+    endif ()
+    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "C:/Windows/System32/vcruntime140.dll"
+            $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>)
     # macOS doesn't need these flags and they cause issues, this is because macOS is a precious little flower that doesn't want any of those icky `flags` 😭
-endif()
-
+endif ()
 if (PROFILE_NAME STREQUAL "debug")
     set(CMAKE_BUILD_TYPE Debug)
 else ()
@@ -79,9 +89,9 @@ else ()
     endif ()
 endif ()
 
-if(WIN32)
+if (WIN32)
     target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE winmm)
-endif()
+endif ()
 
 
 # Add automatic linking for vcpkg packages
