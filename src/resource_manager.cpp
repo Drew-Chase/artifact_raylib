@@ -10,11 +10,11 @@
 
 namespace artifact
 {
-    Resource ResourceManager::get_texture(const char *identifier) { return get_resource(identifier, ResourceType::TEXTURE); }
-    Resource ResourceManager::get_json(const char *identifier) { return get_resource(identifier, ResourceType::JSON); }
-    Resource ResourceManager::get_text(const char *identifier) { return get_resource(identifier, ResourceType::TEXT); }
-    Resource ResourceManager::get_binary(const char *identifier) { return get_resource(identifier, ResourceType::BINARY); }
-    Resource ResourceManager::get_resource(const char *identifier, const ResourceType &type)
+    Resource ResourceManager::getTexture(const char *identifier) { return getResource(identifier, ResourceType::TEXTURE); }
+    Resource ResourceManager::getJson(const char *identifier) { return getResource(identifier, ResourceType::JSON); }
+    Resource ResourceManager::getText(const char *identifier) { return getResource(identifier, ResourceType::TEXT); }
+    Resource ResourceManager::getBinary(const char *identifier) { return getResource(identifier, ResourceType::BINARY); }
+    Resource ResourceManager::getResource(const char *identifier, const ResourceType &type)
     {
         std::string path;
         if (type == ResourceType::TEXTURE)
@@ -35,7 +35,7 @@ namespace artifact
                 type,
         };
     }
-    ResourceType ResourceManager::get_type(const std::string &path)
+    ResourceType ResourceManager::getType(const std::string &path)
     {
         // Find the last occurrence of '.' to get the extension
         const size_t dotPos = path.rfind('.');
