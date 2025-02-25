@@ -1,9 +1,9 @@
-
 #include "game.h"
 
 #include <raylib.h>
 
-namespace artifact {
+namespace artifact
+{
     void Game::run()
     {
         InitWindow(800, 450, "raylib [core] example - basic window");
@@ -18,4 +18,4 @@ namespace artifact {
 
         CloseWindow();
     }
-} // artifact
+} // namespace artifact

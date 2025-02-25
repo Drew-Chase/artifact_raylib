@@ -7,4 +7,4 @@ namespace artifact
     public:
         static void run();
     };
-} // artifact
+} // namespace artifact
