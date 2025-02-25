@@ -1,13 +1,9 @@
 #pragma once
+#include "ui/components/component_base.h"
 
 namespace artifact
 {
-    class MenuBase
+    class MenuBase:public ComponentBase
     {
-        const char *identifier;
-
-    public:
-        explicit MenuBase(const char *identifier) { this->identifier = identifier; }
-        void draw(int width, int height, int x, int y, int mouse_x, int mouse_y);
     };
 } // namespace artifact
