@@ -40,7 +40,6 @@ permissions:
 
 env:
   BUILD_TYPE: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type || 'Release' }}
-  VCPKG_COMMIT: '5a1b13ca83f32c01d40a779747b5cb59d359ac2f'
 
 jobs:
   build:
@@ -84,6 +83,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Conan
+        run: |
+          pip install conan
+
       - name: Install Linux Dependencies
         if: runner.os == 'Linux'
         run: |
@@ -105,38 +108,16 @@ jobs:
         run: |
           choco install ninja
 
-      - name: Cache vcpkg
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ github.workspace }}/vcpkg
-            !${{ github.workspace }}/vcpkg/buildtrees
-            !${{ github.workspace }}/vcpkg/packages
-            !${{ github.workspace }}/vcpkg/downloads
-          key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}-${{ env.VCPKG_COMMIT }}
-
-      - name: Setup vcpkg
-        shell: bash
+      - name: Configure Conan profile
         run: |
-          if [ ! -d "vcpkg" ]; then
-            git clone https://github.com/Microsoft/vcpkg.git
-          fi
-          cd vcpkg
-          git fetch
-          git checkout ${{ env.VCPKG_COMMIT }}
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            ./bootstrap-vcpkg.bat
-          else
-            ./bootstrap-vcpkg.sh
-          fi
+          conan profile detect
+          conan profile update settings.compiler.runtime=MT default
 
-      - name: Verify vcpkg setup
-        shell: bash
+      - name: Install dependencies with Conan
         run: |
-          if [ ! -f "${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake" ]; then
-            echo "vcpkg toolchain file not found!"
-            exit 1
-          fi
+          conan install . --build=missing -if=${{github.workspace}}/build \
+            -pr:b=default -pr:h=default \
+            -s build_type=${{env.BUILD_TYPE}}
 
       - name: Configure CMake Windows
         if: runner.os == 'Windows'
@@ -152,8 +133,7 @@ jobs:
           -DPROFILE_NAME=${{ matrix.profile.cmake_name }} ^
           -DREMOVE_DEBUG_INFO=ON ^
           -DSTRIPPED_VERSION=${{ matrix.profile.strip }} ^
-          -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake ^
-          -DVCPKG_TARGET_TRIPLET=x64-windows-static
+          -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/build/conan_toolchain.cmake
 
       - name: Configure CMake Unix
         if: runner.os != 'Windows'
@@ -168,7 +148,7 @@ jobs:
             -DPROFILE_NAME=${{ matrix.profile.cmake_name }} \
             -DREMOVE_DEBUG_INFO=ON \
             -DSTRIPPED_VERSION=${{ matrix.profile.strip }} \
-            -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake
+            -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/build/conan_toolchain.cmake
 
       - name: Build Unix
         if: runner.os != 'Windows'

@@ -1,10 +1,5 @@
 cmake_minimum_required(VERSION 3.30)
 
-# Enable vcpkg manifest mode
-set(VCPKG_MANIFEST_MODE ON)
-
-set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
-
 project(artifact_raylib)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -83,20 +78,17 @@ else ()
     endif ()
 endif ()
 
-if (WIN32)
-    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE winmm)
-endif ()
-
-
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_HOME_DIRECTORY}/assets"
         $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>/game)
 
-# Add automatic linking for vcpkg packages
-find_package(raylib CONFIG REQUIRED)
-find_package(glfw3 CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
-find_package(fmt CONFIG REQUIRED)
+# Add automatic linking for conan packages
+find_package(raylib)
+find_package(spdlog)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE raylib glfw spdlog::spdlog fmt::fmt)
+
+target_link_libraries(${CMAKE_PROJECT_NAME}
+        raylib
+        spdlog::spdlog
+)
