@@ -2,18 +2,21 @@
 echo Building All Configurations
 :: Build Debug configuration
 echo Building Debug configuration...
-call scripts\windows\debug.bat
+call debug.bat
 if %ERRORLEVEL% neq 0 goto :error
+cd scripts\windows\
 
 :: Build Shared configuration
 echo Building Shared configuration...
-call scripts\windows\minimal.bat
+call minimal.bat
 if %ERRORLEVEL% neq 0 goto :error
+cd scripts\windows\
 
 :: Build Bundled configuration
 echo Building Bundled configuration...
-call scripts\windows\standalone.bat
+call standalone.bat
 if %ERRORLEVEL% neq 0 goto :error
+cd scripts\windows\
 
 echo All configurations built successfully!
 goto :end
