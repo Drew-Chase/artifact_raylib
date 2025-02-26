@@ -114,9 +114,7 @@ jobs:
 
       - name: Install dependencies with Conan
         run: |
-          conan install . --build=missing -if=${{github.workspace}}/build \
-            -pr:b=default -pr:h=default \
-            -s build_type=${{env.BUILD_TYPE}}
+          conan install . --build=missing
 
       - name: Configure CMake Windows
         if: runner.os == 'Windows'
