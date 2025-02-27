@@ -8,9 +8,6 @@
 namespace artifact
 {
     size_t frames_drawn = 0;
-    void TitleScreen::draw() const
-    {
-        DrawText(fmt::format("Frames Drawn: {}", frames_drawn).c_str(), 20, 100, 24, WHITE);
-        frames_drawn++;
-    }
+    void TitleScreen::draw() const { DrawText(fmt::format("Frames Drawn: {}", frames_drawn).c_str(), 20, 100, 24, WHITE); }
+    void TitleScreen::update() const { frames_drawn++; }
 } // namespace artifact
