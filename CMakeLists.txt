@@ -78,6 +78,11 @@ else ()
     endif ()
 endif ()
 
+
+if (WIN32)
+    target_sources(${CMAKE_PROJECT_NAME} PRIVATE "resources/resources.rc")
+endif ()
+
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_HOME_DIRECTORY}/assets"
