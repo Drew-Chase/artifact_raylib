@@ -71,25 +71,25 @@ namespace artifact
         switch (msgType)
         {
             case LOG_TRACE:
-                spdlog::trace(formattedMessage);
+                logger->trace(formattedMessage);
                 break;
             case LOG_DEBUG:
-                spdlog::debug(formattedMessage);
+                logger->debug(formattedMessage);
                 break;
             case LOG_INFO:
-                spdlog::info(formattedMessage);
+                logger->info(formattedMessage);
                 break;
             case LOG_WARNING:
-                spdlog::warn(formattedMessage);
+                logger->warn(formattedMessage);
                 break;
             case LOG_ERROR:
-                spdlog::error(formattedMessage);
+                logger->error(formattedMessage);
                 break;
             case LOG_FATAL:
-                spdlog::critical(formattedMessage);
+                logger->critical(formattedMessage);
                 break;
             default:
-                spdlog::info("Unknown log type: {}", msgType);
+                logger->info("Unknown log type: {}", msgType);
                 break;
         }
         logger->flush(); // Explicit flush after each message
