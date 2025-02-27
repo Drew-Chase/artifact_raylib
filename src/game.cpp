@@ -41,10 +41,12 @@ namespace artifact
         spdlog::flush_every(std::chrono::seconds(3));
         SetTraceLogCallback(register_log_callback);
 
-
         const auto game = get_instance(); // Initialize the singleton.
         StageManager *manager = game->get_stage_manager();
         InitWindow(1280, 720, "Artifact: The Journey Unraveled");
+
+        const auto window_icon = LoadImage("game/app-icon.png");
+        SetWindowIcon(window_icon);
         SetTargetFPS(60);
         manager->load_stage(TITLE_SCREEN);
 
@@ -59,6 +61,7 @@ namespace artifact
             EndDrawing();
         }
 
+        UnloadImage(window_icon);
         CloseWindow();
     }
 
