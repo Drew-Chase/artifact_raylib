@@ -21,7 +21,7 @@ namespace artifact
 
         template<class T>
             requires std::is_base_of_v<Stage, std::remove_pointer_t<T>>
-        Stage *loadStage(T stage)
+        Stage *load_stage(T stage)
         {
             // destroy the current stage
             if (current_stage != nullptr)

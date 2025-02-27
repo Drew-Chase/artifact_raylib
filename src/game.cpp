@@ -15,7 +15,7 @@ namespace artifact
 
     Game::~Game() { delete this->manager; }
 
-    Game *Game::getInstance()
+    Game *Game::get_instance()
     {
         if (instance == nullptr)
         {
@@ -39,13 +39,14 @@ namespace artifact
         const auto logger = std::make_shared<spdlog::async_logger>("game_logger", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
         register_logger(logger);
         spdlog::flush_every(std::chrono::seconds(3));
-        SetTraceLogCallback(SpdLoggerCallback);
+        SetTraceLogCallback(register_log_callback);
 
 
-        const auto game = getInstance(); // Initialize the singleton.
-        StageManager *manager = game->getManager();
+        const auto game = get_instance(); // Initialize the singleton.
+        StageManager *manager = game->get_stage_manager();
         InitWindow(1280, 720, "Artifact: The Journey Unraveled");
-        manager->loadStage(Stage::TITLE_SCREEN);
+        SetTargetFPS(60);
+        manager->load_stage(TITLE_SCREEN);
 
         while (!WindowShouldClose())
         {
@@ -61,10 +62,9 @@ namespace artifact
         CloseWindow();
     }
 
-    void Game::SpdLoggerCallback(int msgType, const char *message, va_list args)
+    void Game::register_log_callback(int msgType, const char *message, va_list args)
     {
-        auto logger = spdlog::get("game_logger");
-
+        const auto logger = spdlog::get("game_logger");
         char formattedMessage[1024];
         vsnprintf(formattedMessage, sizeof(formattedMessage), message, args);
 
