@@ -5,5 +5,8 @@
 namespace artifact
 {
     class MenuStage : public Stage, public MenuBase
-    {};
+    {
+    public:
+        explicit MenuStage(const char *identifier) : Stage(identifier), MenuBase(identifier) {}
+    };
 } // namespace artifact
