@@ -1,16 +1,16 @@
 
 #include "../include/stages/title_screen.h"
 
-#include "stages/stage.h"
+#include <raylib.h>
+
+#include "game.h"
 
 namespace artifact
 {
-    void Stage::draw(bool first_draw) const
+    size_t frames_drawn = 0;
+    void TitleScreen::draw() const
     {
-
-    }
-    void Stage::update(bool first_update) const
-    {
-
+        DrawText(fmt::format("Frames Drawn: {}", frames_drawn).c_str(), 20, 100, 24, WHITE);
+        frames_drawn++;
     }
 } // namespace artifact
