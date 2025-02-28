@@ -1,6 +1,5 @@
 #pragma once
 #include <cstdarg>
-#include <spdlog/spdlog.h>
 
 #include "stages/stage_manager.h"
 
@@ -19,9 +18,6 @@ namespace artifact
     public:
         // Get singleton instance
         static Game *get_instance();
-
-        Game(const Game &) = delete;
-        Game &operator=(const Game &) = delete;
 
         // Replace run with static method that uses singleton
         static void run();
