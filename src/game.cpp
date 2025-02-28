@@ -61,6 +61,7 @@ namespace artifact
             EndDrawing();
         }
 
+        manager->getCurrentStage()->destroy();
         UnloadImage(window_icon);
         CloseWindow();
     }
