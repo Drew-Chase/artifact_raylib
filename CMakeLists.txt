@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.30)
 
 project(artifact_raylib)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 file(GLOB_RECURSE HEADERS "include/*.h")
