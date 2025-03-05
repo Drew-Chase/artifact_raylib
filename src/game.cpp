@@ -43,7 +43,7 @@ namespace artifact
 
         const auto game = get_instance(); // Initialize the singleton.
         StageManager *manager = game->get_stage_manager();
-        InitWindow(1920, 1080, "Artifact: The Journey Unraveled");
+        InitWindow(GetScreenWidth(), GetScreenWidth(), "Artifact: The Journey Unraveled");
         ToggleFullscreen();
 
         const auto window_icon = LoadImage("game/app-icon.png");
