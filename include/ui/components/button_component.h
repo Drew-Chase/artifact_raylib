@@ -32,14 +32,11 @@ namespace artifact
         void set_font_size(int size);
         void set_on_click(std::function<void()> onClick);
         void set_text(const char *text);
+        void set_width(int width);
+        void set_height(int height);
+        void set_position(int x, int y);
 
-        void set_position(float new_x, float new_y) {
-            bounds.x = new_x;
-            bounds.y = new_y;
-        }
-
-        float get_height() const { return bounds.height; }
-        float get_width() const { return bounds.width; }
-
+        int get_height() const;
+        int get_width() const;
     };
 } // namespace artifact

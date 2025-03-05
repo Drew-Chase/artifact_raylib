@@ -6,20 +6,21 @@
 
 namespace artifact
 {
-    VerticalListContainer::VerticalListContainer(const char *identifier, const float x, const float y, const float width, const float height, const float gap, const float padding, const Color background_color) : ContainerBase(identifier), x(x), y(y), width(width), height(height), gap(gap), padding_top(padding), padding_bottom(padding), padding_left(padding), padding_right(padding), background_color(background_color) {}
+    VerticalListContainer::VerticalListContainer(const char *identifier, const int x, const int y, const int width, const int height, const int gap, const int padding, const Color background_color) : ContainerBase(identifier), x(x), y(y), width(width), height(height), gap(gap), padding_top(padding), padding_bottom(padding), padding_left(padding), padding_right(padding), background_color(background_color) {}
 
     void VerticalListContainer::draw()
     {
         // Draw the background respecting the padding on all sides evenly
-        DrawRectangle(x - padding_left, y - padding_top, width + padding_right, height + padding_bottom, background_color);
+        DrawRectangle(x - padding_left, y - padding_top, width + padding_left + padding_right, height + padding_top + padding_bottom, background_color);
 
-        float current_y = y + padding_top;
+        int current_y = y + padding_top;
 
         for (const auto &it: std::ranges::reverse_view(entries()))
         {
             if (auto *button = dynamic_cast<ButtonComponent *>(it))
             {
                 button->set_position(x + padding_left, current_y);
+                button->set_width(width - padding_right - padding_left);
                 button->draw();
                 current_y += button->get_height() + gap;
             }
@@ -34,9 +35,9 @@ namespace artifact
         }
     }
 
-    void VerticalListContainer::set_padding(const float padding) { padding_top = padding_bottom = padding_left = padding_right = padding; }
+    void VerticalListContainer::set_padding(const int padding) { padding_top = padding_bottom = padding_left = padding_right = padding; }
 
-    void VerticalListContainer::set_padding(const float top, const float bottom, const float left, const float right)
+    void VerticalListContainer::set_padding(const int top, const int bottom, const int left, const int right)
     {
         padding_top = top;
         padding_bottom = bottom;
@@ -44,13 +45,13 @@ namespace artifact
         padding_right = right;
     }
 
-    void VerticalListContainer::set_position(const float x, const float y)
+    void VerticalListContainer::set_position(const int x, const int y)
     {
         this->x = x;
         this->y = y;
     }
 
-    void VerticalListContainer::set_size(const float width, const float height)
+    void VerticalListContainer::set_size(const int width, const int height)
     {
         this->width = width;
         this->height = height;

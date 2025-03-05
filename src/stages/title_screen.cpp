@@ -15,7 +15,8 @@ namespace artifact
         constexpr int button_height = 50;
         constexpr int button_spacing = 10;
         constexpr int container_width = button_width;
-        constexpr int container_height = button_height * 2 + button_spacing;
+        constexpr int container_padding = 10;
+        constexpr int container_height = button_height * 2 + button_spacing + container_padding * 2;
 
         // Position the container in the center of the screen
         const int container_x = (GetScreenWidth() - container_width) / 2;
@@ -24,7 +25,7 @@ namespace artifact
         button_container = std::make_unique<VerticalListContainer>("button_container", container_x, container_y, container_width, container_height);
 
         button_container->set_gap(button_spacing);
-        button_container->set_padding(10);
+        button_container->set_padding(container_padding);
         button_container->set_background_color(ColorAlpha(RED, .2));
 
         // Create buttons
