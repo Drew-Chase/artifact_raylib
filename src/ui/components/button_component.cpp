@@ -3,7 +3,7 @@
 
 namespace artifact
 {
-    ButtonComponent::ButtonComponent(const char *identifier, int x, int y, int width, int height, const char *buttonText, std::function<void()> clickHandler) : ComponentBase(identifier), bounds{static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)}, isHovered(false), isPressed(false), onClick(std::move(clickHandler)), text(buttonText)
+    ButtonComponent::ButtonComponent(const char *identifier, const int x, const int y, const int width, const int height, const char *buttonText, std::function<void()> clickHandler) : ComponentBase(identifier), bounds{static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)}, isHovered(false), isPressed(false), onClick(std::move(clickHandler)), text(buttonText)
     {
         // Default colors
         normalColor = LIGHTGRAY;
@@ -22,15 +22,14 @@ namespace artifact
         DrawRectangleRec(bounds, currentColor);
 
         // Draw text centered in button
-        const int fontSize = 20;
         const int textWidth = MeasureText(text, fontSize);
-        const int textX = static_cast<int>(bounds.x + (bounds.width - textWidth) / 2);
-        const int textY = static_cast<int>(bounds.y + (bounds.height - fontSize) / 2);
+        const int textX = static_cast<int>(bounds.x + (bounds.width - static_cast<float>(textWidth)) / 2);
+        const int textY = static_cast<int>(bounds.y + (bounds.height - static_cast<float>(this->fontSize)) / 2);
 
-        DrawText(text, textX, textY, fontSize, BLACK);
+        DrawText(text, textX, textY, fontSize, textColor);
     }
 
-    void ButtonComponent::update(int mouseX, int mouseY)
+    void ButtonComponent::update(const int mouseX, const int mouseY)
     {
         const Vector2 mousePoint = {static_cast<float>(mouseX), static_cast<float>(mouseY)};
         isHovered = CheckCollisionPointRec(mousePoint, bounds);
@@ -53,11 +52,26 @@ namespace artifact
             isPressed = false;
         }
     }
-
-    void ButtonComponent::setColors(Color normal, Color hover, Color pressed)
+    void ButtonComponent::set_colors(const Color normal, const Color hover, const Color pressed, const Color text)
     {
         normalColor = normal;
         hoverColor = hover;
         pressedColor = pressed;
+        textColor = text;
     }
+
+    void ButtonComponent::set_normal_color(const Color color) { normalColor = color; }
+
+    void ButtonComponent::set_hover_color(const Color color) { hoverColor = color; }
+
+    void ButtonComponent::set_pressed_color(const Color color) { pressedColor = color; }
+
+    void ButtonComponent::set_text_color(const Color color) { textColor = color; }
+
+    void ButtonComponent::set_font_size(const int size) { fontSize = size; }
+
+    void ButtonComponent::set_on_click(std::function<void()> onClick) { this->onClick = std::move(onClick); }
+
+    void ButtonComponent::set_text(const char *text) { this->text = text; }
+
 } // namespace artifact
