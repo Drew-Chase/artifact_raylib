@@ -1,7 +1,7 @@
-#include <ranges>
 #include "ui/components/containers/container_base.h"
+#include <ranges>
 
-void artifact::ContainerBase::draw(int width, int height, int x, int y) {}
+void artifact::ContainerBase::draw() {}
 void artifact::ContainerBase::update(int mouse_x, int mouse_y) {}
 void artifact::ContainerBase::add_component(ComponentBase *component) { this->components[component->get_identifier()] = component; }
 void artifact::ContainerBase::remove_component(const size_t index)
