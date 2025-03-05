@@ -12,7 +12,7 @@ namespace artifact
         std::map<std::string, ComponentBase *> components;
 
     public:
-        void draw(int width, int height, int x, int y) override;
+        void draw() override;
         void update(int mouse_x, int mouse_y) override;
         virtual void add_component(ComponentBase *component);
         virtual void remove_component(size_t index);
