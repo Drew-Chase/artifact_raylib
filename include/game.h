@@ -14,10 +14,13 @@ namespace artifact
         // Add static instance
         static Game *instance;
         static void register_log_callback(int msgType, const char *message, va_list args);
+        bool isRunning = true;
 
     public:
         // Get singleton instance
         static Game *get_instance();
+        void exit_game() { isRunning = false; }
+
 
         // Replace run with static method that uses singleton
         static void run();
