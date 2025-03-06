@@ -29,7 +29,7 @@ namespace artifact
 
     void VerticalListContainer::update(const int mouse_x, const int mouse_y)
     {
-        for (auto components = entries(); auto *component: components)
+        for (const auto components = entries(); auto *component: components)
         {
             component->update(mouse_x, mouse_y);
         }
