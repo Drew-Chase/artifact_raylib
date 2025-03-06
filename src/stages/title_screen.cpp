@@ -26,7 +26,7 @@ namespace artifact
         // Create buttons
         start_button = std::make_unique<ButtonComponent>("start_button", 0, 0, button_width, button_height, "Start Game", [] { TraceLog(LOG_INFO, "Start button clicked!"); });
 
-        settings_button = std::make_unique<ButtonComponent>("settings_button", 0, 0, button_width, button_height, "Settings Game", [] { Game::get_instance()->get_stage_manager()->load_stage(TITLE_SCREEN); });
+        settings_button = std::make_unique<ButtonComponent>("settings_button", 0, 0, button_width, button_height, "Settings Game", [] { TraceLog(LOG_INFO, "Settings button clicked!"); });
 
         exit_button = std::make_unique<ButtonComponent>("exit_button", 0, 0, button_width, button_height, "Exit Game",
                                                         []
