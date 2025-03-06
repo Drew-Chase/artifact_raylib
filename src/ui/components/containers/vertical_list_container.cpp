@@ -56,4 +56,33 @@ namespace artifact
         this->width = width;
         this->height = height;
     }
+    void VerticalListContainer::auto_height()
+    {
+        int current_y = y + padding_top;
+        for (const auto &it: std::ranges::reverse_view(entries()))
+        {
+            if (const auto *button = dynamic_cast<ButtonComponent *>(it))
+            {
+                current_y += button->get_height() + gap;
+            }
+        }
+        this->height = current_y - y - padding_top + padding_bottom;
+    }
+    void VerticalListContainer::auto_width()
+    {
+        int largest_width = 0;
+        for (const auto &it: entries())
+        {
+            if (const auto *button = dynamic_cast<ButtonComponent *>(it))
+            {
+                largest_width = std::max(largest_width, button->get_width());
+            }
+        }
+        this->width = largest_width + padding_left + padding_right;
+    }
+    void VerticalListContainer::auto_size()
+    {
+        auto_width();
+        auto_height();
+    }
 } // namespace artifact
