@@ -45,6 +45,7 @@ namespace artifact
         StageManager *manager = game->get_stage_manager();
         InitWindow(GetScreenWidth(), GetScreenWidth(), "Artifact: The Journey Unraveled");
         ToggleFullscreen();
+        InitAudioDevice();
 
         const auto window_icon = LoadImage("game/app-icon.png");
         SetWindowIcon(window_icon);
@@ -53,7 +54,7 @@ namespace artifact
         instance->isRunning = true;
         while (!WindowShouldClose() && instance->isRunning)
         {
-            const auto stage = manager->getCurrentStage();
+            const auto stage = manager->get_current_stage();
             stage->update();
             BeginDrawing();
             ClearBackground(BLACK);
@@ -62,7 +63,7 @@ namespace artifact
             EndDrawing();
         }
 
-        manager->getCurrentStage()->destroy();
+        manager->get_current_stage()->destroy();
         UnloadImage(window_icon);
         CloseWindow();
     }
