@@ -24,7 +24,7 @@ namespace artifact
 
         // Replace run with static method that uses singleton
         static void run();
-        [[nodiscard]] StageManager *get_stage_manager() const { return manager; }
+        StageManager *get_stage_manager() const { return manager; }
     };
 
 } // namespace artifact
