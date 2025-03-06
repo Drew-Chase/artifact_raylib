@@ -17,16 +17,58 @@ namespace artifact
         const Color button_hover_bg_color = ColorAlpha(BLACK, 0.75f);
         const Color button_pressed_bg_color = BLACK;
 
-        const int font_size = 24;
+        const int font_size = 48;
+
+        mutable float clouds_scroll = 0.0f;
+        mutable float mountains_scroll = 0.0f;
+        const float clouds_scroll_speed = 25.0f;
+        const float mountains_scroll_speed = 75.0f;
+
+        float calculate_background_scale(const Texture2D *texture) const
+        {
+            if (texture == nullptr)
+                return 0.0f;
+            return static_cast<float>(GetScreenHeight()) / static_cast<float>(texture->height);
+        }
+
+        int calculate_required_backgrounds(const Texture2D *texture, float scale) const
+        {
+            if (texture == nullptr)
+                return 0;
+            // Calculate scaled width of the background
+            float scaled_width = texture->width * scale;
+            // Calculate how many images we need to cover the screen width plus one extra
+            return static_cast<int>(GetScreenWidth() / scaled_width) + 2;
+        }
+
 
         // Images
-        Texture2D *background_image = nullptr;
+        Texture2D *sky_clouds_background_image = nullptr;
+        Texture2D *mountain_hills_background_image = nullptr;
         Texture2D *title_image = nullptr;
 
         // Components
         std::unique_ptr<VerticalListContainer> button_container;
         std::unique_ptr<ButtonComponent> start_button;
         std::unique_ptr<ButtonComponent> exit_button;
+
+        float calculate_background_scale() const
+        {
+            if (sky_clouds_background_image == nullptr)
+                return 0.0f;
+            return static_cast<float>(GetScreenHeight()) / static_cast<float>(sky_clouds_background_image->height);
+        }
+
+        int calculate_required_backgrounds() const
+        {
+            if (sky_clouds_background_image == nullptr)
+                return 0;
+            // Calculate scaled width of the background
+            float scaled_width = sky_clouds_background_image->width * calculate_background_scale();
+            // Calculate how many images we need to cover the screen width plus one extra
+            return static_cast<int>(GetScreenWidth() / scaled_width) + 2;
+        }
+
 
     public:
         explicit TitleScreen() : MenuStage("title_screen") {}

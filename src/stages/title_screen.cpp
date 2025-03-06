@@ -7,31 +7,31 @@ namespace artifact
 {
     void TitleScreen::startup()
     {
-        background_image = new Texture2D(LoadTexture("game/texture/menus/title_screen/sunny-mountains-sky.png"));
+        sky_clouds_background_image = new Texture2D(LoadTexture("game/texture/menus/title_screen/sunny-mountains-sky.png"));
+        mountain_hills_background_image = new Texture2D(LoadTexture("game/texture/menus/title_screen/sunny-mountains-hills.png"));
         title_image = new Texture2D(LoadTexture("game/texture/menus/title_screen/artifact_logo.png"));
 
         // Create the vertical container for buttons
-        constexpr int button_width = 200;
         constexpr int button_height = 50;
         constexpr int button_spacing = 10;
-        constexpr int container_width = button_width;
+        const int container_width = GetScreenWidth() / 4;
         constexpr int container_padding = 10;
         constexpr int container_height = button_height * 2 + button_spacing + container_padding * 2;
 
         // Position the container in the center of the screen
         const int container_x = (GetScreenWidth() - container_width) / 2;
-        const int container_y = GetScreenHeight() * 0.6f; // Position at 60% of screen height
+        const int container_y = GetScreenHeight() * 0.8f; // Position at 60% of screen height
 
         button_container = std::make_unique<VerticalListContainer>("button_container", container_x, container_y, container_width, container_height);
 
         button_container->set_gap(button_spacing);
         button_container->set_padding(container_padding);
-        button_container->set_background_color(ColorAlpha(RED, .2));
+        button_container->set_background_color(BLANK);
 
         // Create buttons
-        start_button = std::make_unique<ButtonComponent>("start_button", container_x, container_y, button_width, button_height, "Start Game", [] { TraceLog(LOG_INFO, "Start button clicked!"); });
+        start_button = std::make_unique<ButtonComponent>("start_button", container_x, container_y, 0, button_height, "Start Game", [] { TraceLog(LOG_INFO, "Start button clicked!"); });
 
-        exit_button = std::make_unique<ButtonComponent>("exit_button", container_x, container_y + button_height + button_spacing, button_width, button_height, "Exit Game",
+        exit_button = std::make_unique<ButtonComponent>("exit_button", container_x, container_y + button_height + button_spacing, 0, button_height, "Exit Game",
                                                         []
                                                         {
                                                             TraceLog(LOG_INFO, "Exit button clicked!");
@@ -42,8 +42,8 @@ namespace artifact
         start_button->set_colors(button_normal_bg_color, button_hover_bg_color, button_pressed_bg_color, text_color);
         exit_button->set_colors(button_normal_bg_color, button_hover_bg_color, button_pressed_bg_color, text_color);
 
-        start_button->set_font_size(24);
-        exit_button->set_font_size(24);
+        start_button->set_font_size(font_size);
+        exit_button->set_font_size(font_size);
 
         // Add buttons to container
         button_container->add_component(start_button.get());
@@ -54,18 +54,40 @@ namespace artifact
     {
         ClearBackground(background_color);
 
-        // Draw background
-        if (background_image != nullptr)
-            draw_texture_to_fill_rect(GetScreenWidth(), GetScreenHeight(), 0, 0, *background_image);
+        // Draw clouds background layer
+        if (sky_clouds_background_image != nullptr)
+        {
+            const float clouds_scale = calculate_background_scale(sky_clouds_background_image);
+            const float scaled_clouds_width = sky_clouds_background_image->width * clouds_scale;
+            const int num_clouds = calculate_required_backgrounds(sky_clouds_background_image, clouds_scale);
+
+            for (int i = 0; i < num_clouds; i++)
+            {
+                draw_texture_scaled(clouds_scale, clouds_scroll + (i * scaled_clouds_width), 0, *sky_clouds_background_image);
+            }
+        }
+
+        // Draw mountains background layer
+        if (mountain_hills_background_image != nullptr)
+        {
+            const float mountains_scale = calculate_background_scale(mountain_hills_background_image);
+            const float scaled_mountains_width = mountain_hills_background_image->width * mountains_scale;
+            const int num_mountains = calculate_required_backgrounds(mountain_hills_background_image, mountains_scale);
+
+            for (int i = 0; i < num_mountains; i++)
+            {
+                draw_texture_scaled(mountains_scale, mountains_scroll + (i * scaled_mountains_width), 0, *mountain_hills_background_image);
+            }
+        }
+
 
         // Draw title
         if (title_image != nullptr)
         {
-            const int width = GetScreenWidth() / 2;
-            const int height = GetScreenHeight() / 2;
-            const int x = (GetScreenWidth() - width) / 2;
-            const int y = 20;
-            draw_texture_scaled(width, height, x, y, *title_image);
+            const int width = GetScreenWidth() / 1.25; // 1536px
+            const int x = (GetScreenWidth() - width) / 2; // 192px
+            constexpr int y = 20;
+            draw_texture_scaled(width, -1, x, y, *title_image);
         }
 
         // Draw the button container and its contents
@@ -75,13 +97,43 @@ namespace artifact
 
     void TitleScreen::update() const
     {
+        const float dt = GetFrameTime();
+
+        // Update clouds scroll
+        if (sky_clouds_background_image != nullptr)
+        {
+            const float clouds_scale = calculate_background_scale(sky_clouds_background_image);
+            const float scaled_clouds_width = sky_clouds_background_image->width * clouds_scale;
+
+            clouds_scroll -= clouds_scroll_speed * dt;
+            if (clouds_scroll <= -scaled_clouds_width)
+            {
+                clouds_scroll = 0.0f;
+            }
+        }
+
+        // Update mountains scroll
+        if (mountain_hills_background_image != nullptr)
+        {
+            const float mountains_scale = calculate_background_scale(mountain_hills_background_image);
+            const float scaled_mountains_width = mountain_hills_background_image->width * mountains_scale;
+
+            mountains_scroll -= mountains_scroll_speed * dt;
+            if (mountains_scroll <= -scaled_mountains_width)
+            {
+                mountains_scroll = 0.0f;
+            }
+        }
+
+
         if (button_container)
             button_container->update(GetMouseX(), GetMouseY());
     }
 
     void TitleScreen::destroy()
     {
-        delete background_image;
+        delete sky_clouds_background_image;
+        delete mountain_hills_background_image;
         delete title_image;
         button_container.reset();
         start_button.reset();
