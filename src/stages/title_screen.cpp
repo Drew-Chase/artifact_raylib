@@ -135,7 +135,7 @@ namespace artifact
         }
 
 
-        if (button_container)
+        if (button_container && this->is_menu_in_focus())
             button_container->update(GetMouseX(), GetMouseY());
     }
 
@@ -144,10 +144,10 @@ namespace artifact
         delete sky_clouds_background_image;
         delete mountain_hills_background_image;
         delete title_image;
-        UnloadMusicStream(menu_music);
         button_container.reset();
         start_button.reset();
         settings_button.reset();
         exit_button.reset();
+        UnloadMusicStream(menu_music);
     }
 } // namespace artifact
