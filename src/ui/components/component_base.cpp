@@ -40,13 +40,24 @@ void artifact::ComponentBase::draw_texture_scaled(const float scale, const float
 }
 void artifact::ComponentBase::draw_texture_scaled(const int width, const int height, const int x, const int y, const Texture2D &texture)
 {
-    const float scaleX = static_cast<float>(width) / static_cast<float>(texture.width);
-    const float scaleY = static_cast<float>(height) / static_cast<float>(texture.height);
+    int adjustedWidth = width;
+    int adjustedHeight = height;
+
+    if (width <= 0 && height > 0)
+    {
+        adjustedWidth = static_cast<int>(static_cast<float>(height) * (static_cast<float>(texture.width) / static_cast<float>(texture.height)));
+    } else if (height <= 0 && width > 0)
+    {
+        adjustedHeight = static_cast<int>(static_cast<float>(width) * (static_cast<float>(texture.height) / static_cast<float>(texture.width)));
+    }
+
+    const float scaleX = static_cast<float>(adjustedWidth) / static_cast<float>(texture.width);
+    const float scaleY = static_cast<float>(adjustedHeight) / static_cast<float>(texture.height);
     const float scale = std::min(scaleX, scaleY);
     const float scaledWidth = static_cast<float>(texture.width) * scale;
     const float scaledHeight = static_cast<float>(texture.height) * scale;
-    const float dx = (static_cast<float>(width) - scaledWidth) * 0.5f + static_cast<float>(x);
-    const float dy = (static_cast<float>(height) - scaledHeight) * 0.5f + static_cast<float>(y);
+    const float dx = (static_cast<float>(adjustedWidth) - scaledWidth) * 0.5f + static_cast<float>(x);
+    const float dy = (static_cast<float>(adjustedHeight) - scaledHeight) * 0.5f + static_cast<float>(y);
     const Rectangle source = {0.0f, 0.0f, static_cast<float>(texture.width), static_cast<float>(texture.height)};
     const Rectangle dest = {dx, dy, scaledWidth, scaledHeight};
 
