@@ -34,6 +34,6 @@ namespace artifact
         }
 
 
-        [[nodiscard]] Stage *getCurrentStage() const { return current_stage; }
+        [[nodiscard]] Stage *get_current_stage() const { return current_stage; }
     };
 } // namespace artifact
