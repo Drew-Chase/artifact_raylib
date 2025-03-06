@@ -6,6 +6,7 @@ namespace artifact
     class ComponentBase
     {
         const char *identifier;
+        bool is_focused = false;
 
     public:
         virtual ~ComponentBase() = default;
@@ -16,5 +17,7 @@ namespace artifact
         static void draw_texture_scaled(float scale, float x, float y, const Texture2D &texture);
         static void draw_texture_scaled(int width, int height, int x, int y, const Texture2D &texture);
         virtual const char *get_identifier() { return identifier; }
+        void set_focused(const bool is_focused) { this->is_focused = is_focused; }
+        const char* get_identifier() const { return this->identifier; }
     };
 } // namespace artifact
