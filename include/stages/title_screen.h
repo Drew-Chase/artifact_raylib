@@ -47,9 +47,13 @@ namespace artifact
         Texture2D *mountain_hills_background_image = nullptr;
         Texture2D *title_image = nullptr;
 
+        // Sounds
+        Music menu_music;
+
         // Components
         std::unique_ptr<VerticalListContainer> button_container;
         std::unique_ptr<ButtonComponent> start_button;
+        std::unique_ptr<ButtonComponent> settings_button;
         std::unique_ptr<ButtonComponent> exit_button;
 
         float calculate_background_scale() const
@@ -68,7 +72,6 @@ namespace artifact
             // Calculate how many images we need to cover the screen width plus one extra
             return static_cast<int>(GetScreenWidth() / scaled_width) + 2;
         }
-
 
     public:
         explicit TitleScreen() : MenuStage("title_screen") {}

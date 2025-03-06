@@ -12,26 +12,23 @@ namespace artifact
         title_image = new Texture2D(LoadTexture("game/texture/menus/title_screen/artifact_logo.png"));
 
         // Create the vertical container for buttons
-        constexpr int button_height = 50;
+        constexpr int button_height = 70;
+        const int button_width = GetScreenWidth() / 4;
         constexpr int button_spacing = 10;
-        const int container_width = GetScreenWidth() / 4;
         constexpr int container_padding = 10;
-        constexpr int container_height = button_height * 2 + button_spacing + container_padding * 2;
 
-        // Position the container in the center of the screen
-        const int container_x = (GetScreenWidth() - container_width) / 2;
-        const int container_y = GetScreenHeight() * 0.8f; // Position at 60% of screen height
-
-        button_container = std::make_unique<VerticalListContainer>("button_container", container_x, container_y, container_width, container_height);
+        button_container = std::make_unique<VerticalListContainer>("button_container", 0, 0, 0, 0);
 
         button_container->set_gap(button_spacing);
         button_container->set_padding(container_padding);
         button_container->set_background_color(BLANK);
 
         // Create buttons
-        start_button = std::make_unique<ButtonComponent>("start_button", container_x, container_y, 0, button_height, "Start Game", [] { TraceLog(LOG_INFO, "Start button clicked!"); });
+        start_button = std::make_unique<ButtonComponent>("start_button", 0, 0, button_width, button_height, "Start Game", [] { TraceLog(LOG_INFO, "Start button clicked!"); });
 
-        exit_button = std::make_unique<ButtonComponent>("exit_button", container_x, container_y + button_height + button_spacing, 0, button_height, "Exit Game",
+        settings_button = std::make_unique<ButtonComponent>("settings_button", 0, 0, button_width, button_height, "Settings Game", [] { Game::get_instance()->get_stage_manager()->load_stage(TITLE_SCREEN); });
+
+        exit_button = std::make_unique<ButtonComponent>("exit_button", 0, 0, button_width, button_height, "Exit Game",
                                                         []
                                                         {
                                                             TraceLog(LOG_INFO, "Exit button clicked!");
@@ -40,14 +37,26 @@ namespace artifact
 
         // Configure button appearances
         start_button->set_colors(button_normal_bg_color, button_hover_bg_color, button_pressed_bg_color, text_color);
+        settings_button->set_colors(button_normal_bg_color, button_hover_bg_color, button_pressed_bg_color, text_color);
         exit_button->set_colors(button_normal_bg_color, button_hover_bg_color, button_pressed_bg_color, text_color);
 
         start_button->set_font_size(font_size);
+        settings_button->set_font_size(font_size);
         exit_button->set_font_size(font_size);
 
         // Add buttons to container
         button_container->add_component(start_button.get());
+        button_container->add_component(settings_button.get());
         button_container->add_component(exit_button.get());
+
+        button_container->auto_size();
+        button_container->set_position((GetScreenWidth() / 2) - (button_container->get_width() / 2), GetScreenHeight() - button_container->get_height() - 20);
+
+
+        // Play theme music
+        menu_music = LoadMusicStream("game/audio/music/mainmenu.wav");
+        menu_music.looping = true;
+        PlayMusicStream(menu_music);
     }
 
     void TitleScreen::draw() const
@@ -84,9 +93,9 @@ namespace artifact
         // Draw title
         if (title_image != nullptr)
         {
-            const int width = GetScreenWidth() / 1.25; // 1536px
-            const int x = (GetScreenWidth() - width) / 2; // 192px
-            constexpr int y = 20;
+            const int width = GetScreenWidth() / 1.35;
+            const int x = (GetScreenWidth() - width) / 2;
+            constexpr int y = 0;
             draw_texture_scaled(width, -1, x, y, *title_image);
         }
 
@@ -135,8 +144,10 @@ namespace artifact
         delete sky_clouds_background_image;
         delete mountain_hills_background_image;
         delete title_image;
+        UnloadMusicStream(menu_music);
         button_container.reset();
         start_button.reset();
+        settings_button.reset();
         exit_button.reset();
     }
 } // namespace artifact
