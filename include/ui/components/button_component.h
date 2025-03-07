@@ -18,7 +18,7 @@ namespace artifact
         int fontSize = 12;
 
     public:
-        ButtonComponent(const char *identifier, int x, int y, int width, int height, const char *buttonText, std::function<void()> clickHandler);
+        ButtonComponent(const char *identifier, Stage *owner, int x, int y, int width, int height, const char *buttonText, std::function<void()> clickHandler);
 
         void draw() override;
         void update(int mouseX, int mouseY) override;

@@ -12,7 +12,7 @@ namespace artifact
         std::map<std::string, ComponentBase *> components;
 
     public:
-        explicit ContainerBase(const char *identifier) : ComponentBase(identifier) {}
+        explicit ContainerBase(const char *identifier, Stage *owner) : ComponentBase(identifier, owner) {}
         void draw() override;
         void update(int mouse_x, int mouse_y) override;
         virtual void add_component(ComponentBase *component);

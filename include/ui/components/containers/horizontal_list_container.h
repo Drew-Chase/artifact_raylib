@@ -17,7 +17,7 @@ namespace artifact
         Color background_color;
 
     public:
-        HorizontalListContainer(const char *identifier, float x, float y, float width, float height, float gap = 0.0f, float padding = 0.0f, Color background_color = BLANK);
+        HorizontalListContainer(const char *identifier, Stage *owner, float x, float y, float width, float height, float gap = 0.0f, float padding = 0.0f, Color background_color = BLANK);
 
         void draw() override;
         void update(int mouse_x, int mouse_y) override;

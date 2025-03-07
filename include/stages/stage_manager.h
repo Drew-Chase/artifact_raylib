@@ -1,7 +1,5 @@
 #pragma once
 #include <type_traits>
-
-
 #include "stage.h"
 #include "title_screen.h"
 
@@ -11,7 +9,6 @@ namespace artifact
 
     class StageManager
     {
-
         Stage *current_stage = nullptr;
 
     public:

@@ -3,7 +3,7 @@
 
 namespace artifact
 {
-    ButtonComponent::ButtonComponent(const char *identifier, const int x, const int y, const int width, const int height, const char *buttonText, std::function<void()> clickHandler) : ComponentBase(identifier), bounds{static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)}, isHovered(false), isPressed(false), onClick(std::move(clickHandler)), text(buttonText)
+    ButtonComponent::ButtonComponent(const char *identifier, Stage *owner, const int x, const int y, const int width, const int height, const char *buttonText, std::function<void()> clickHandler) : ComponentBase(identifier, owner), bounds{static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)}, isHovered(false), isPressed(false), onClick(std::move(clickHandler)), text(buttonText)
     {
         // Default colors
         normalColor = LIGHTGRAY;

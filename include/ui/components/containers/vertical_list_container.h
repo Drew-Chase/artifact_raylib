@@ -17,7 +17,7 @@ namespace artifact
         Color background_color;
 
     public:
-        VerticalListContainer(const char *identifier, int x, int y, int width, int height, int gap = 0, int padding = 0, Color background_color = BLANK);
+        VerticalListContainer(const char *identifier, Stage *owner, int x, int y, int width, int height, int gap = 0, int padding = 0, Color background_color = BLANK);
 
         void draw() override;
         void update(int mouse_x, int mouse_y) override;

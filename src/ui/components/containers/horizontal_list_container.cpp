@@ -2,7 +2,7 @@
 
 namespace artifact
 {
-    HorizontalListContainer::HorizontalListContainer(const char *identifier, const float x, const float y, const float width, const float height, const float gap, const float padding, const Color background_color) : ContainerBase(identifier), x(x), y(y), width(width), height(height), gap(gap), padding_top(padding), padding_bottom(padding), padding_left(padding), padding_right(padding), background_color(background_color) {}
+    HorizontalListContainer::HorizontalListContainer(const char *identifier, Stage *owner, const float x, const float y, const float width, const float height, const float gap, const float padding, const Color background_color) : ContainerBase(identifier, owner), x(x), y(y), width(width), height(height), gap(gap), padding_top(padding), padding_bottom(padding), padding_left(padding), padding_right(padding), background_color(background_color) {}
 
     void HorizontalListContainer::draw()
     {

@@ -1,17 +1,17 @@
 #pragma once
-#include "ui/menus/menu_base.h"
-
+#include <algorithm>
+#include <vector>
 
 namespace artifact
 {
+    class MenuBase;
     class Stage
     {
         const char *identifier;
-        const MenuBase *menu_in_focus = nullptr;
+        std::vector<const MenuBase *> zindex;
 
     public:
         explicit Stage(const char *identifier) : identifier(identifier) {}
-
         virtual ~Stage() = default;
 
         virtual void draw() const { draw(false); }
@@ -21,8 +21,13 @@ namespace artifact
         virtual void startup() {}
         virtual void destroy() {}
 
-        const char *get_identifier() const { return this->identifier; }
-        void set_menu_in_focus(const MenuBase *menu_in_focus) { this->menu_in_focus = menu_in_focus; }
-        const MenuBase *get_menu_in_focus() const { return this->menu_in_focus; }
+        virtual const char *get_identifier() const { return this->identifier; }
+        virtual void set_menu_in_focus(const MenuBase *menu_in_focus) { zindex.push_back(menu_in_focus); }
+        virtual const MenuBase *get_menu_in_focus() const { return zindex.back(); }
+        virtual void remove_from_zindex(const MenuBase *menu)
+        {
+            if (const auto it = std::ranges::find(zindex, menu); it != zindex.end())
+                zindex.erase(it);
+        }
     };
 } // namespace artifact
