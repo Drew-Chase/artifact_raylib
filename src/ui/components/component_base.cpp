@@ -63,3 +63,19 @@ void artifact::ComponentBase::draw_texture_scaled(const int width, const int hei
 
     DrawTexturePro(texture, source, dest, {0.0f, 0.0f}, 0.0f, WHITE);
 }
+void artifact::ComponentBase::scale_texture(int &width, int &height, const Texture2D &texture)
+{
+    if (width <= 0 && height > 0)
+    {
+        width = static_cast<int>(static_cast<float>(height) * (static_cast<float>(texture.width) / static_cast<float>(texture.height)));
+    } else if (height <= 0 && width > 0)
+    {
+        height = static_cast<int>(static_cast<float>(width) * (static_cast<float>(texture.height) / static_cast<float>(texture.width)));
+    }
+
+    const float scaleX = static_cast<float>(width) / static_cast<float>(texture.width);
+    const float scaleY = static_cast<float>(height) / static_cast<float>(texture.height);
+    const float scale = std::min(scaleX, scaleY);
+    width = static_cast<int>(static_cast<float>(texture.width) * scale);
+    height = static_cast<int>(static_cast<float>(texture.height) * scale);
+}
