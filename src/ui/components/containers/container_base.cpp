@@ -23,3 +23,10 @@ std::vector<artifact::ComponentBase *> artifact::ContainerBase::entries()
     }
     return components;
 }
+void artifact::ContainerBase::destroy()
+{
+    for (const ComponentBase *component: this->components | std::views::values)
+    {
+        delete component;
+    }
+}
