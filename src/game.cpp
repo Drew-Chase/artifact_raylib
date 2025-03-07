@@ -70,7 +70,7 @@ namespace artifact
         while (!WindowShouldClose() && instance->isRunning)
         {
             const auto stage = manager->get_current_stage();
-            stage->update();
+            stage->update(GetFrameTime());
             BeginDrawing();
             ClearBackground(BLACK);
             stage->draw();

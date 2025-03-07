@@ -25,8 +25,6 @@ namespace artifact
 
             current_stage = stage;
             current_stage->startup();
-            current_stage->update(true);
-            current_stage->draw(true);
             return stage;
         }
 

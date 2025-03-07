@@ -14,10 +14,8 @@ namespace artifact
         explicit Stage(const char *identifier) : identifier(identifier) {}
         virtual ~Stage() = default;
 
-        virtual void draw() const { draw(false); }
-        virtual void draw(bool first_draw) const {}
-        virtual void update() const { update(false); }
-        virtual void update(bool first_update) const {}
+        virtual void draw() const {}
+        virtual void update(float deltaTime) const {}
         virtual void startup() {}
         virtual void destroy() {}
 
