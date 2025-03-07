@@ -16,7 +16,7 @@ namespace artifact
         const Color button_hover_bg_color = ColorAlpha(BLACK, 0.75f);
         const Color button_pressed_bg_color = BLACK;
 
-        const int font_size = 48;
+        const int font_size = 24;
 
         mutable float clouds_scroll = 0.0f;
         mutable float mountains_scroll = 0.0f;

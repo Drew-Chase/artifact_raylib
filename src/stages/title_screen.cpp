@@ -7,6 +7,7 @@ namespace artifact
 {
     void TitleScreen::startup()
     {
+        owner->push_to_zindex(this);
         sky_clouds_background_image = new Texture2D(LoadTexture("game/texture/menus/title_screen/sunny-mountains-sky.png"));
         mountain_hills_background_image = new Texture2D(LoadTexture("game/texture/menus/title_screen/sunny-mountains-hills.png"));
         title_image = new Texture2D(LoadTexture("game/texture/menus/title_screen/artifact_logo.png"));
@@ -50,8 +51,6 @@ namespace artifact
         button_container->add_component(exit_button.get());
 
         button_container->auto_size();
-        button_container->set_position((GetScreenWidth() / 2) - (button_container->get_width() / 2), GetScreenHeight() - button_container->get_height() - 20);
-
 
         // Play theme music
         menu_music = LoadMusicStream("game/audio/music/mainmenu.WAV");
@@ -93,10 +92,13 @@ namespace artifact
         // Draw title
         if (title_image != nullptr)
         {
-            const int width = static_cast<int>(static_cast<double>(GetScreenWidth()) / 1.35);
-            const int x = (GetScreenWidth() - width) / 2;
+            int width = -1;
+            int height = static_cast<int>(static_cast<double>(GetScreenHeight()) / 1.5);
+            scale_texture(width, height, *title_image);
+
             constexpr int y = 0;
-            draw_texture_scaled(width, -1, x, y, *title_image);
+            const int x = (GetScreenWidth() - width) / 2;
+            draw_texture_scaled(width, height, x, y, *title_image);
         }
 
         // Draw the button container and its contents
@@ -138,7 +140,9 @@ namespace artifact
         if (button_container && this->is_menu_in_focus())
             button_container->update(GetMouseX(), GetMouseY());
 
-        // UpdateMusicStream(menu_music);
+        UpdateMusicStream(menu_music);
+
+        button_container->set_position((GetScreenWidth() / 2) - (button_container->get_width() / 2), GetScreenHeight() - button_container->get_height() - 20);
     }
 
     void TitleScreen::destroy()
@@ -151,6 +155,7 @@ namespace artifact
         settings_button.reset();
         exit_button.reset();
         UnloadMusicStream(menu_music);
+        owner->remove_from_zindex(this);
     }
 
 } // namespace artifact

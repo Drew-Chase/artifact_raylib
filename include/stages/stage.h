@@ -22,8 +22,13 @@ namespace artifact
         virtual void destroy() {}
 
         virtual const char *get_identifier() const { return this->identifier; }
-        virtual void set_menu_in_focus(const MenuBase *menu_in_focus) { zindex.push_back(menu_in_focus); }
-        virtual const MenuBase *get_menu_in_focus() const { return zindex.back(); }
+        virtual void push_to_zindex(const MenuBase *menu) { zindex.push_back(menu); }
+        virtual const MenuBase *peek_zindex() const
+        {
+            if (zindex.empty())
+                return nullptr;
+            return zindex.back();
+        }
         virtual void remove_from_zindex(const MenuBase *menu)
         {
             if (const auto it = std::ranges::find(zindex, menu); it != zindex.end())
