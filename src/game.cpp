@@ -11,7 +11,11 @@ namespace artifact
     // Initialize static member
     Game *Game::instance = nullptr;
 
-    Game::Game() { this->manager = new StageManager(); }
+    Game::Game()
+    {
+        this->manager = new StageManager();
+        this->display_settings = new DisplaySettings();
+    }
 
     Game::~Game() { delete this->manager; }
 
@@ -30,29 +34,38 @@ namespace artifact
             throw std::runtime_error("Game::run(): Game instance already exists");
 
         const auto game = get_instance(); // Initialize the singleton.
+
         // Setup the async logger
         spdlog::init_thread_pool(8192, 1);
         spdlog::set_pattern("[%H:%M:%S.%f] [%l] [thread %t] %v");
         spdlog::set_level(spdlog::level::trace);
+
         const auto rotating_file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/game.log", 10 * 1024 * 1024, 6, true);
         const auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
         std::vector<spdlog::sink_ptr> sinks{rotating_file_sink, stdout_sink};
         const auto logger = std::make_shared<spdlog::async_logger>("game_logger", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
         register_logger(logger);
         spdlog::flush_every(std::chrono::seconds(3));
+
         SetTraceLogCallback(register_log_callback);
 
+        const auto window_icon = LoadImage("game/app-icon.png");
         StageManager *manager = game->get_stage_manager();
-        InitWindow(1280, 720, "Artifact: The Journey Unraveled");
-        SetWindowState(FLAG_WINDOW_RESIZABLE);
-        // InitWindow(GetScreenWidth(), GetScreenWidth(), "Artifact: The Journey Unraveled");
-        // ToggleFullscreen();
+
+        // Load Settings
+        game->display_settings->load();
+
+        InitWindow(game->display_settings->screen_width, game->display_settings->screen_height, "Artifact: The Journey Unraveled");
         InitAudioDevice();
 
-        const auto window_icon = LoadImage("game/app-icon.png");
+        // Apply Settings
+        game->display_settings->apply();
+
         SetWindowIcon(window_icon);
         SetTargetFPS(60);
+
         manager->load_stage(TITLE_SCREEN);
+
         instance->isRunning = true;
         while (!WindowShouldClose() && instance->isRunning)
         {
@@ -68,6 +81,8 @@ namespace artifact
         manager->get_current_stage()->destroy();
         UnloadImage(window_icon);
         CloseWindow();
+        // Unload settings after window close, to prevent a visible window hang.
+        delete game->display_settings;
     }
 
     void Game::register_log_callback(int msgType, const char *message, const va_list args)
