@@ -43,8 +43,10 @@ namespace artifact
         SetTraceLogCallback(register_log_callback);
 
         StageManager *manager = game->get_stage_manager();
-        InitWindow(GetScreenWidth(), GetScreenWidth(), "Artifact: The Journey Unraveled");
-        ToggleFullscreen();
+        InitWindow(1280, 720, "Artifact: The Journey Unraveled");
+        SetWindowState(FLAG_WINDOW_RESIZABLE);
+        // InitWindow(GetScreenWidth(), GetScreenWidth(), "Artifact: The Journey Unraveled");
+        // ToggleFullscreen();
         InitAudioDevice();
 
         const auto window_icon = LoadImage("game/app-icon.png");
