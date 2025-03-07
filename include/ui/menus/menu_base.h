@@ -8,6 +8,7 @@ namespace artifact
     public:
         explicit MenuBase(const char *identifier, Stage *owner) : ComponentBase(identifier, owner) {}
         ~MenuBase() override;
+        virtual void destroy(){}
         bool is_menu_in_focus() const;
     };
 } // namespace artifact

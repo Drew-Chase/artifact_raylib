@@ -20,7 +20,7 @@ namespace artifact
 
     public:
         // Properties
-        DisplaySettings *display_settings = nullptr;
+        mutable DisplaySettings *display_settings = nullptr;
 
         // Get singleton instance
         static Game *get_instance();
