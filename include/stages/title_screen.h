@@ -1,10 +1,9 @@
-// title_screen.h
 #pragma once
 #include <memory>
 #include <raylib.h>
 #include "menu_stage.h"
 #include "ui/components/button_component.h"
-#include "ui/components/containers/vertical_list_container.h" // Add this include
+#include "ui/components/containers/vertical_list_container.h"
 
 namespace artifact
 {
@@ -24,21 +23,21 @@ namespace artifact
         const float clouds_scroll_speed = 25.0f;
         const float mountains_scroll_speed = 75.0f;
 
-        float calculate_background_scale(const Texture2D *texture) const
+        static float calculate_background_scale(const Texture2D *texture)
         {
             if (texture == nullptr)
                 return 0.0f;
             return static_cast<float>(GetScreenHeight()) / static_cast<float>(texture->height);
         }
 
-        int calculate_required_backgrounds(const Texture2D *texture, float scale) const
+        static int calculate_required_backgrounds(const Texture2D *texture, const float scale)
         {
             if (texture == nullptr)
                 return 0;
             // Calculate scaled width of the background
-            float scaled_width = texture->width * scale;
+            const float scaled_width = static_cast<float>(texture->width) * scale;
             // Calculate how many images we need to cover the screen width plus one extra
-            return static_cast<int>(GetScreenWidth() / scaled_width) + 2;
+            return static_cast<int>(static_cast<float>(GetScreenWidth()) / scaled_width) + 2;
         }
 
 
@@ -68,9 +67,9 @@ namespace artifact
             if (sky_clouds_background_image == nullptr)
                 return 0;
             // Calculate scaled width of the background
-            float scaled_width = sky_clouds_background_image->width * calculate_background_scale();
+            const float scaled_width = static_cast<float>(sky_clouds_background_image->width) * calculate_background_scale();
             // Calculate how many images we need to cover the screen width plus one extra
-            return static_cast<int>(GetScreenWidth() / scaled_width) + 2;
+            return static_cast<int>(static_cast<float>(GetScreenWidth()) / scaled_width) + 2;
         }
 
     public:
