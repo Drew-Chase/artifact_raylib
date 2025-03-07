@@ -1,6 +1,5 @@
 #pragma once
 #include <cstdarg>
-
 #include "stages/stage_manager.h"
 
 namespace artifact
@@ -8,8 +7,8 @@ namespace artifact
     class Game
     {
         StageManager *manager;
-        Game(); // Keep constructor private
-        ~Game(); // Keep destructor private
+        Game();
+        ~Game();
 
         // Add static instance
         static Game *instance;
@@ -24,7 +23,7 @@ namespace artifact
 
         // Replace run with static method that uses singleton
         static void run();
-        StageManager *get_stage_manager() const { return manager; }
+        [[nodiscard]] StageManager *get_stage_manager() const { return manager; }
     };
 
 } // namespace artifact

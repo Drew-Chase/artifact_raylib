@@ -29,6 +29,7 @@ namespace artifact
         if (instance != nullptr)
             throw std::runtime_error("Game::run(): Game instance already exists");
 
+        const auto game = get_instance(); // Initialize the singleton.
         // Setup the async logger
         spdlog::init_thread_pool(8192, 1);
         spdlog::set_pattern("[%H:%M:%S.%f] [%l] [thread %t] %v");
@@ -41,7 +42,6 @@ namespace artifact
         spdlog::flush_every(std::chrono::seconds(3));
         SetTraceLogCallback(register_log_callback);
 
-        const auto game = get_instance(); // Initialize the singleton.
         StageManager *manager = game->get_stage_manager();
         InitWindow(GetScreenWidth(), GetScreenWidth(), "Artifact: The Journey Unraveled");
         ToggleFullscreen();
@@ -68,7 +68,7 @@ namespace artifact
         CloseWindow();
     }
 
-    void Game::register_log_callback(int msgType, const char *message, va_list args)
+    void Game::register_log_callback(int msgType, const char *message, const va_list args)
     {
         const auto logger = spdlog::get("game_logger");
         char formattedMessage[1024];
