@@ -1,16 +1,22 @@
 
 #include "ui/components/containers/list_container.h"
+
+#include <iostream>
+
+#include <ostream>
 #include <ranges>
 #include "ui/components/button_component.h"
 
 namespace artifact
 {
-    ListContainer::ListContainer(const char *identifier, Stage *owner, int x, int y, int width, int height, int gap, int padding, Color background_color):ContainerBase(identifier, owner), x(x), y(y), width(width), height(height), gap(gap), padding_top(padding), padding_bottom(padding), padding_left(padding), padding_right(padding), background_color(background_color) {}
+    ListContainer::ListContainer(const char *identifier, Stage *owner, const int x, const int y, const int width, const int height, const int gap, const int padding, const Color background_color) : ContainerBase(identifier, owner), x(x), y(y), width(width), height(height), gap(gap), padding_top(padding), padding_bottom(padding), padding_left(padding), padding_right(padding), background_color(background_color) {}
+    void ListContainer::draw() { ContainerBase::draw(); }
     void ListContainer::update(const int mouse_x, const int mouse_y)
     {
         for (const auto components = entries(); auto *component: components)
         {
-            component->update(mouse_x, mouse_y);
+            if (component != nullptr && component != reinterpret_cast<ComponentBase *>(-1))
+                component->update(mouse_x, mouse_y);
         }
     }
 
@@ -37,15 +43,15 @@ namespace artifact
     }
     void ListContainer::auto_height()
     {
-        int current_y = y + padding_top;
-        for (const auto &it: std::ranges::reverse_view(entries()))
+        int largest_height = 0;
+        for (const auto &it: entries())
         {
             if (const auto *button = dynamic_cast<ButtonComponent *>(it))
             {
-                current_y += button->get_height() + gap;
+                largest_height = std::max(largest_height, button->get_height());
             }
         }
-        this->height = current_y - y - padding_top + padding_bottom;
+        this->height = largest_height + padding_top + padding_bottom;
     }
     void ListContainer::auto_width()
     {
@@ -64,4 +70,14 @@ namespace artifact
         auto_width();
         auto_height();
     }
+    int ListContainer::get_x() const { return x; }
+    int ListContainer::get_y() const { return y; }
+    int ListContainer::get_width() const { return width; }
+    int ListContainer::get_height() const { return height; }
+    int ListContainer::get_gap() const { return gap; }
+    int ListContainer::get_padding_top() const { return padding_top; }
+    int ListContainer::get_padding_bottom() const { return padding_bottom; }
+    int ListContainer::get_padding_left() const { return padding_left; }
+    int ListContainer::get_padding_right() const { return padding_right; }
+    const Color &ListContainer::get_background_color() const { return background_color; }
 } // namespace artifact

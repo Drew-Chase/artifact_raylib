@@ -1,8 +1,12 @@
 #include "ui/components/containers/horizontal_list_container.h"
 
+#include <ranges>
+
+#include "ui/components/button_component.h"
+
 namespace artifact
 {
-    HorizontalListContainer::HorizontalListContainer(const char *identifier, Stage *owner, const float x, const float y, const float width, const float height, const float gap, const float padding, const Color background_color) : ListContainer(identifier, owner, x, y, width, height, gap, padding, background_color) {}
+    HorizontalListContainer::HorizontalListContainer(const char *identifier, Stage *owner, const int x, const int y, const int width, const int height, const int gap, const int padding, const Color background_color) : ListContainer(identifier, owner, x, y, width, height, gap, padding, background_color) {}
 
     void HorizontalListContainer::draw()
     {
@@ -13,13 +17,27 @@ namespace artifact
 
         float current_x = x + padding_left;
 
-        for (auto components = entries(); auto *component: components)
+        for (const auto &it: std::ranges::reverse_view(entries()))
         {
-            if (auto *base = component)
+            if (auto *button = dynamic_cast<ButtonComponent *>(it))
             {
-                base->draw();
-                current_x += gap;
+                button->set_position(current_x, y + padding_top);
+                button->set_height(height - padding_top - padding_bottom);
+                button->draw();
+                current_x += button->get_width() + gap;
             }
         }
+    }
+    void HorizontalListContainer::auto_width()
+    {
+        int current_x = x + padding_left;
+        for (const auto &it: std::ranges::reverse_view(entries()))
+        {
+            if (const auto *button = dynamic_cast<ButtonComponent *>(it))
+            {
+                current_x += button->get_width() + gap;
+            }
+        }
+        this->width = current_x - x - padding_left + padding_right;
     }
 } // namespace artifact

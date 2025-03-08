@@ -11,8 +11,24 @@ namespace artifact
         setup_action_buttons();
         setup_settings_tabs();
     }
-    void SettingsScreen::draw() { MenuBase::draw(); }
-    void SettingsScreen::update(const int mouse_x, const int mouse_y) { MenuBase::update(mouse_x, mouse_y); }
+    void SettingsScreen::draw()
+    {
+        if (settings_menu_actions_container)
+            settings_menu_actions_container->draw();
+    }
+    void SettingsScreen::update(const int mouse_x, const int mouse_y)
+    {
+        if (pending_removal)
+        {
+            destroy();
+            return;
+        }
+        if (settings_menu_actions_container)
+        {
+            settings_menu_actions_container->update(mouse_x, mouse_y);
+            settings_menu_actions_container->set_position(GetScreenWidth() / 2 - settings_menu_actions_container->get_width() / 2, GetScreenHeight() - settings_menu_actions_container->get_height() - 20);
+        }
+    }
     void SettingsScreen::setup_action_buttons()
     {
 
@@ -27,8 +43,8 @@ namespace artifact
         settings_menu_actions_container->set_padding(container_padding);
         settings_menu_actions_container->set_background_color(BLANK);
 
-        const auto save_apply_button = std::make_unique<ButtonComponent>("settings_save_apply", owner, 0, 0, button_width, button_height, "Save & Apply", [&] { save_apply(); });
-        const auto back_button = std::make_unique<ButtonComponent>("settings_back", owner, 0, 0, button_width, button_height, "Back", [&] { destroy(); });
+        save_apply_button = std::make_unique<ButtonComponent>("settings_save_apply", owner, 0, 0, button_width, button_height, "Save & Apply", [&] { save_apply(); });
+        back_button = std::make_unique<ButtonComponent>("settings_back", owner, 0, 0, button_width, button_height, "Back", [&] { pending_removal = true; });
 
 
         // Configure button appearances
@@ -37,7 +53,6 @@ namespace artifact
 
         save_apply_button->set_font_size(font_size);
         back_button->set_font_size(font_size);
-
 
         settings_menu_actions_container->add_component(save_apply_button.get());
         settings_menu_actions_container->add_component(back_button.get());
@@ -58,6 +73,12 @@ namespace artifact
     {
         if (const auto title_screen = dynamic_cast<TitleScreen *>(owner); title_screen != nullptr)
         {
+            save_apply_button.reset();
+            back_button.reset();
+            settings_menu_actions_container.reset();
+            settings_tabs_container.reset();
+            settings_container.reset();
+
             title_screen->close_settings_menu();
         }
     }

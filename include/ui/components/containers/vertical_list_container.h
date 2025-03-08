@@ -1,6 +1,5 @@
 #pragma once
-#include "list_container.h"
-#include "ui/components/containers/container_base.h"
+#include "ui/components/containers/list_container.h"
 
 namespace artifact
 {
@@ -9,5 +8,6 @@ namespace artifact
     public:
         VerticalListContainer(const char *identifier, Stage *owner, int x, int y, int width, int height, int gap = 0, int padding = 0, Color background_color = BLANK);
         void draw() override;
+        void auto_height() override;
     };
 } // namespace artifact

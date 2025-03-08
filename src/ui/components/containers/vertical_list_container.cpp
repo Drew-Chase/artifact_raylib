@@ -8,8 +8,11 @@ namespace artifact
 
     void VerticalListContainer::draw()
     {
-        // Draw the background respecting the padding on all sides evenly
-        DrawRectangle(x - padding_left, y - padding_top, width + padding_left + padding_right, height + padding_top + padding_bottom, background_color);
+        if (background_color.a != 0)
+        {
+            // Draw the background respecting the padding on all sides evenly
+            DrawRectangle(x - padding_left, y - padding_top, width + padding_left + padding_right, height + padding_top + padding_bottom, background_color);
+        }
 
         int current_y = y + padding_top;
 
@@ -23,6 +26,19 @@ namespace artifact
                 current_y += button->get_height() + gap;
             }
         }
+    }
+    void VerticalListContainer::auto_height()
+    {
+
+        int current_y = y + padding_top;
+        for (const auto &it: std::ranges::reverse_view(entries()))
+        {
+            if (const auto *button = dynamic_cast<ButtonComponent *>(it))
+            {
+                current_y += button->get_height() + gap;
+            }
+        }
+        this->height = current_y - y - padding_top + padding_bottom;
     }
 
 

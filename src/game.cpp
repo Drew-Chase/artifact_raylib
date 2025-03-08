@@ -52,12 +52,12 @@ namespace artifact
         const auto window_icon = LoadImage("game/app-icon.png");
         StageManager *manager = game->get_stage_manager();
 
-        // Load Settings
-        game->display_settings->load();
 
-        InitWindow(game->display_settings->screen_width, game->display_settings->screen_height, "Artifact: The Journey Unraveled");
+        InitWindow(0, 0, "Artifact: The Journey Unraveled");
         InitAudioDevice();
 
+        // Load Settings
+        game->display_settings->load();
         // Apply Settings
         game->display_settings->apply();
 
@@ -83,6 +83,7 @@ namespace artifact
         CloseWindow();
         // Unload settings after window close, to prevent a visible window hang.
         delete game->display_settings;
+        delete game;
     }
 
     void Game::register_log_callback(int msgType, const char *message, const va_list args)

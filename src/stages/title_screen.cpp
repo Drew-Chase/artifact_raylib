@@ -25,16 +25,16 @@ namespace artifact
         button_container->set_background_color(BLANK);
 
         // Create buttons
-        const auto start_button = std::make_unique<ButtonComponent>("start_button", this, 0, 0, button_width, button_height, "Start Game", [] { TraceLog(LOG_INFO, "Start button clicked!"); });
+        start_button = std::make_unique<ButtonComponent>("start_button", this, 0, 0, button_width, button_height, "Start Game", [] { TraceLog(LOG_INFO, "Start button clicked!"); });
 
-        const auto settings_button = std::make_unique<ButtonComponent>("settings_button", this, 0, 0, button_width, button_height, "Settings Game",
+        settings_button = std::make_unique<ButtonComponent>("settings_button", this, 0, 0, button_width, button_height, "Settings Game",
                                                             [this]
                                                             {
                                                                 TraceLog(LOG_INFO, "Settings button clicked!");
                                                                 settings_screen = new SettingsScreen(this);
                                                             });
 
-        const auto exit_button = std::make_unique<ButtonComponent>("exit_button", this, 0, 0, button_width, button_height, "Exit Game",
+        exit_button = std::make_unique<ButtonComponent>("exit_button", this, 0, 0, button_width, button_height, "Exit Game",
                                                         []
                                                         {
                                                             TraceLog(LOG_INFO, "Exit button clicked!");
@@ -94,9 +94,15 @@ namespace artifact
         UpdateMusicStream(menu_music);
         update_background(deltaTime);
 
-        if (button_container && this->is_menu_in_focus())
-            button_container->update(GetMouseX(), GetMouseY());
-        button_container->set_position(GetScreenWidth() / 2 - button_container->get_width() / 2, GetScreenHeight() - button_container->get_height() - 20);
+        if (settings_screen != nullptr)
+        {
+            settings_screen->update(GetMouseX(), GetMouseY());
+        } else
+        {
+            if (button_container && this->is_menu_in_focus())
+                button_container->update(GetMouseX(), GetMouseY());
+            button_container->set_position(GetScreenWidth() / 2 - button_container->get_width() / 2, GetScreenHeight() - button_container->get_height() - 20);
+        }
     }
     void TitleScreen::draw_background() const
     {

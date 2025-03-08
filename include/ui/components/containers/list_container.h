@@ -30,19 +30,19 @@ namespace artifact
         void set_background_color(const Color color) { this->background_color = color; }
         void set_position(int x, int y);
         void set_size(int width, int height);
-        void auto_height();
-        void auto_width();
-        void auto_size();
+        virtual void auto_height();
+        virtual void auto_width();
+        virtual void auto_size();
 
-        int get_x() const { return x; }
-        int get_y() const { return y; }
-        int get_width() const { return width; }
-        int get_height() const { return height; }
-        int get_gap() const { return gap; }
-        int get_padding_top() const { return padding_top; }
-        int get_padding_bottom() const { return padding_bottom; }
-        int get_padding_left() const { return padding_left; }
-        int get_padding_right() const { return padding_right; }
-        const Color &get_background_color() const { return background_color; }
+        int get_x() const;
+        int get_y() const;
+        int get_width() const;
+        int get_height() const;
+        int get_gap() const;
+        int get_padding_top() const;
+        int get_padding_bottom() const;
+        int get_padding_left() const;
+        int get_padding_right() const;
+        const Color &get_background_color() const;
     };
 } // namespace artifact

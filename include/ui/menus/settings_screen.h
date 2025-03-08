@@ -19,6 +19,8 @@ namespace artifact
         const Color button_pressed_bg_color = BLACK;
         const int font_size = 16;
 
+        bool pending_removal = false;
+
         // Shadow Settings
         DisplaySettings display_settings;
 
@@ -26,13 +28,17 @@ namespace artifact
         std::unique_ptr<HorizontalListContainer> settings_tabs_container;
         std::unique_ptr<HorizontalListContainer> settings_menu_actions_container;
         std::unique_ptr<VerticalListContainer> settings_container;
+        std::unique_ptr<ButtonComponent> save_apply_button;
+        std::unique_ptr<ButtonComponent> back_button;
+
         void setup_action_buttons();
         void setup_settings_tabs();
 
         // Utility functions
         void save_apply();
+
     public:
-        explicit SettingsScreen(Stage *owner) ;
+        explicit SettingsScreen(Stage *owner);
         void draw() override;
         void update(int mouse_x, int mouse_y) override;
         void destroy() override;

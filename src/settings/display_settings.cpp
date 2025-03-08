@@ -46,6 +46,14 @@ namespace artifact
     }
     void DisplaySettings::apply()
     {
+        if (!IsWindowReady())
+        {
+            return;
+        }
+
+        const int monitor = GetCurrentMonitor();
+        const int monitor_width = GetMonitorWidth(monitor);
+        const int monitor_height = GetMonitorHeight(monitor);
         SetTargetFPS(frame_rate);
         if (vsync)
             SetWindowState(FLAG_VSYNC_HINT);
@@ -61,7 +69,10 @@ namespace artifact
             if (window_mode == WindowMode::WINDOWED)
             {
                 SetWindowSize(screen_width, screen_height);
-                SetWindowPosition(GetScreenWidth() / 2 - screen_width / 2, GetScreenHeight() / 2 - screen_height / 2);
+                const int x = monitor_width / 2 - screen_width / 2;
+                const int y = monitor_height / 2 - screen_height / 2;
+                TraceLog(LOG_INFO, "Windowed mode: w=%d,h=%d,x=%d,y=%d", monitor_width, monitor_height, x, y);
+                SetWindowPosition(x, y);
             } else
             {
                 SetWindowState(FLAG_WINDOW_UNDECORATED);
@@ -69,16 +80,21 @@ namespace artifact
             }
         } else if (window_mode == WindowMode::FULLSCREEN)
         {
-            SetWindowSize(GetScreenWidth(), GetScreenHeight());
+            SetWindowSize(screen_width, screen_height);
             if (!IsWindowFullscreen())
                 ToggleFullscreen();
         }
     }
     void DisplaySettings::reset()
     {
+        if (!IsWindowReady())
+        {
+            return;
+        }
+        const int monitor = GetCurrentMonitor();
         this->window_mode = WindowMode::FULLSCREEN;
-        this->screen_width = GetScreenWidth();
-        this->screen_height = GetScreenHeight();
+        this->screen_width = GetMonitorWidth(monitor);
+        this->screen_height = GetMonitorHeight(monitor);
         this->frame_rate = 60;
         this->vsync = true;
         save();

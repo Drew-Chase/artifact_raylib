@@ -35,9 +35,9 @@ namespace artifact
 
         // Components
         std::unique_ptr<VerticalListContainer> button_container;
-        // std::unique_ptr<ButtonComponent> start_button;
-        // std::unique_ptr<ButtonComponent> settings_button;
-        // std::unique_ptr<ButtonComponent> exit_button;
+        std::unique_ptr<ButtonComponent> start_button;
+        std::unique_ptr<ButtonComponent> settings_button;
+        std::unique_ptr<ButtonComponent> exit_button;
 
         // Component functions
         void update_background(float deltaTime) const;
