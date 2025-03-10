@@ -14,11 +14,11 @@ namespace artifact
 
     public:
         // Display Settings
-        WindowMode window_mode = WindowMode::FULLSCREEN;
-        unsigned int screen_width = 1280;
-        unsigned int screen_height = 720;
-        unsigned int frame_rate = 60;
-        bool vsync = true;
+        WindowMode window_mode;
+        unsigned int screen_width;
+        unsigned int screen_height;
+        unsigned int frame_rate;
+        bool vsync;
 
         // Functions
         explicit DisplaySettings();
