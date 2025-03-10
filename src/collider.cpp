@@ -1,5 +1,5 @@
 #include "Collider.h"
-#include <bits/ranges_algo.h>
+#include <algorithm>
 #include <cmath>
 #include <ranges>
 
