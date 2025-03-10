@@ -25,5 +25,8 @@ namespace artifact
         }
 
         void startup() override;
+        void draw() const override;
+        void update(float deltaTime) const override;
+        void destroy() override;
     };
 } // namespace artifact
