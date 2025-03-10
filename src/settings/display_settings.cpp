@@ -9,7 +9,7 @@ using namespace std::filesystem;
 
 namespace artifact
 {
-    DisplaySettings::DisplaySettings() : SettingsBase("display.json") { DisplaySettings::load(); }
+    DisplaySettings::DisplaySettings() : SettingsBase("display.json") {  }
     DisplaySettings::~DisplaySettings() { DisplaySettings::save(); }
     void DisplaySettings::load()
     {
