@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdarg>
 
+#include "settings/controls_settings.h"
 #include "settings/display_settings.h"
 #include "stages/stage_manager.h"
 
@@ -21,6 +22,7 @@ namespace artifact
     public:
         // Properties
         mutable DisplaySettings *display_settings = nullptr;
+        mutable ControlsSettings *controls_settings = nullptr;
 
         // Get singleton instance
         static Game *get_instance();

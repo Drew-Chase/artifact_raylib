@@ -15,6 +15,7 @@ namespace artifact
     {
         this->manager = new StageManager();
         this->display_settings = new DisplaySettings();
+        this->controls_settings = new ControlsSettings();
     }
 
     Game::~Game() { delete this->manager; }
@@ -58,6 +59,7 @@ namespace artifact
 
         // Load Settings
         game->display_settings->load();
+        game->controls_settings->load();
         // Apply Settings
         game->display_settings->apply();
 
