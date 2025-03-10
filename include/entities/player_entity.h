@@ -16,11 +16,17 @@ namespace artifact
         float sprint_multiplier = 1.5f;
         float jump_multiplier = 1.5f;
         float friction_multiplier = 1.f;
-
         Camera2D camera = {0};
 
-    protected:
-        void startup() override;
+        void handle_input();
 
+    public:
+        void startup() override;
+        void draw() override;
+        void update(float deltaTime) override;
+        void damage(int damage) override;
+        void kill() override;
+        void jump() override;
+        void walk(char direction) override;
     };
 } // namespace artifact
