@@ -19,7 +19,7 @@ namespace artifact
             return;
         }
         std::fstream file = open_settings_file(std::ios::in);
-        json settings = json::parse(file);
+        const json settings = json::parse(file);
 
         window_mode = settings["window_mode"];
         screen_width = settings.value("screen_width", screen_width);
