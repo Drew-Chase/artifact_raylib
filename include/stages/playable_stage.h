@@ -11,7 +11,7 @@ namespace artifact
     {
     protected:
         Texture2D ground;
-        std::vector<Entity *> entities;
+        std::vector<std::unique_ptr<Entity>> entities;
         std::vector<Collider> colliders;
 
     public:

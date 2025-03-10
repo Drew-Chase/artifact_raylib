@@ -14,7 +14,8 @@ namespace artifact
          * This constant is used as a default or placeholder value for colliders. It is defined
          * with zero-sized bounds and a non-blocking state to signify the absence of a valid collider.
          */
-        static const Collider EMPTY_COLLIDER;
+        static const Collider EMPTY;
+
         /**
          * Represents the rectangular boundaries of the collider, which define its position and size in the game world.
          *
@@ -39,11 +40,60 @@ namespace artifact
          * @return True if the current collider is equal to the given collider; otherwise, false.
          */
         bool operator==(const Collider &collider) const;
+
+
         /**
-         * Checks whether the given collider is empty by comparing it to the predefined EMPTY_COLLIDER.
+         * Default constructor for the Collider class.
+         *
+         * Initializes a new Collider instance with its default state.
+         * This constructor does not perform any specific initialization logic,
+         * relying on the compiler-generated default behavior.
+         */
+        Collider() = default;
+        /**
+         * Constructs a new Collider instance with specified bounds and blocking state.
+         *
+         * This constructor initializes the Collider using the given rectangular bounds
+         * and a flag indicating whether the collider should block other entities.
+         *
+         * @param bounds The rectangular boundary defining the size and position of the collider.
+         * @param is_blocking A boolean flag indicating whether the collider should act as blocking.
+         *                    If true, the collider will prevent movement through it.
+         * @return A new instance of the Collider with the specified properties.
+         */
+        Collider(Rectangle bounds, bool is_blocking);
+        /**
+         * Constructs a collider instance with the specified position and size, and marks it as blocking by default.
+         *
+         * @param x The x-coordinate of the upper-left corner of the collider's bounds.
+         * @param y The y-coordinate of the upper-left corner of the collider's bounds.
+         * @param width The width of the collider's bounds.
+         * @param height The height of the collider's bounds.
+         * @return An instance of Collider initialized with the given bounds and a blocking state.
+         */
+        Collider(int x, int y, int width, int height);
+
+        /**
+         * Constructs a collider instance with specified position, dimensions, and blocking state.
+         *
+         * This constructor initializes the collider's bounding box and its blocking property based on the
+         * given parameters, enabling representation of physical boundaries or areas used in simulations or games.
+         *
+         * @param x The x-coordinate of the top-left corner of the collider.
+         * @param y The y-coordinate of the top-left corner of the collider.
+         * @param width The width of the collider's bounding box.
+         * @param height The height of the collider's bounding box.
+         * @param is_blocking Indicates whether the collider should act as a blocking object.
+         *
+         * @return A new instance of the Collider class with specified bounds and blocking behavior.
+         */
+        Collider(int x, int y, int width, int height, bool is_blocking);
+
+        /**
+         * Checks whether the given collider is empty by comparing it to the predefined EMPTY.
          *
          * This function determines if the provided collider has no valid bounds or is marked as inactive by
-         * checking for equality with the static EMPTY_COLLIDER instance.
+         * checking for equality with the static EMPTY instance.
          *
          * @param collider The collider to check for emptiness.
          * @return True if the collider is empty, false otherwise.
@@ -102,12 +152,5 @@ namespace artifact
          */
         static std::vector<Collider> get_blocking_colliders(std::vector<Collider> colliders);
     };
-    /**
-     * A constant representing an uninitialized or empty collider.
-     *
-     * This collider is characterized by zero-sized dimensions and a non-interactive state.
-     * It serves as a default or placeholder value to indicate the lack of a defined collider.
-     */
-    const Collider Collider::EMPTY_COLLIDER = Collider{Rectangle{0, 0, 0, 0}, false};
 
 } // namespace artifact

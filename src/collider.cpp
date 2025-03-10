@@ -6,7 +6,10 @@
 namespace artifact
 {
     bool Collider::operator==(const Collider &collider) const { return this->bounds.x == collider.bounds.x && this->bounds.y == collider.bounds.y && this->bounds.width == collider.bounds.width && this->bounds.height == collider.bounds.height && this->is_blocking == collider.is_blocking; }
-    bool Collider::is_collider_empty(const Collider &collider) { return collider == EMPTY_COLLIDER; }
+    Collider::Collider(const Rectangle bounds, const bool is_blocking) : bounds(bounds), is_blocking(is_blocking) {}
+    Collider::Collider(const int x, const int y, const int width, const int height) : bounds{static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)}, is_blocking{true} {}
+    Collider::Collider(const int x, const int y, const int width, const int height, const bool is_blocking) : bounds{static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)}, is_blocking(is_blocking) {}
+    bool Collider::is_collider_empty(const Collider &collider) { return collider == EMPTY; }
     bool Collider::is_entity_colliding(const Entity *entity, const std::vector<Collider> &colliders)
     {
         const auto &[x, y, width, height] = entity->get_bounds();
@@ -29,13 +32,13 @@ namespace artifact
         const std::vector<Collider> close_colliders = get_colliders_closest_to(x, y, colliders, blocking_only);
         if (close_colliders.empty())
         {
-            return EMPTY_COLLIDER;
+            return EMPTY;
         }
         const float fx = static_cast<float>(x);
         const float fy = static_cast<float>(y);
         if (CheckCollisionRecs(close_colliders[0].bounds, {fx, fy, 1, 1}))
             return close_colliders[0];
-        return EMPTY_COLLIDER;
+        return EMPTY;
     }
 
     std::vector<Collider> Collider::get_colliders_closest_to(const int x, const int y, const std::vector<Collider> &colliders, const bool blocking_only)
