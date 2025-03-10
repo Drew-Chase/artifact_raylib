@@ -6,7 +6,6 @@ namespace artifact
 {
     class ButtonComponent : public ComponentBase
     {
-        Rectangle bounds;
         bool isHovered;
         bool isPressed;
         std::function<void()> onClick;
@@ -32,11 +31,5 @@ namespace artifact
         void set_font_size(int size);
         void set_on_click(std::function<void()> onClick);
         void set_text(const char *text);
-        void set_width(int width);
-        void set_height(int height);
-        void set_position(int x, int y);
-
-        int get_height() const;
-        int get_width() const;
     };
 } // namespace artifact

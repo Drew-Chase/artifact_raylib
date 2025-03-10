@@ -1,10 +1,6 @@
 
 #include "ui/components/containers/list_container.h"
-
 #include <iostream>
-
-#include <ostream>
-#include <ranges>
 #include "ui/components/button_component.h"
 
 namespace artifact
@@ -69,6 +65,16 @@ namespace artifact
     {
         auto_width();
         auto_height();
+    }
+    void ListContainer::set_height(const int height)
+    {
+        ContainerBase::set_height(height);
+        this->set_position(width, height);
+    }
+    void ListContainer::set_width(const int width)
+    {
+        ContainerBase::set_width(width);
+        this->set_position(width, height);
     }
     int ListContainer::get_x() const { return x; }
     int ListContainer::get_y() const { return y; }

@@ -1,14 +1,14 @@
-
 #include "ui/components/button_component.h"
 
 namespace artifact
 {
-    ButtonComponent::ButtonComponent(const char *identifier, Stage *owner, const int x, const int y, const int width, const int height, const char *buttonText, std::function<void()> clickHandler) : ComponentBase(identifier, owner), bounds{static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)}, isHovered(false), isPressed(false), onClick(std::move(clickHandler)), text(buttonText)
+    ButtonComponent::ButtonComponent(const char *identifier, Stage *owner, const int x, const int y, const int width, const int height, const char *buttonText, std::function<void()> clickHandler) : ComponentBase(identifier, owner, x, y, width, height), isHovered(false), isPressed(false), onClick(std::move(clickHandler)), text(buttonText)
     {
         // Default colors
         normalColor = LIGHTGRAY;
         hoverColor = GRAY;
         pressedColor = DARKGRAY;
+        textColor = BLACK;
     }
 
     void ButtonComponent::draw()
@@ -52,6 +52,7 @@ namespace artifact
             isPressed = false;
         }
     }
+
     void ButtonComponent::set_colors(const Color normal, const Color hover, const Color pressed, const Color text)
     {
         normalColor = normal;
@@ -73,14 +74,5 @@ namespace artifact
     void ButtonComponent::set_on_click(std::function<void()> onClick) { this->onClick = std::move(onClick); }
 
     void ButtonComponent::set_text(const char *text) { this->text = text; }
-    void ButtonComponent::set_width(const int width) { bounds.width = static_cast<float>(width); }
-    void ButtonComponent::set_height(const int height) { bounds.height = static_cast<float>(height); }
-    void ButtonComponent::set_position(const int x, const int y)
-    {
-        bounds.x = static_cast<float>(x);
-        bounds.y = static_cast<float>(y);
-    }
-    int ButtonComponent::get_height() const { return static_cast<int>(bounds.height); }
-    int ButtonComponent::get_width() const { return static_cast<int>(bounds.width); }
 
 } // namespace artifact

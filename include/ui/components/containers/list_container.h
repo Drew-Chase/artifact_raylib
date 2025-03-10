@@ -33,6 +33,8 @@ namespace artifact
         virtual void auto_height();
         virtual void auto_width();
         virtual void auto_size();
+        virtual void set_height(int height);
+        virtual void set_width(int width);
 
         int get_x() const;
         int get_y() const;
