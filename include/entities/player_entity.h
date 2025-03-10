@@ -11,14 +11,14 @@ namespace artifact
         // Statistics
         int lives = 3;
         int coin = 0;
+        bool sprinting = false;
 
         // Multipliers
         float sprint_multiplier = 1.5f;
         float jump_multiplier = 1.5f;
         float friction_multiplier = 1.f;
-        Camera2D camera = {0};
-
-        void handle_input();
+        Camera2D camera = {};
+        void handle_input(float deltaTime);
 
     public:
         void startup() override;
@@ -27,6 +27,5 @@ namespace artifact
         void damage(int damage) override;
         void kill() override;
         void jump() override;
-        void walk(char direction) override;
     };
 } // namespace artifact
