@@ -6,6 +6,7 @@
 namespace artifact
 {
     bool Collider::operator==(const Collider &collider) const { return this->bounds.x == collider.bounds.x && this->bounds.y == collider.bounds.y && this->bounds.width == collider.bounds.width && this->bounds.height == collider.bounds.height && this->is_blocking == collider.is_blocking; }
+    Collider::Collider() : bounds({0, 0, 0, 0}), is_blocking(false) {}
     Collider::Collider(const Rectangle bounds, const bool is_blocking) : bounds(bounds), is_blocking(is_blocking) {}
     Collider::Collider(const int x, const int y, const int width, const int height) : bounds{static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)}, is_blocking{true} {}
     Collider::Collider(const int x, const int y, const int width, const int height, const bool is_blocking) : bounds{static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)}, is_blocking(is_blocking) {}
@@ -19,10 +20,10 @@ namespace artifact
         const Vector2 top_right = {x + width, y + height};
 
         // Colliders
-        const Collider collider_bottom_right = get_collider_at(bottom_left.x, bottom_left.y, colliders);
-        const Collider collider_bottom_left = get_collider_at(bottom_right.x, bottom_right.y, colliders);
-        const Collider collider_top_right = get_collider_at(top_left.x, top_left.y, colliders);
-        const Collider collider_top_left = get_collider_at(top_right.x, top_right.y, colliders);
+        const Collider collider_bottom_right = get_collider_at(static_cast<int>(bottom_left.x), static_cast<int>(bottom_left.y), colliders);
+        const Collider collider_bottom_left = get_collider_at(static_cast<int>(bottom_right.x), static_cast<int>(bottom_right.y), colliders);
+        const Collider collider_top_right = get_collider_at(static_cast<int>(top_left.x), static_cast<int>(top_left.y), colliders);
+        const Collider collider_top_left = get_collider_at(static_cast<int>(top_right.x), static_cast<int>(top_right.y), colliders);
 
         return !is_collider_empty(collider_bottom_right) || !is_collider_empty(collider_bottom_left) || !is_collider_empty(collider_top_right) || !is_collider_empty(collider_top_left);
     }
@@ -34,8 +35,9 @@ namespace artifact
         {
             return EMPTY;
         }
-        const float fx = static_cast<float>(x);
-        const float fy = static_cast<float>(y);
+        const auto fx = static_cast<float>(x);
+        // ReSharper disable once CppTooWideScopeInitStatement
+        const auto fy = static_cast<float>(y);
         if (CheckCollisionRecs(close_colliders[0].bounds, {fx, fy, 1, 1}))
             return close_colliders[0];
         return EMPTY;
@@ -43,8 +45,8 @@ namespace artifact
 
     std::vector<Collider> Collider::get_colliders_closest_to(const int x, const int y, const std::vector<Collider> &colliders, const bool blocking_only)
     {
-        const float fx = static_cast<float>(x);
-        const float fy = static_cast<float>(y);
+        const auto fx = static_cast<float>(x);
+        const auto fy = static_cast<float>(y);
 
         std::vector<Collider> filtered_colliders = blocking_only ? get_blocking_colliders(colliders) : colliders;
 

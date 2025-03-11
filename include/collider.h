@@ -9,14 +9,6 @@ namespace artifact
     {
     public:
         /**
-         * Represents an empty collider instance with no bounds and marked as non-blocking.
-         *
-         * This constant is used as a default or placeholder value for colliders. It is defined
-         * with zero-sized bounds and a non-blocking state to signify the absence of a valid collider.
-         */
-        static const Collider EMPTY;
-
-        /**
          * Represents the rectangular boundaries of the collider, which define its position and size in the game world.
          *
          * This property is used for collision detection and spatial relationships among entities and colliders.
@@ -49,7 +41,7 @@ namespace artifact
          * This constructor does not perform any specific initialization logic,
          * relying on the compiler-generated default behavior.
          */
-        Collider() = default;
+        Collider();
         /**
          * Constructs a new Collider instance with specified bounds and blocking state.
          *
@@ -152,5 +144,5 @@ namespace artifact
          */
         static std::vector<Collider> get_blocking_colliders(std::vector<Collider> colliders);
     };
-
+    static const auto EMPTY = Collider();
 } // namespace artifact
