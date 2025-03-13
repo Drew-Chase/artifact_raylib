@@ -3,12 +3,12 @@
 
 namespace artifact
 {
-    class Level1AStage : public PlayableStage
+    class Level1AStage final : public PlayableStage
     {
-
     public:
+        explicit Level1AStage();
         void draw() const override;
-        void update(float deltaTime) const override;
+        void update(float deltaTime) override;
         void destroy() override;
         void startup() override;
     };

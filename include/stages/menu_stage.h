@@ -8,6 +8,5 @@ namespace artifact
     {
     public:
         explicit MenuStage(const char *identifier) : Stage(identifier), MenuBase(identifier, this) {}
-        ~MenuStage() override = default;
     };
 } // namespace artifact

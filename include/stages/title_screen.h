@@ -26,9 +26,9 @@ namespace artifact
         SettingsScreen *settings_screen = nullptr;
 
         // Images
-        Texture2D *sky_clouds_background_image = nullptr;
-        Texture2D *mountain_hills_background_image = nullptr;
-        Texture2D *title_image = nullptr;
+        Texture2D sky_clouds_background_image{};
+        Texture2D mountain_hills_background_image{};
+        Texture2D title_image{};
 
         // Sounds
         Music menu_music;
@@ -46,13 +46,13 @@ namespace artifact
         // Utility functions
         float calculate_background_scale() const;
         int calculate_required_backgrounds() const;
-        static float calculate_background_scale(const Texture2D *texture);
+        static float calculate_background_scale(const Texture2D &texture);
         static int calculate_required_backgrounds(const Texture2D *texture, float scale);
 
     public:
         TitleScreen() : MenuStage("TitleScreen"), menu_music() {}
         void draw() const override;
-        void update(float deltaTime) const override;
+        void update(float deltaTime) override;
         void startup() override;
         void destroy() override;
         void close_settings_menu();

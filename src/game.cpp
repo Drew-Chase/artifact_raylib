@@ -13,12 +13,25 @@ namespace artifact
 
     Game::Game()
     {
-        this->manager = new StageManager();
-        this->display_settings = new DisplaySettings();
-        this->controls_settings = new ControlsSettings();
+        manager = new StageManager();
+        display_settings = new DisplaySettings();
+        controls_settings = new ControlsSettings();
     }
 
-    Game::~Game() { delete this->manager; }
+    Game::~Game()
+    {
+        spdlog::shutdown();
+        delete display_settings;
+        display_settings = nullptr;
+
+        delete controls_settings;
+        controls_settings = nullptr;
+
+        delete manager;
+        manager = nullptr;
+
+        instance = nullptr;
+    }
 
     Game *Game::get_instance()
     {
@@ -66,7 +79,8 @@ namespace artifact
         SetWindowIcon(window_icon);
         SetTargetFPS(60);
 
-        manager->load_stage(TITLE_SCREEN);
+        manager->load_stage(Stages::LEVEL1A);
+        // manager->load_stage(Stages::TITLE_SCREEN);
 
         instance->isRunning = true;
         while (!WindowShouldClose() && instance->isRunning)
@@ -82,9 +96,10 @@ namespace artifact
 
         manager->get_current_stage()->destroy();
         UnloadImage(window_icon);
+        CloseAudioDevice();
         CloseWindow();
-        // Unload settings after window close, to prevent a visible window hang.
-        delete game->display_settings;
+
+        // Call the deconstructor.
         delete game;
     }
 

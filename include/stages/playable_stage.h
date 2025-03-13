@@ -9,12 +9,16 @@ namespace artifact
     class Entity;
     class PlayableStage : public Stage
     {
+        // Vector2 background_position{-638.7887, -2850.868};
+        // float background_scale = 2.3;
+
     protected:
-        Texture2D ground;
+        Texture2D background;
         std::vector<std::unique_ptr<Entity>> entities;
         std::vector<Collider> colliders;
 
     public:
+        explicit PlayableStage(const char *identifier);
         template<typename T>
             requires std::derived_from<T, Entity>
         T *spawn_entity(int x, int y)
@@ -29,11 +33,12 @@ namespace artifact
         void startup() override;
         void draw() const override;
         void debug_draw_colliders() const;
-        void update(float deltaTime) const override;
+        void update(float deltaTime) override;
         void destroy() override;
         bool is_entity_colliding(const Entity *entity) const;
         Collider get_collider_at(int x, int y, bool blocking_only = true) const;
         std::vector<Collider> get_colliders_closest_to(int x, int y, bool blocking_only = true) const;
         std::vector<Collider> get_blocking_colliders() const;
+        void set_background(const char *resource_location);
     };
 } // namespace artifact
