@@ -8,9 +8,9 @@ namespace artifact
     void TitleScreen::startup()
     {
         owner->push_to_zindex(this);
-        sky_clouds_background_image = new Texture2D(LoadTexture("game/texture/menus/title_screen/sunny-mountains-sky.png"));
-        mountain_hills_background_image = new Texture2D(LoadTexture("game/texture/menus/title_screen/sunny-mountains-hills.png"));
-        title_image = new Texture2D(LoadTexture("game/texture/menus/title_screen/artifact_logo.png"));
+        sky_clouds_background_image = LoadTexture("game/texture/menus/title_screen/sunny-mountains-sky.png");
+        mountain_hills_background_image = LoadTexture("game/texture/menus/title_screen/sunny-mountains-hills.png");
+        title_image = LoadTexture("game/texture/menus/title_screen/artifact_logo.png");
 
         // Create the vertical container for buttons
         constexpr int button_height = 70;
@@ -25,7 +25,12 @@ namespace artifact
         button_container->set_background_color(BLANK);
 
         // Create buttons
-        start_button = std::make_unique<ButtonComponent>("start_button", this, 0, 0, button_width, button_height, "Start Game", [] { TraceLog(LOG_INFO, "Start button clicked!"); });
+        start_button = std::make_unique<ButtonComponent>("start_button", this, 0, 0, button_width, button_height, "Start Game",
+                                                         []
+                                                         {
+                                                             TraceLog(LOG_INFO, "Start button clicked!");
+                                                             Game::get_instance()->get_stage_manager()->load_stage(Stages::LEVEL1A);
+                                                         });
 
         settings_button = std::make_unique<ButtonComponent>("settings_button", this, 0, 0, button_width, button_height, "Settings Game",
                                                             [this]
@@ -64,6 +69,8 @@ namespace artifact
     }
     void TitleScreen::draw() const
     {
+        if (is_being_destroyed)
+            return;
         ClearBackground(BLACK);
         draw_background();
 
@@ -73,24 +80,23 @@ namespace artifact
         } else
         {
             // Draw title
-            if (title_image != nullptr)
-            {
-                int width = -1;
-                int height = static_cast<int>(static_cast<double>(GetScreenHeight()) / 1.5);
-                scale_texture(width, height, *title_image);
+            int width = -1;
+            int height = static_cast<int>(static_cast<double>(GetScreenHeight()) / 1.5);
+            scale_texture(width, height, title_image);
 
-                constexpr int y = 0;
-                const int x = (GetScreenWidth() - width) / 2;
-                draw_texture_scaled(width, height, x, y, *title_image);
-            }
+            constexpr int y = 0;
+            const int x = (GetScreenWidth() - width) / 2;
+            draw_texture_scaled(width, height, x, y, title_image);
 
             // Draw the button container and its contents
             if (button_container)
                 button_container->draw();
         }
     }
-    void TitleScreen::update(const float deltaTime) const
+    void TitleScreen::update(const float deltaTime)
     {
+        if (is_being_destroyed)
+            return;
         UpdateMusicStream(menu_music);
         update_background(deltaTime);
 
@@ -107,83 +113,76 @@ namespace artifact
     void TitleScreen::draw_background() const
     {
         // Draw clouds background layer
-        if (sky_clouds_background_image != nullptr)
-        {
-            const float clouds_scale = calculate_background_scale(sky_clouds_background_image);
-            const float scaled_clouds_width = static_cast<float>(sky_clouds_background_image->width) * clouds_scale;
-            const int num_clouds = calculate_required_backgrounds(sky_clouds_background_image, clouds_scale);
+        const float clouds_scale = calculate_background_scale(sky_clouds_background_image);
+        const float scaled_clouds_width = static_cast<float>(sky_clouds_background_image.width) * clouds_scale;
+        const int num_clouds = calculate_required_backgrounds(&sky_clouds_background_image, clouds_scale);
 
-            for (int i = 0; i < num_clouds; i++)
-            {
-                draw_texture_scaled(clouds_scale, clouds_scroll + (static_cast<float>(i) * scaled_clouds_width), 0, *sky_clouds_background_image);
-            }
+        for (int i = 0; i < num_clouds; i++)
+        {
+            draw_texture_scaled(clouds_scale, clouds_scroll + (static_cast<float>(i) * scaled_clouds_width), 0, sky_clouds_background_image);
         }
 
         // Draw mountains background layer
-        if (mountain_hills_background_image != nullptr)
-        {
-            const float mountains_scale = calculate_background_scale(mountain_hills_background_image);
-            const float scaled_mountains_width = static_cast<float>(mountain_hills_background_image->width) * mountains_scale;
-            const int num_mountains = calculate_required_backgrounds(mountain_hills_background_image, mountains_scale);
+        const float mountains_scale = calculate_background_scale(mountain_hills_background_image);
+        const float scaled_mountains_width = static_cast<float>(mountain_hills_background_image.width) * mountains_scale;
+        const int num_mountains = calculate_required_backgrounds(&mountain_hills_background_image, mountains_scale);
 
-            for (int i = 0; i < num_mountains; i++)
-            {
-                draw_texture_scaled(mountains_scale, mountains_scroll + (static_cast<float>(i) * scaled_mountains_width), 0, *mountain_hills_background_image);
-            }
+        for (int i = 0; i < num_mountains; i++)
+        {
+            draw_texture_scaled(mountains_scale, mountains_scroll + (static_cast<float>(i) * scaled_mountains_width), 0, mountain_hills_background_image);
         }
     }
     void TitleScreen::update_background(const float deltaTime) const
     {
 
         // Update clouds scroll
-        if (sky_clouds_background_image != nullptr)
-        {
-            const float clouds_scale = calculate_background_scale(sky_clouds_background_image);
-            const float scaled_clouds_width = static_cast<float>(sky_clouds_background_image->width) * clouds_scale;
+        const float clouds_scale = calculate_background_scale(sky_clouds_background_image);
+        const float scaled_clouds_width = static_cast<float>(sky_clouds_background_image.width) * clouds_scale;
 
-            clouds_scroll -= clouds_scroll_speed * deltaTime;
-            if (clouds_scroll <= -scaled_clouds_width)
-            {
-                clouds_scroll = 0.0f;
-            }
+        clouds_scroll -= clouds_scroll_speed * deltaTime;
+        if (clouds_scroll <= -scaled_clouds_width)
+        {
+            clouds_scroll = 0.0f;
         }
 
         // Update mountains scroll
-        if (mountain_hills_background_image != nullptr)
-        {
-            const float mountains_scale = calculate_background_scale(mountain_hills_background_image);
-            const float scaled_mountains_width = static_cast<float>(mountain_hills_background_image->width) * mountains_scale;
+        const float mountains_scale = calculate_background_scale(mountain_hills_background_image);
+        const float scaled_mountains_width = static_cast<float>(mountain_hills_background_image.width) * mountains_scale;
 
-            mountains_scroll -= mountains_scroll_speed * deltaTime;
-            if (mountains_scroll <= -scaled_mountains_width)
-            {
-                mountains_scroll = 0.0f;
-            }
+        mountains_scroll -= mountains_scroll_speed * deltaTime;
+        if (mountains_scroll <= -scaled_mountains_width)
+        {
+            mountains_scroll = 0.0f;
         }
     }
     void TitleScreen::destroy()
     {
-        // Free dynamically allocated resources
-        delete sky_clouds_background_image;
-        delete mountain_hills_background_image;
-        delete title_image;
-        delete settings_screen;
+        Stage::destroy();
+        if (is_being_destroyed)
+            return;
+        // Make sure to explicitly clean up textures
+        UnloadTexture(sky_clouds_background_image);
+        UnloadTexture(mountain_hills_background_image);
+        UnloadTexture(title_image);
 
-        // Set pointers to null to avoid dangling pointers
-        mountain_hills_background_image = nullptr;
-        title_image = nullptr;
-        sky_clouds_background_image = nullptr;
-        settings_screen = nullptr;
-
-        // Reset unique pointers for UI components
-        button_container->destroy();
-        button_container.reset();
-
-        // Remove this menu stage from z-index managed by the owner
-        owner->remove_from_zindex(this);
-
-        // Unload the music stream to free audio resources
+        // Clean up music resource
+        if (IsMusicStreamPlaying(menu_music))
+            StopMusicStream(menu_music);
         UnloadMusicStream(menu_music);
+
+        // Delete settings_screen if it exists
+        if (settings_screen != nullptr)
+        {
+            settings_screen->destroy();
+            delete settings_screen;
+            settings_screen = nullptr;
+        }
+
+        // Clear UI components before parent destroy
+        button_container.reset();
+        start_button.reset();
+        settings_button.reset();
+        exit_button.reset();
     }
     void TitleScreen::close_settings_menu()
     {
@@ -194,25 +193,13 @@ namespace artifact
         }
     }
 
-    float TitleScreen::calculate_background_scale() const
-    {
-        if (sky_clouds_background_image == nullptr)
-            return 0.0f;
-        return static_cast<float>(GetScreenHeight()) / static_cast<float>(sky_clouds_background_image->height);
-    }
+    float TitleScreen::calculate_background_scale() const { return static_cast<float>(GetScreenHeight()) / static_cast<float>(sky_clouds_background_image.height); }
     int TitleScreen::calculate_required_backgrounds() const
     {
-        if (sky_clouds_background_image == nullptr)
-            return 0;
-        const float scaled_width = static_cast<float>(sky_clouds_background_image->width) * calculate_background_scale();
+        const float scaled_width = static_cast<float>(sky_clouds_background_image.width) * calculate_background_scale();
         return static_cast<int>(static_cast<float>(GetScreenWidth()) / scaled_width) + 2;
     }
-    float TitleScreen::calculate_background_scale(const Texture2D *texture)
-    {
-        if (texture == nullptr)
-            return 0.0f;
-        return static_cast<float>(GetScreenHeight()) / static_cast<float>(texture->height);
-    }
+    float TitleScreen::calculate_background_scale(const Texture2D &texture) { return static_cast<float>(GetScreenHeight()) / static_cast<float>(texture.height); }
     int TitleScreen::calculate_required_backgrounds(const Texture2D *texture, const float scale)
     {
         if (texture == nullptr)
