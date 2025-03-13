@@ -1,15 +1,19 @@
 
 #include "stages/playable_stage.h"
-#include <stdexcept>
+#include <fmt/format.h>
 #include <vector>
+
 #include "entities/entity.h"
 
 namespace artifact
 {
+    PlayableStage::PlayableStage(const char *identifier) : Stage(identifier) {}
     void PlayableStage::startup() { Stage::startup(); }
     void PlayableStage::draw() const
     {
         Stage::draw();
+        DrawTextureEx(background, {-638.7887, -2850.868}, 0, 2.3, WHITE);
+        DrawRectangleLines(300, 0, 80, 160, WHITE);
         for (auto &entity: entities)
         {
             entity->draw();
@@ -22,10 +26,11 @@ namespace artifact
             DrawRectangleLinesEx(bounds, 1, blocking ? RED : BLUE);
         }
     }
-    void PlayableStage::update(const float deltaTime) const
+    void PlayableStage::update(const float deltaTime)
     {
         Stage::update(deltaTime);
-        for (auto &entity: entities)
+
+        for (const auto &entity: entities)
         {
             entity->update(deltaTime);
         }
@@ -34,9 +39,11 @@ namespace artifact
     {
         Stage::destroy();
         entities.clear();
+        UnloadTexture(background);
     }
     bool PlayableStage::is_entity_colliding(const Entity *entity) const { return Collider::is_entity_colliding(entity, colliders); }
     Collider PlayableStage::get_collider_at(const int x, const int y, const bool blocking_only) const { return Collider::get_collider_at(x, y, colliders, blocking_only); }
     std::vector<Collider> PlayableStage::get_colliders_closest_to(const int x, const int y, const bool blocking_only) const { return Collider::get_colliders_closest_to(x, y, colliders, blocking_only); }
     std::vector<Collider> PlayableStage::get_blocking_colliders() const { return Collider::get_blocking_colliders(colliders); }
+    void PlayableStage::set_background(const char *resource_location) { this->background = LoadTexture(resource_location); }
 } // namespace artifact
