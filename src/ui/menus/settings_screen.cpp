@@ -8,6 +8,7 @@ namespace artifact
 {
     SettingsScreen::SettingsScreen(Stage *owner) : MenuBase("settings_screen", owner)
     {
+        display_settings = *Game::get_instance()->display_settings;
         setup_action_buttons();
         setup_settings_tabs();
     }
