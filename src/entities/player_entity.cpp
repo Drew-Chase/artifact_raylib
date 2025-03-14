@@ -150,10 +150,9 @@ namespace artifact
         if (std::abs(target_speed - horizontal_velocity) > 0.1f)
         {
             const float direction = target_speed > horizontal_velocity ? 1.0f : -1.0f;
-            const float acc = acceleration * control_multiplier * deltaTime;
 
             // Ensure we don't overshoot the target speed
-            if (std::abs(acc) > std::abs(target_speed - horizontal_velocity))
+            if (const float acc = acceleration * control_multiplier * deltaTime; std::abs(acc) > std::abs(target_speed - horizontal_velocity))
                 horizontal_velocity = target_speed;
             else
                 horizontal_velocity += acc * direction;
