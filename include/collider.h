@@ -82,10 +82,10 @@ namespace artifact
         Collider(int x, int y, int width, int height, bool is_blocking);
 
         /**
-         * Checks whether the given collider is empty by comparing it to the predefined EMPTY.
+         * Checks whether the given collider is empty by comparing it to the predefined EMPTY_COLLIDER.
          *
          * This function determines if the provided collider has no valid bounds or is marked as inactive by
-         * checking for equality with the static EMPTY instance.
+         * checking for equality with the static EMPTY_COLLIDER instance.
          *
          * @param collider The collider to check for emptiness.
          * @return True if the collider is empty, false otherwise.
@@ -144,5 +144,5 @@ namespace artifact
          */
         static std::vector<Collider> get_blocking_colliders(std::vector<Collider> colliders);
     };
-    static const auto EMPTY = Collider();
+    static const auto EMPTY_COLLIDER = Collider();
 } // namespace artifact

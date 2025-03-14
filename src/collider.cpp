@@ -10,7 +10,7 @@ namespace artifact
     Collider::Collider(const Rectangle bounds, const bool is_blocking) : bounds(bounds), is_blocking(is_blocking) {}
     Collider::Collider(const int x, const int y, const int width, const int height) : bounds{static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)}, is_blocking{true} {}
     Collider::Collider(const int x, const int y, const int width, const int height, const bool is_blocking) : bounds{static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)}, is_blocking(is_blocking) {}
-    bool Collider::is_collider_empty(const Collider &collider) { return collider == EMPTY; }
+    bool Collider::is_collider_empty(const Collider &collider) { return collider == EMPTY_COLLIDER; }
     bool Collider::is_entity_colliding(const Entity *entity, const std::vector<Collider> &colliders)
     {
         const auto &[x, y, width, height] = entity->get_bounds();
@@ -33,14 +33,14 @@ namespace artifact
         const std::vector<Collider> close_colliders = get_colliders_closest_to(x, y, colliders, blocking_only);
         if (close_colliders.empty())
         {
-            return EMPTY;
+            return EMPTY_COLLIDER;
         }
         const auto fx = static_cast<float>(x);
         // ReSharper disable once CppTooWideScopeInitStatement
         const auto fy = static_cast<float>(y);
         if (CheckCollisionRecs(close_colliders[0].bounds, {fx, fy, 1, 1}))
             return close_colliders[0];
-        return EMPTY;
+        return EMPTY_COLLIDER;
     }
 
     std::vector<Collider> Collider::get_colliders_closest_to(const int x, const int y, const std::vector<Collider> &colliders, const bool blocking_only)
