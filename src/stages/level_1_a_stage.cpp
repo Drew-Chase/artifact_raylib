@@ -9,9 +9,6 @@ namespace artifact
     {
         PlayableStage::startup();
 
-        // Spawn the Player
-        spawn_entity<PlayerEntity>(0, -100);
-
         // Spawn enemies
         // TODO: Spawn enemies
 
@@ -24,13 +21,14 @@ namespace artifact
         // Create Colliders
         float block_scale = 32 * 2.3;
         colliders.emplace_back(-150, 205, block_scale * 9, block_scale, true);
-        colliders.emplace_back(-150, -72, block_scale, block_scale*6, true);
+        colliders.emplace_back(-150, -90, block_scale, block_scale * 4, true);
+        colliders.emplace_back(-500, 500, block_scale*150, block_scale, [this] { player->set_position(0, 0); });
     }
     void Level1AStage::draw() const
     {
         BeginMode2D(camera);
         PlayableStage::draw();
-        DrawRectangle(0, 0, 50, 50, RED);
+        DrawRectangle(0, 0, 10, 10, RED);
         EndMode2D();
     }
     void Level1AStage::update(const float deltaTime) { PlayableStage::update(deltaTime); }
