@@ -10,6 +10,7 @@ namespace artifact
     Collider::Collider(const Rectangle bounds, const bool is_blocking) : bounds(bounds), is_blocking(is_blocking) {}
     Collider::Collider(const int x, const int y, const int width, const int height) : bounds{static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)}, is_blocking{true} {}
     Collider::Collider(const int x, const int y, const int width, const int height, const bool is_blocking) : bounds{static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)}, is_blocking(is_blocking) {}
+    Collider::Collider(const int x, const int y, const int width, const int height, const std::function<void()> &on_overlap) : on_overlap(on_overlap), bounds{static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)}, is_blocking(false) {}
     bool Collider::is_collider_empty(const Collider &collider) { return collider == EMPTY_COLLIDER; }
     bool Collider::is_entity_colliding(const Entity *entity, const std::vector<Collider> &colliders)
     {
@@ -66,5 +67,14 @@ namespace artifact
         auto filtered_view = colliders | std::views::filter([](const Collider &collider) { return collider.is_blocking; });
         std::ranges::copy(filtered_view, std::back_inserter(blocking_colliders));
         return blocking_colliders;
+    }
+    void Collider::overlap()
+    {
+        if (on_overlap && overlap_cooldown <= 0)
+        {
+            on_overlap();
+            overlap_cooldown = 60; // ~60 frame cooldown
+        } else if (overlap_cooldown > 0)
+            overlap_cooldown -= 1;
     }
 } // namespace artifact

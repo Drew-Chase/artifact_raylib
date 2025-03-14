@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include <raylib.h>
 #include <vector>
 #include "entities/entity.h"
@@ -7,6 +8,9 @@ namespace artifact
 {
     class Collider
     {
+        std::function<void()> on_overlap;
+        int overlap_cooldown = 0;
+
     public:
         /**
          * Represents the rectangular boundaries of the collider, which define its position and size in the game world.
@@ -81,6 +85,8 @@ namespace artifact
          */
         Collider(int x, int y, int width, int height, bool is_blocking);
 
+        Collider(int x, int y, int width, int height, const std::function<void()> &on_overlap);
+
         /**
          * Checks whether the given collider is empty by comparing it to the predefined EMPTY_COLLIDER.
          *
@@ -143,6 +149,12 @@ namespace artifact
          * @return A vector of colliders that are marked as blocking.
          */
         static std::vector<Collider> get_blocking_colliders(std::vector<Collider> colliders);
+
+
+        /**
+         * This is called when an entity overlaps with a collider instead of colliding with it.
+         */
+        void overlap();
     };
     static const auto EMPTY_COLLIDER = Collider();
 } // namespace artifact
