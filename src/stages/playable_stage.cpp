@@ -11,13 +11,14 @@ namespace artifact
     void PlayableStage::startup() { Stage::startup(); }
     void PlayableStage::draw() const
     {
+
         Stage::draw();
-        DrawTextureEx(background, {-638.7887, -2850.868}, 0, 2.3, WHITE);
-        DrawRectangleLines(300, 0, 80, 160, WHITE);
+        DrawTextureEx(background, {-1000, -3150}, 0, 2.3, WHITE);
         for (auto &entity: entities)
         {
             entity->draw();
         }
+        debug_draw_colliders();
     }
     void PlayableStage::debug_draw_colliders() const
     {
