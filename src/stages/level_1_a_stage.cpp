@@ -20,9 +20,18 @@ namespace artifact
 
         // Create Colliders
         float block_scale = 32 * 2.3;
+
+        // Ground
         colliders.emplace_back(-150, 205, block_scale * 9, block_scale, true);
-        colliders.emplace_back(-150, -90, block_scale, block_scale * 4, true);
-        colliders.emplace_back(-500, 500, block_scale*150, block_scale, [this] { player->set_position(0, 0); });
+        colliders.emplace_back(-150 + block_scale * 9, 205 - block_scale, block_scale, block_scale, true);
+        colliders.emplace_back(-150 + block_scale * 10, 205 - block_scale * 2, block_scale * 8, block_scale, true);
+
+
+        // Walls
+        colliders.emplace_back(-223.6, -90, block_scale, block_scale * 4, true);
+
+        // Killnet
+        colliders.emplace_back(-500, 500, block_scale * 150, block_scale, respawn);
     }
     void Level1AStage::draw() const
     {
