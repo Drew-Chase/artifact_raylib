@@ -9,15 +9,15 @@ namespace artifact
     class Entity;
     class PlayableStage : public Stage
     {
-        // Vector2 background_position{-638.7887, -2850.868};
-        // float background_scale = 2.3;
-
     protected:
         Texture2D background;
         std::vector<std::unique_ptr<Entity>> entities;
         std::vector<Collider> colliders;
 
     public:
+        Camera2D camera{};
+
+
         explicit PlayableStage(const char *identifier);
         template<typename T>
             requires std::derived_from<T, Entity>
