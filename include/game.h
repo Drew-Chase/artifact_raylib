@@ -1,6 +1,5 @@
 #pragma once
 #include <cstdarg>
-
 #include "settings/controls_settings.h"
 #include "settings/display_settings.h"
 #include "stages/stage_manager.h"
