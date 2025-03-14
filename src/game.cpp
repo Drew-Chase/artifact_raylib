@@ -85,8 +85,13 @@ namespace artifact
         instance->isRunning = true;
         while (!WindowShouldClose() && instance->isRunning)
         {
+            float deltaTime = GetFrameTime();
+            if (constexpr float MAX_DELTA_TIME = 0.05f; deltaTime > MAX_DELTA_TIME)
+                deltaTime = MAX_DELTA_TIME;
+
+
             const auto stage = manager->get_current_stage();
-            stage->update(GetFrameTime());
+            stage->update(deltaTime);
             BeginDrawing();
             ClearBackground(BLACK);
             stage->draw();
