@@ -1,22 +1,36 @@
 #pragma once
-#include <raylib.h>
 #include "entity.h"
 
 namespace artifact
 {
     class PlayerEntity final : public Entity
     {
-        // Statistics
-        int lives = 3;
-        int coin = 0;
+        float walk_speed = 300.0f;
+        float walk_speed_multiplier = 1;
+        float sprint_multiplier = 1.5f;
         bool sprinting = false;
 
-        // Multipliers
-        float sprint_multiplier = 1.5f;
-        float jump_multiplier = 1.5f;
-        float friction_multiplier = 1.f;
-        Camera2D camera = {};
+        // Gravity and jumping variables
+        float vertical_velocity = 0.0f;
+        float horizontal_velocity = 0.0f;
+        float gravity = 1200.0f;
+        float jump_force = 600.0f;
+        bool is_grounded = false;
+        bool is_jumping = false;
+
+        // Air control and physics constants
+        float air_control = 0.8f; // Lower control when in air
+        float ground_friction = 10.0f; // Friction when on ground
+        float air_friction = 1.0f; // Friction when in air
+        float acceleration = 2000.0f; // How quickly the player accelerates
+
+        Vector2 bounds{80, 160};
+
         void handle_input(float deltaTime);
+        void apply_gravity(float deltaTime);
+        void apply_horizontal_movement(float deltaTime);
+        void check_ground_collision();
+        void UpdateCameraCenterSmoothFollow(float delta) const;
 
     public:
         void startup() override;
@@ -24,6 +38,6 @@ namespace artifact
         void update(float deltaTime) override;
         void damage(int damage) override;
         void kill() override;
-        void jump() override;
+        void jump();
     };
 } // namespace artifact
