@@ -12,8 +12,8 @@ namespace artifact
         this->position = Vector2{static_cast<float>(x), static_cast<float>(y)};
         this->startup();
     }
+    void Entity::set_position(const int x, const int y) { this->position = Vector2{static_cast<float>(x), static_cast<float>(y)}; }
     void Entity::startup() {}
-    void Entity::goto_point(Vector2 point) {}
     bool Entity::has_hit_obstacle() { return false; }
     void Entity::debug_draw_colliders() { DrawRectangleLinesEx(bounds, 1, GREEN); }
     Rectangle Entity::get_bounds() const { return bounds; }

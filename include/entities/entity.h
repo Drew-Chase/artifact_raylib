@@ -31,7 +31,7 @@ namespace artifact
         virtual void damage(int damage);
         virtual void kill();
         void spawn(int x, int y, PlayableStage *owner);
-        virtual void goto_point(Vector2 point);
+        virtual void set_position(int x, int y);
         virtual bool has_hit_obstacle();
         virtual void debug_draw_colliders();
         Rectangle get_bounds() const;
