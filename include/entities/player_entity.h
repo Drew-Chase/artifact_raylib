@@ -29,7 +29,7 @@ namespace artifact
         void handle_input(float deltaTime);
         void apply_gravity(float deltaTime);
         void apply_horizontal_movement(float deltaTime);
-        void check_ground_collision();
+        void check_collision();
         void UpdateCameraCenterSmoothFollow(float delta) const;
 
     public:
