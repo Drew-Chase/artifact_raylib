@@ -12,7 +12,7 @@ namespace artifact
     {
     protected:
         Texture2D background;
-        PlayerEntity* player;
+        PlayerEntity *player;
         std::vector<std::unique_ptr<Entity>> entities;
         std::vector<Collider> colliders;
 
@@ -42,5 +42,6 @@ namespace artifact
         std::vector<Collider> get_colliders_closest_to(int x, int y, bool blocking_only = true) const;
         std::vector<Collider> get_blocking_colliders() const;
         void set_background(const char *resource_location);
+        void respawn();
     };
 } // namespace artifact

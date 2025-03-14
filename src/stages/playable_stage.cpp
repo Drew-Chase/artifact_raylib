@@ -52,4 +52,8 @@ namespace artifact
     std::vector<Collider> PlayableStage::get_colliders_closest_to(const int x, const int y, const bool blocking_only) const { return Collider::get_colliders_closest_to(x, y, colliders, blocking_only); }
     std::vector<Collider> PlayableStage::get_blocking_colliders() const { return Collider::get_blocking_colliders(colliders); }
     void PlayableStage::set_background(const char *resource_location) { this->background = LoadTexture(resource_location); }
+    void PlayableStage::respawn()
+    {
+        player->set_position(0, 0);
+    }
 } // namespace artifact
