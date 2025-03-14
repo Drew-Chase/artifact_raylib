@@ -11,7 +11,7 @@ namespace artifact
     {
         Entity::startup();
         owner->camera.target = this->position;
-        owner->camera.zoom = 1.0f;
+        owner->camera.zoom = 1;
         owner->camera.rotation = 0;
     }
 
@@ -107,21 +107,19 @@ namespace artifact
             const int check_x = static_cast<int>(position.x + bounds.x * x_percent);
             const int check_y = static_cast<int>(position.y + bounds.y * y_percent);
 
-            std::vector<Collider> nearby_colliders = owner->get_colliders_closest_to(check_x, check_y);
+            std::vector<Collider> nearby_colliders = owner->get_colliders_closest_to(check_x, check_y, false);
 
             if (nearby_colliders.empty())
                 continue;
 
-            for (const auto &collider: nearby_colliders)
+            for (Collider &collider: nearby_colliders)
             {
+                if (!CheckCollisionPointRec({static_cast<float>(check_x), static_cast<float>(check_y)}, collider.bounds))
+                    continue;
+
+                collider.overlap();
                 if (!collider.is_blocking)
                     continue;
-
-                if (!CheckCollisionPointRec({static_cast<float>(check_x), static_cast<float>(check_y)}, collider.bounds))
-                {
-                    continue;
-                }
-
                 switch (edge)
                 {
                     case BOTTOM:
