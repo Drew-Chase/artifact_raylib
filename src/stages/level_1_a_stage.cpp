@@ -24,6 +24,7 @@ namespace artifact
         // Create Colliders
         float block_scale = 32 * 2.3;
         colliders.emplace_back(-150, 205, block_scale * 9, block_scale, true);
+        colliders.emplace_back(-150, -72, block_scale, block_scale*6, true);
     }
     void Level1AStage::draw() const
     {
