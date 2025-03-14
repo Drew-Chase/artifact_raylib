@@ -8,7 +8,12 @@
 namespace artifact
 {
     PlayableStage::PlayableStage(const char *identifier) : Stage(identifier) {}
-    void PlayableStage::startup() { Stage::startup(); }
+    void PlayableStage::startup()
+    {
+        Stage::startup();
+        // Spawn the Player
+        this->player = spawn_entity<PlayerEntity>(0, 0);
+    }
     void PlayableStage::draw() const
     {
 
@@ -22,9 +27,9 @@ namespace artifact
     }
     void PlayableStage::debug_draw_colliders() const
     {
-        for (const auto [bounds, blocking]: colliders)
+        for (const auto collider: colliders)
         {
-            DrawRectangleLinesEx(bounds, 1, blocking ? RED : BLUE);
+            DrawRectangleLinesEx(collider.bounds, 4, collider.is_blocking ? RED : BLUE);
         }
     }
     void PlayableStage::update(const float deltaTime)

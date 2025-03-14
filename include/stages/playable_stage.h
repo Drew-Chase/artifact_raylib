@@ -2,6 +2,7 @@
 #include <memory>
 #include <raylib.h>
 #include "collider.h"
+#include "entities/player_entity.h"
 #include "stage.h"
 namespace artifact
 {
@@ -11,6 +12,7 @@ namespace artifact
     {
     protected:
         Texture2D background;
+        PlayerEntity* player;
         std::vector<std::unique_ptr<Entity>> entities;
         std::vector<Collider> colliders;
 
