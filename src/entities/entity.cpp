@@ -3,11 +3,7 @@
 namespace artifact
 {
     void Entity::draw() {}
-    void Entity::update(const float deltaTime)
-    {
-        // Handle gravity
-        position.y += 10 * deltaTime;
-    }
+    void Entity::update(const float deltaTime) {}
     void Entity::damage(int damage) {}
     void Entity::kill() {}
     void Entity::spawn(const int x, const int y, PlayableStage *owner)
@@ -17,11 +13,6 @@ namespace artifact
         this->startup();
     }
     void Entity::startup() {}
-    void Entity::jump()
-    {
-        is_on_ground = false;
-        is_jumping = true;
-    }
     void Entity::goto_point(Vector2 point) {}
     bool Entity::has_hit_obstacle() { return false; }
     void Entity::debug_draw_colliders() { DrawRectangleLinesEx(bounds, 1, GREEN); }
