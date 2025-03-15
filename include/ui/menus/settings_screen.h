@@ -10,6 +10,13 @@
 
 namespace artifact
 {
+    enum class SettingsTab
+    {
+        DISPLAY,
+        CONTROLS,
+        AUDIO,
+        VIDEO,
+    };
     class SettingsScreen final : public MenuBase
     {
         // UI Settings
@@ -18,6 +25,7 @@ namespace artifact
         const Color button_hover_bg_color = ColorAlpha(BLACK, 0.75f);
         const Color button_pressed_bg_color = BLACK;
         const int font_size = 16;
+        SettingsTab current_tab = SettingsTab::DISPLAY;
 
         bool pending_removal = false;
 
