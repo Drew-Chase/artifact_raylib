@@ -13,7 +13,6 @@ namespace artifact
         int attack_damage = 1;
         bool is_on_ground = true;
         float gravity_multiplier = 1.f;
-        bool is_jumping = false;
 
         // Multipliers
         float walk_speed_multiplier = 1.f;
