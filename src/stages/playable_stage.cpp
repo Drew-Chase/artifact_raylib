@@ -12,6 +12,7 @@ namespace artifact
     {
         Stage::startup();
         // Spawn the Player
+        // this->player = spawn_entity<PlayerEntity>(-150 + 32 * 2.3 * 118.5, 205 - 32 * 2.3 * 4);
         this->player = spawn_entity<PlayerEntity>(0, 0);
     }
     void PlayableStage::draw() const
@@ -52,10 +53,7 @@ namespace artifact
     std::vector<Collider> PlayableStage::get_colliders_closest_to(const int x, const int y, const bool blocking_only) const { return Collider::get_colliders_closest_to(x, y, colliders, blocking_only); }
     std::vector<Collider> PlayableStage::get_blocking_colliders() const { return Collider::get_blocking_colliders(colliders); }
     void PlayableStage::set_background(const char *resource_location) { this->background = LoadTexture(resource_location); }
-    Texture2D* PlayableStage::get_background()
-    {
-        return &background;
-    }
+    Texture2D *PlayableStage::get_background() { return &background; }
     void PlayableStage::respawn()
     {
         camera.target = {0, 0};
