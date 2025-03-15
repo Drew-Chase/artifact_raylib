@@ -1,6 +1,8 @@
 
 #include "ui/menus/settings_screen.h"
 
+#include <fmt/format.h>
+
 #include "game.h"
 #include "stages/title_screen.h"
 
@@ -29,10 +31,10 @@ namespace artifact
             settings_menu_actions_container->update(mouse_x, mouse_y);
             settings_menu_actions_container->set_position(GetScreenWidth() / 2 - settings_menu_actions_container->get_width() / 2, GetScreenHeight() - settings_menu_actions_container->get_height() - 20);
         }
+        TraceLog(LOG_DEBUG, "test");
     }
     void SettingsScreen::setup_action_buttons()
     {
-
         constexpr int button_height = 70;
         const int button_width = GetScreenWidth() / 4;
         constexpr int button_spacing = 10;
@@ -60,7 +62,31 @@ namespace artifact
 
         settings_menu_actions_container->auto_size();
     }
-    void SettingsScreen::setup_settings_tabs() {}
+    void SettingsScreen::setup_settings_tabs()
+    {
+        for (int i = 0; i <= 3; i++)
+        {
+            const auto tab = static_cast<SettingsTab>(i);
+            const char *label;
+            switch (tab)
+            {
+                case SettingsTab::DISPLAY:
+                    label = "Display";
+                    break;
+                case SettingsTab::AUDIO:
+                    label = "Audio";
+                    break;
+                case SettingsTab::CONTROLS:
+                    label = "Controls";
+                    break;
+                case SettingsTab::VIDEO:
+                    label = "Video";
+                    break;
+            }
+            TraceLog(LOG_DEBUG, "tab: %d, label: %s", i, label);
+            settings_tabs_container->add_component<ButtonComponent>(fmt::format("settings_tab_{}", i).c_str(), owner, 0, 0, 0, 0, label, [&] { current_tab = tab; });
+        }
+    }
     void SettingsScreen::save_apply()
     {
         const Game *game = Game::get_instance();
