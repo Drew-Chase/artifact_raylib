@@ -63,7 +63,7 @@ namespace artifact
         button_container->auto_size();
 
         // Play theme music
-        menu_music = LoadMusicStream("game/audio/music/mainmenu.wav");
+        menu_music = LoadMusicStream("game/audio/music/mainmenu.ogg");
         menu_music.looping = true;
         PlayMusicStream(menu_music);
     }
