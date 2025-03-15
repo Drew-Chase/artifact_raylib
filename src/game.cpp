@@ -81,8 +81,8 @@ namespace artifact
         SetWindowIcon(window_icon);
         SetTargetFPS(60);
 
-        // manager->load_stage(Stages::LEVEL1A);
-        manager->load_stage(Stages::TITLE_SCREEN);
+        // manager->load_stage(Stages::TITLE_SCREEN);
+        manager->load_stage(Stages::LEVEL1A);
 
         instance->isRunning = true;
         while (!WindowShouldClose() && instance->isRunning)
