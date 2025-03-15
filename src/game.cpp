@@ -62,6 +62,7 @@ namespace artifact
         spdlog::flush_every(std::chrono::seconds(3));
 
         SetTraceLogCallback(register_log_callback);
+        SetTraceLogLevel(LOG_DEBUG);
 
         const auto window_icon = LoadImage("game/app-icon.png");
         StageManager *manager = game->get_stage_manager();
@@ -69,6 +70,7 @@ namespace artifact
 
         InitWindow(0, 0, "Artifact: The Journey Unraveled");
         InitAudioDevice();
+        SetWindowState(FLAG_WINDOW_RESIZABLE);
 
         // Load Settings
         game->display_settings->load();
@@ -79,8 +81,8 @@ namespace artifact
         SetWindowIcon(window_icon);
         SetTargetFPS(60);
 
-        manager->load_stage(Stages::LEVEL1A);
-        // manager->load_stage(Stages::TITLE_SCREEN);
+        // manager->load_stage(Stages::LEVEL1A);
+        manager->load_stage(Stages::TITLE_SCREEN);
 
         instance->isRunning = true;
         while (!WindowShouldClose() && instance->isRunning)
@@ -116,9 +118,6 @@ namespace artifact
 
         switch (msgType)
         {
-            case LOG_TRACE:
-                logger->trace(formattedMessage);
-                break;
             case LOG_DEBUG:
                 logger->debug(formattedMessage);
                 break;
@@ -134,8 +133,9 @@ namespace artifact
             case LOG_FATAL:
                 logger->critical(formattedMessage);
                 break;
+            case LOG_TRACE:
             default:
-                logger->info("Unknown log type: {}", msgType);
+                logger->trace(formattedMessage);
                 break;
         }
         logger->flush(); // Explicit flush after each message
