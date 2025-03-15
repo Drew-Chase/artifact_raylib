@@ -13,10 +13,12 @@ namespace artifact
         // Gravity and jumping variables
         float vertical_velocity = 0.0f;
         float horizontal_velocity = 0.0f;
-        float gravity = 1200.0f;
-        float jump_force = 600.0f;
+        float gravity = 1800.0f;
+        float jump_force = 670.0f;
         bool is_grounded = false;
-        bool is_jumping = false;
+        int jump_count = 0;
+        int max_jump_count = 2;
+
 
         // Air control and physics constants
         float air_control = 0.8f; // Lower control when in air
