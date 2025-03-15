@@ -1,8 +1,12 @@
 cmake_minimum_required(VERSION 3.22)
-
 project(artifact_raylib)
-
 set(CMAKE_CXX_STANDARD 23)
+
+include(cmake/assets.cmake)
+include(cmake/vendors.cmake)
+include(cmake/gcc.cmake)
+include(cmake/clang.cmake)
+include(cmake/msvc.cmake)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 file(GLOB_RECURSE HEADERS "include/*.h")
@@ -23,83 +27,19 @@ option(STRIPPED_VERSION "Create a stripped version of the build without certain 
 
 # Setting up the bin and obj directories as the good lord intended.
 # Non of that `cmake-build-*` crap.
-set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/${CMAKE_PROJECT_NAME}/${PROFILE_NAME}")
+set(RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/${CMAKE_PROJECT_NAME}/${PROFILE_NAME}")
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIRECTORY})
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES INTERMEDIATE_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/obj/${CMAKE_PROJECT_NAME}/${PROFILE_NAME}")
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME "${CMAKE_PROJECT_NAME}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${PROFILE_NAME}")
 set(CMAKE_BINARY_DIR "${CMAKE_SOURCE_DIR}/bin/obj/${PROFILE_NAME}")
 set(CMAKE_CACHEFILE_DIR ${PROJECT_SOURCE_DIR}/bin/obj/cmake/${CMAKE_PROJECT_NAME})
-
-if (REMOVE_DEBUG_INFO)
-    if (MSVC)
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /RTC- /D NDEBUG /DEBUG:NONE")
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /RTC- /D NDEBUG /DEBUG:NONE")
-        target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE /O2 /GL)
-    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -s")
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
-        target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE -Oz)
-    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        string(REPLACE "-s" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
-        string(REPLACE "-s" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-        target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE -Oz)
-    endif ()
-endif ()
-# I swear to god, if the github workflow fails one more time due to different compiler options, I'm going to force delete this project 😠
-if (NOT STRIPPED_VERSION)
-    if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-        if (MSVC)
-            # Static linking for MSVC runtime
-            set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-            foreach (flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-                    CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-                if (${flag_var} MATCHES "/MD")
-                    string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-                endif ()
-            endforeach ()
-            target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE /MT) # Ensure static runtime linking
-        else ()
-            # For GCC
-            set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static-libgcc -static-libstdc++ -static")
-            target_link_options(${CMAKE_PROJECT_NAME} PRIVATE -static -static-libgcc -static-libstdc++ -Wl,--allow-multiple-definition)
-        endif ()
-    elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static-libgcc -static-libstdc++ -static -lpthread")
-    endif ()
-    # macOS doesn't need these flags and they cause issues, this is because macOS is a precious little flower that doesn't want any of those icky `flags` 😭
-endif ()
-if (PROFILE_NAME STREQUAL "debug")
-    set(CMAKE_BUILD_TYPE Debug)
-else ()
-    set(CMAKE_BUILD_TYPE Release)
-    if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-        if (MSVC)
-            set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
-        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-            set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-mwindows")
-        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-            # Remove unsupported Clang options
-            set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,--subsystem,windows")
-        endif ()
-    endif ()
-endif ()
-
 if (WIN32)
     target_sources(${CMAKE_PROJECT_NAME} PRIVATE "resources/resources.rc")
 endif ()
 
-add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_HOME_DIRECTORY}/assets"
-        $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>/game)
+build_gcc()
+build_clang()
+build_msvc()
 
-# Add automatic linking for conan packages
-find_package(spdlog)
-find_package(nlohmann_json)
-find_package(raylib)
-
-
-target_link_libraries(${CMAKE_PROJECT_NAME}
-        raylib
-        spdlog::spdlog
-        nlohmann_json::nlohmann_json
-)
+copy_assets()
+initialize_vendors()
