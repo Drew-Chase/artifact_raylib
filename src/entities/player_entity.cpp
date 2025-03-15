@@ -130,7 +130,7 @@ namespace artifact
                                 highest_ground = collider.bounds.y;
                             }
                             is_grounded = true;
-                            is_jumping = false;
+                            jump_count = 0;
                         }
                         break;
 
@@ -181,11 +181,11 @@ namespace artifact
 
     void PlayerEntity::jump()
     {
-        if (is_grounded && !is_jumping)
+        if (jump_count < max_jump_count)
         {
             vertical_velocity = jump_force;
             is_grounded = false;
-            is_jumping = true;
+            jump_count++;
         }
     }
 
@@ -228,16 +228,42 @@ namespace artifact
 
     void PlayerEntity::UpdateCameraCenterSmoothFollow(const float delta) const
     {
+        if (!owner)
+            return;
+
+        const int background_width = owner->get_background()->width;
+        const int background_height = owner->get_background()->height;
+
+        // Background position and scale from PlayableStage::draw
+        constexpr Vector2 bg_position = {-1000, -3150};
+        constexpr float bg_scale = 2.3f;
+
         constexpr float minEffectLength = 10;
         owner->camera.offset = (Vector2) {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
         const Vector2 diff = Vector2Subtract(position, owner->camera.target);
 
+        // Update camera target with smooth follow
         if (const float length = Vector2Length(diff); length > minEffectLength)
         {
             constexpr float fractionSpeed = 0.9f;
             constexpr float minSpeed = 10;
-            const float speed = fmaxf(fractionSpeed * length, minSpeed);
+            const float distanceFactor = length / minEffectLength; // Multiplier based on distance
+            const float speed = fmaxf(fractionSpeed * length * distanceFactor, minSpeed);
             owner->camera.target = Vector2Add(owner->camera.target, Vector2Scale(diff, speed * delta / length));
         }
+
+        // Calculate the visible area dimensions
+        const float halfScreenWidth = owner->camera.offset.x;
+        const float halfScreenHeight = owner->camera.offset.y;
+
+        // Calculate camera bounds based on background size and screen dimensions
+        const float minX = bg_position.x + halfScreenWidth;
+        const float minY = bg_position.y + halfScreenHeight;
+        const float maxX = bg_position.x + (background_width * bg_scale) - halfScreenWidth;
+        const float maxY = bg_position.y + (background_height * bg_scale) - halfScreenHeight;
+
+        // Clamp camera target position to stay within bounds
+        owner->camera.target.x = Clamp(owner->camera.target.x, minX, maxX);
+        owner->camera.target.y = Clamp(owner->camera.target.y, minY, maxY);
     }
 } // namespace artifact
