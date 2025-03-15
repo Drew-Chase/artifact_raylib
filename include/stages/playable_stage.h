@@ -42,6 +42,7 @@ namespace artifact
         std::vector<Collider> get_colliders_closest_to(int x, int y, bool blocking_only = true) const;
         std::vector<Collider> get_blocking_colliders() const;
         void set_background(const char *resource_location);
+        Texture2D *get_background();
         void respawn();
     };
 } // namespace artifact
