@@ -43,6 +43,13 @@ function(copy_assets)
             list(APPEND USED_ASSETS "${RELATIVE_PATH}")
         endforeach ()
 
+        string(REGEX MATCHALL "LoadMusicStream\\([\"']([^\"']+)[\"']\\)" MUSIC_MATCHES "${FILE_CONTENTS}")
+        foreach (MATCH ${MUSIC_MATCHES})
+            string(REGEX REPLACE "LoadMusicStream\\([\"']([^\"']+)[\"']\\)" "\\1" ASSET_PATH "${MATCH}")
+            string(REGEX REPLACE "^game/" "" RELATIVE_PATH "${ASSET_PATH}")
+            list(APPEND USED_ASSETS "${RELATIVE_PATH}")
+        endforeach ()
+
         string(REGEX MATCHALL "set_background\\([\"']([^\"']+)[\"']\\)" BACKGROUND_MATCHES "${FILE_CONTENTS}")
         foreach (MATCH ${BACKGROUND_MATCHES})
             string(REGEX REPLACE "set_background\\([\"']([^\"']+)[\"']\\)" "\\1" ASSET_PATH "${MATCH}")
