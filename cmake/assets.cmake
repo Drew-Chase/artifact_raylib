@@ -1,81 +1,104 @@
-function(copy_assets)
+# asset_copier.cmake
+function(copy_used_assets)
     set(ASSETS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/assets")
     set(ASSETS_OUTPUT_DIR "${RUNTIME_OUTPUT_DIRECTORY}/game")
 
-    file(REMOVE_RECURSE "${ASSETS_OUTPUT_DIR}")
+    # Create output directory if it doesn't exist
+    file(MAKE_DIRECTORY ${ASSETS_OUTPUT_DIR})
 
-    file(GLOB_RECURSE SOURCE_FILES "src/*.cpp" "include/*.h" "main.cpp")
-    set(USED_ASSETS "")
+    # Get all source files
+    file(GLOB_RECURSE SOURCE_FILES
+            "${CMAKE_SOURCE_DIR}/src/*.cpp"
+            "${CMAKE_SOURCE_DIR}/src/*.h"
+            "${CMAKE_SOURCE_DIR}/include/*.cpp"
+            "${CMAKE_SOURCE_DIR}/include/*.h"
+    )
 
-    foreach (SOURCE_FILE ${SOURCE_FILES})
-        file(READ ${SOURCE_FILE} FILE_CONTENTS)
+    # Initialize set of assets to copy
+    set(ASSETS_TO_COPY "")
 
-        string(REGEX MATCHALL "LoadTexture\\([\"']([^\"']+)[\"']\\)" TEXTURE_MATCHES "${FILE_CONTENTS}")
-        foreach (MATCH ${TEXTURE_MATCHES})
-            string(REGEX REPLACE "LoadTexture\\([\"']([^\"']+)[\"']\\)" "\\1" ASSET_PATH "${MATCH}")
+    # Process each source file
+    foreach(SOURCE_FILE ${SOURCE_FILES})
+        # Read file content line by line
+        file(STRINGS "${SOURCE_FILE}" FILE_LINES)
 
-            string(REGEX REPLACE "^game/" "" RELATIVE_PATH "${ASSET_PATH}")
+        foreach(LINE ${FILE_LINES})
+            # Extract asset paths using regex
+            string(REGEX MATCHALL "\"game/[^\"]+\"" MATCHES "${LINE}")
 
-            list(APPEND USED_ASSETS "${RELATIVE_PATH}")
-            message("Found texture resource in source file: ${SOURCE_FILE} - ${RELATIVE_PATH}")
-        endforeach ()
+            foreach(MATCH ${MATCHES})
+                # Remove quotes
+                string(REGEX REPLACE "\"(.*)\"" "\\1" ASSET_PATH "${MATCH}")
 
-        string(REGEX MATCHALL "LoadImage\\([\"']([^\"']+)[\"']\\)" IMAGE_MATCHES "${FILE_CONTENTS}")
-        foreach (MATCH ${IMAGE_MATCHES})
-            string(REGEX REPLACE "LoadImage\\([\"']([^\"']+)[\"']\\)" "\\1" ASSET_PATH "${MATCH}")
-            string(REGEX REPLACE "^game/" "" RELATIVE_PATH "${ASSET_PATH}")
-            list(APPEND USED_ASSETS "${RELATIVE_PATH}")
-            message("Found image resource in source file: ${SOURCE_FILE} - ${RELATIVE_PATH}")
-        endforeach ()
+                # Check if path contains %d formatting
+                if("${ASSET_PATH}" MATCHES "%d")
+                    # Look for the first number after the path string
+                    # This handles function calls like SpriteSheet idle_sheet("game/texture/entities/player/idle%d.png", 9, 8);
+                    string(REGEX MATCH "\"${ASSET_PATH}\"[^0-9]*([0-9]+)" COUNT_MATCH "${LINE}")
 
-        string(REGEX MATCHALL "LoadSound\\([\"']([^\"']+)[\"']\\)" SOUND_MATCHES "${FILE_CONTENTS}")
-        foreach (MATCH ${SOUND_MATCHES})
-            string(REGEX REPLACE "LoadSound\\([\"']([^\"']+)[\"']\\)" "\\1" ASSET_PATH "${MATCH}")
-            string(REGEX REPLACE "^game/" "" RELATIVE_PATH "${ASSET_PATH}")
-            list(APPEND USED_ASSETS "${RELATIVE_PATH}")
-            message("Found sound resource in source file: ${SOURCE_FILE} - ${RELATIVE_PATH}")
-        endforeach ()
+                    if(COUNT_MATCH)
+                        # Extract the actual number
+                        string(REGEX REPLACE ".*\"${ASSET_PATH}\"[^0-9]*([0-9]+).*" "\\1" COUNT "${LINE}")
+                        message(STATUS "Found pattern with count: ${ASSET_PATH}, Count: ${COUNT}")
 
-        string(REGEX MATCHALL "LoadMusic\\([\"']([^\"']+)[\"']\\)" MUSIC_MATCHES "${FILE_CONTENTS}")
-        foreach (MATCH ${MUSIC_MATCHES})
-            string(REGEX REPLACE "LoadMusic\\([\"']([^\"']+)[\"']\\)" "\\1" ASSET_PATH "${MATCH}")
-            string(REGEX REPLACE "^game/" "" RELATIVE_PATH "${ASSET_PATH}")
-            list(APPEND USED_ASSETS "${RELATIVE_PATH}")
-        endforeach ()
+                        # Generate paths for each numbered asset
+                        math(EXPR COUNT_MAX "${COUNT}")
+                        foreach(NUM RANGE 1 ${COUNT_MAX})
+                            if(NUM LESS 10)
+                                set(NUM_STR "0${NUM}")
+                            else()
+                                set(NUM_STR "${NUM}")
+                            endif()
 
-        string(REGEX MATCHALL "LoadMusicStream\\([\"']([^\"']+)[\"']\\)" MUSIC_MATCHES "${FILE_CONTENTS}")
-        foreach (MATCH ${MUSIC_MATCHES})
-            string(REGEX REPLACE "LoadMusicStream\\([\"']([^\"']+)[\"']\\)" "\\1" ASSET_PATH "${MATCH}")
-            string(REGEX REPLACE "^game/" "" RELATIVE_PATH "${ASSET_PATH}")
-            list(APPEND USED_ASSETS "${RELATIVE_PATH}")
-        endforeach ()
+                            string(REPLACE "%d" "${NUM_STR}" NUMBERED_PATH "${ASSET_PATH}")
 
-        string(REGEX MATCHALL "set_background\\([\"']([^\"']+)[\"']\\)" BACKGROUND_MATCHES "${FILE_CONTENTS}")
-        foreach (MATCH ${BACKGROUND_MATCHES})
-            string(REGEX REPLACE "set_background\\([\"']([^\"']+)[\"']\\)" "\\1" ASSET_PATH "${MATCH}")
-            string(REGEX REPLACE "^game/" "" RELATIVE_PATH "${ASSET_PATH}")
-            list(APPEND USED_ASSETS "${RELATIVE_PATH}")
-            message("Found background resource in source file: ${SOURCE_FILE} - ${RELATIVE_PATH}")
-        endforeach ()
-    endforeach ()
+                            # Check if asset exists (strip 'game/' prefix)
+                            string(SUBSTRING "${NUMBERED_PATH}" 5 -1 RELATIVE_PATH)
+                            set(FULL_SOURCE_PATH "${ASSETS_SOURCE_DIR}/${RELATIVE_PATH}")
 
-    list(REMOVE_DUPLICATES USED_ASSETS)
+                            if(EXISTS "${FULL_SOURCE_PATH}")
+                                message(STATUS "Found numbered asset: ${NUMBERED_PATH}")
+                                list(APPEND ASSETS_TO_COPY "${NUMBERED_PATH}")
+                            else()
+                                message(WARNING "Numbered asset not found: ${NUMBERED_PATH}")
+                            endif()
+                        endforeach()
+                    else()
+                        message(WARNING "Found %d in path but couldn't extract count: ${LINE}")
+                    endif()
+                else()
+                    # Check if regular asset exists (strip 'game/' prefix)
+                    string(SUBSTRING "${ASSET_PATH}" 5 -1 RELATIVE_PATH)
+                    set(FULL_SOURCE_PATH "${ASSETS_SOURCE_DIR}/${RELATIVE_PATH}")
 
-    file(MAKE_DIRECTORY "${ASSETS_OUTPUT_DIR}")
+                    if(EXISTS "${FULL_SOURCE_PATH}")
+                        message(STATUS "Found asset: ${ASSET_PATH}")
+                        list(APPEND ASSETS_TO_COPY "${ASSET_PATH}")
+                    else()
+                        message(WARNING "Asset not found: ${ASSET_PATH}")
+                    endif()
+                endif()
+            endforeach()
+        endforeach()
+    endforeach()
 
-    foreach (RELATIVE_PATH ${USED_ASSETS})
-        set(SOURCE_ASSET_PATH "${ASSETS_SOURCE_DIR}/${RELATIVE_PATH}")
-        set(DEST_ASSET_PATH "${ASSETS_OUTPUT_DIR}/${RELATIVE_PATH}")
+    # Remove duplicates
+    if(ASSETS_TO_COPY)
+        list(REMOVE_DUPLICATES ASSETS_TO_COPY)
+    endif()
 
-        get_filename_component(DEST_ASSET_DIR "${DEST_ASSET_PATH}" DIRECTORY)
+    # Copy each asset
+    foreach(ASSET_PATH ${ASSETS_TO_COPY})
+        string(SUBSTRING "${ASSET_PATH}" 5 -1 RELATIVE_PATH)
+        set(SOURCE_FILE "${ASSETS_SOURCE_DIR}/${RELATIVE_PATH}")
+        set(DEST_FILE "${ASSETS_OUTPUT_DIR}/${RELATIVE_PATH}")
 
-        file(MAKE_DIRECTORY "${DEST_ASSET_DIR}")
+        # Create destination directory
+        get_filename_component(DEST_DIR "${DEST_FILE}" DIRECTORY)
+        file(MAKE_DIRECTORY "${DEST_DIR}")
 
-        if (EXISTS "${SOURCE_ASSET_PATH}")
-            file(COPY "${SOURCE_ASSET_PATH}" DESTINATION "${DEST_ASSET_DIR}")
-            message(STATUS "Copying used asset: ${RELATIVE_PATH}")
-        else ()
-            message(WARNING "Asset referenced but not found: ${SOURCE_ASSET_PATH}")
-        endif ()
-    endforeach ()
+        # Copy the file
+        message(STATUS "Copying asset: ${ASSET_PATH}")
+        file(COPY "${SOURCE_FILE}" DESTINATION "${DEST_DIR}")
+    endforeach()
 endfunction()
