@@ -9,6 +9,10 @@
       <file path="$PROJECT_DIR$/include" />
       <file path="$PROJECT_DIR$/src" />
     </sourceRoots>
+    <excludeRoots>
+      <file path="$PROJECT_DIR$/assets" />
+      <file path="$PROJECT_DIR$/bin" />
+    </excludeRoots>
   </component>
   <component name="MaterialThemeProjectNewConfig">
     <option name="metadata">
