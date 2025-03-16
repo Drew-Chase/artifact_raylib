@@ -1,5 +1,6 @@
 #pragma once
 #include "entity.h"
+#include "sprite_sheet.h"
 
 namespace artifact
 {
@@ -19,12 +20,15 @@ namespace artifact
         int jump_count = 0;
         int max_jump_count = 2;
 
+        // Sprite sheets
+        SpriteSheet idle_sheet;
+
 
         // Air control and physics constants
-        float air_control = 0.8f; // Lower control when in air
-        float ground_friction = 10.0f; // Friction when on ground
-        float air_friction = 1.0f; // Friction when in air
-        float acceleration = 2000.0f; // How quickly the player accelerates
+        float air_control = 0.8f;
+        float ground_friction = 10.0f;
+        float air_friction = 1.0f;
+        float acceleration = 2000.0f;
 
         Vector2 bounds{80, 160};
 

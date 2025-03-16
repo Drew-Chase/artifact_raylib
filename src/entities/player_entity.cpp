@@ -13,14 +13,26 @@ namespace artifact
         owner->camera.target = this->position;
         owner->camera.zoom = 1;
         owner->camera.rotation = 0;
+
+        // Load sprite sheets
+        SpriteSheet idle_sheet("game/texture/entities/player/idle%d.png", 9, 8);
     }
 
     void PlayerEntity::draw()
     {
         Entity::draw();
-        DrawRectanglePro({position.x, position.y, bounds.x, bounds.y}, {0, 0}, 0, BLUE);
-        DrawText(fmt::format("Player Pos: X{}, Y{}", this->position.x, this->position.y).c_str(), 0, 50, 16, WHITE);
-        DrawText(fmt::format("Grounded: {}, VVel: {:.1f}, HVel: {:.1f}", is_grounded ? "true" : "false", vertical_velocity, horizontal_velocity).c_str(), 0, 70, 16, WHITE);
+        // DrawRectanglePro({position.x, position.y, bounds.x, bounds.y}, {0, 0}, 0, BLUE);
+        // DrawText(fmt::format("Player Pos: X{}, Y{}", this->position.x, this->position.y).c_str(), 0, 50, 16, WHITE);
+        // DrawText(fmt::format("Grounded: {}, VVel: {:.1f}, HVel: {:.1f}", is_grounded ? "true" : "false", vertical_velocity, horizontal_velocity).c_str(), 0, 70, 16, WHITE);
+
+        // Draw animations
+        if (is_grounded)
+        {
+            if (horizontal_velocity == 0)
+            {
+                idle_sheet.draw(position);
+            }
+        }
     }
 
     void PlayerEntity::update(const float deltaTime)
@@ -33,6 +45,8 @@ namespace artifact
         check_collision();
         apply_gravity(deltaTime);
         apply_horizontal_movement(deltaTime);
+
+        idle_sheet.update(deltaTime);
 
         UpdateCameraCenterSmoothFollow(deltaTime);
     }
