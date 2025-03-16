@@ -41,5 +41,5 @@ build_gcc()
 build_clang()
 build_msvc()
 
-copy_assets()
+copy_used_assets()
 initialize_vendors()
