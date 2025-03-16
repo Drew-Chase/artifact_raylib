@@ -105,6 +105,16 @@ namespace artifact
          */
         SpriteSheet(const std::string &root_path, const int frame_count, const float fps);
 
+
+        /**
+         * Default constructor for the SpriteSheet class.
+         *
+         * Initializes a SpriteSheet object with default parameters. This constructor
+         * does not perform any specific setup or allocate resources, serving as a
+         * straightforward way to create an instance of the class.
+         */
+        SpriteSheet() = default;
+
         /**
          * Destructor for the SpriteSheet class.
          *
