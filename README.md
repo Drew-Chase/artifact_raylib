@@ -9,6 +9,7 @@
 - [Building the Project](#building-the-project)
     - [Windows](#windows)
     - [Linux/macOS](#linuxmacos)
+- [Manual Build with CMake and Conan](#manual-build-with-cmake-and-conan)
 - [Build Configurations](#build-configurations)
 - [Build Scripts](#build-scripts)
 - [Troubleshooting](#troubleshooting)
@@ -17,9 +18,9 @@
 
 Before building the project, ensure you have the following tools installed:
 
-- **CMake** (version 3.30 or higher)
+- **CMake** (version 3.22 or higher)
 - **Git** (for source code management)
-- **C++ Compiler** with C++20 support:
+- **C++ Compiler** with C++23 support:
     - Windows: Visual Studio 2019 or newer with C++ workload
     - Linux: GCC 10+ or Clang 12+
     - macOS: Xcode Command Line Tools or AppleClang 12+
@@ -73,16 +74,13 @@ scripts\windows\standalone.bat # Standalone configuration
 1. **Install Prerequisites**
 
 For Ubuntu/Debian:
-
-```shell script
+```bash
 sudo apt update
 sudo apt install build-essential cmake ninja-build git python3-pip
 pip3 install conan
 ```
-
 For macOS:
-
-```shell script
+```bash
 # Install Homebrew if not installed
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
@@ -90,17 +88,13 @@ For macOS:
 brew install cmake ninja git python
 pip3 install conan
 ```
-
 2. **Clone the Repository**
-
-```shell script
+```bash
 git clone https://github.com/Drew-Chase/artifact_raylib.git
 cd artifact_raylib
 ```
-
 3. **Build the Project**
-
-```shell script
+```bash
 # Make scripts executable
 chmod +x scripts/unix/*.sh
 
@@ -112,26 +106,73 @@ chmod +x scripts/unix/*.sh
 ./scripts/unix/minimal.sh     # Minimal configuration
 ./scripts/unix/standalone.sh  # Standalone configuration
 ```
+## Manual Build with CMake and Conan
 
+If you prefer to build manually without using the provided scripts, follow these steps:
+
+1. **Setup Conan Provider**
+
+First, create a `conan_provider.cmake` file in the project root to let CMake find the Conan dependencies:
+```bash
+# Generate the conan provider file
+conan install . --output-folder=. -s build_type=Debug
+```
+2. **Configure CMake Project**
+
+For Debug configuration:
+```bash
+# Windows
+cmake -B bin/obj/winx64/debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DPROFILE_NAME=debug -DSTRIPPED_VERSION=ON -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="conan_provider.cmake"
+
+# Linux/macOS
+cmake -B bin/obj/linux-amd64/debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DPROFILE_NAME=debug -DSTRIPPED_VERSION=ON -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="conan_provider.cmake"
+```
+For Minimal configuration:
+```bash
+# Windows
+cmake -B bin/obj/winx64/minimal -G Ninja -DCMAKE_BUILD_TYPE=Release -DPROFILE_NAME=minimal -DREMOVE_DEBUG_INFO=ON -DSTRIPPED_VERSION=ON -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="conan_provider.cmake"
+
+# Linux/macOS
+cmake -B bin/obj/linux-amd64/minimal -G Ninja -DCMAKE_BUILD_TYPE=Release -DPROFILE_NAME=minimal -DREMOVE_DEBUG_INFO=ON -DSTRIPPED_VERSION=ON -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="conan_provider.cmake"
+```
+For Standalone configuration:
+```bash
+# Windows
+cmake -B bin/obj/winx64/standalone -G Ninja -DCMAKE_BUILD_TYPE=Release -DPROFILE_NAME=standalone -DREMOVE_DEBUG_INFO=ON -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="conan_provider.cmake"
+
+# Linux/macOS
+cmake -B bin/obj/linux-amd64/standalone -G Ninja -DCMAKE_BUILD_TYPE=Release -DPROFILE_NAME=standalone -DREMOVE_DEBUG_INFO=ON -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="conan_provider.cmake"
+```
+3. **Build the Project**
+```bash
+# Build using the desired configuration
+cmake --build bin/obj/winx64/debug -j 32     # For Windows Debug
+cmake --build bin/obj/linux-amd64/debug -j 32 # For Linux/macOS Debug
+
+# Similar commands for minimal and standalone configurations
+cmake --build bin/obj/winx64/minimal -j 32
+cmake --build bin/obj/winx64/standalone -j 32
+```
 ## Build Configurations
 
 The project supports three build configurations:
 
 1. **Debug**
     - Includes debug symbols
-    - No optimization
+    - Development build with debugging information
+    - Stripped version with certain flags removed
     - Suitable for development and debugging
 
 2. **Minimal**
     - Release build with optimizations
     - Debug symbols removed
-    - Dynamic linking where possible
+    - Stripped version with certain flags removed
     - Suitable for development testing
 
 3. **Standalone**
     - Release build with optimizations
     - Debug symbols removed
-    - Static linking where possible
+    - No stripping of flags
     - Suitable for distribution
 
 ## Build Scripts
@@ -149,7 +190,7 @@ The project includes platform-specific build scripts located in:
 - `minimal.bat` - Builds minimal configuration
 - `standalone.bat` - Builds standalone configuration
 
-### Unix Scripts (Linux/macOS)
+### Unix Scripts
 
 - `init.sh` - Initializes the project by installing dependencies and building all configurations
 - `conan-install.sh` - Installs Conan dependencies
@@ -157,15 +198,11 @@ The project includes platform-specific build scripts located in:
 - `minimal.sh` - Builds minimal configuration
 - `standalone.sh` - Builds standalone configuration
 
-## Build Output
+## Troubleshooting
 
-Built binaries are placed in the `bin/obj/` directory under their respective configuration folders.
+If you encounter build issues, try the following:
 
-The main changes made to the README include:
-
-1. Replaced vcpkg with Conan as the package manager
-2. Updated prerequisites to include Conan and removed vcpkg
-3. Added information about the new script structure, including `init.bat` and `conan-install.bat`
-4. Updated the build configurations to reflect the actual configurations (debug, minimal, standalone)
-5. Modified the build instructions to use the new initialization process
-6. Updated the script descriptions to match the current script set
+1. Ensure all prerequisites are correctly installed and their versions meet the requirements
+2. Clear the build directory and rebuild
+3. Update Conan dependencies with `conan install . --update`
+4. Check compiler compatibility with C++23
