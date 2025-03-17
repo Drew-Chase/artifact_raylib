@@ -71,13 +71,11 @@ jobs:
         profile:
           - {
             name: "minimal",
-            cmake_name: "minimal",
-            strip: true
+            script_name: "minimal",
           }
           - {
             name: "standalone",
-            cmake_name: "standalone",
-            strip: false
+            script_name: "standalone",
           }
 
     steps:
@@ -108,117 +106,92 @@ jobs:
         run: |
           choco install ninja
 
+      - name: Setup environment variables
+        shell: bash
+        run: |
+          echo "CC=${{ matrix.config.cc }}" >> $GITHUB_ENV
+          echo "CXX=${{ matrix.config.cxx }}" >> $GITHUB_ENV
+
       - name: Configure Conan profile
         run: |
           conan profile detect --force 
 
-      - name: Install dependencies with Conan
-        run: |
-          conan install . --build=missing
-
-      - name: Configure CMake Windows
+      - name: Install dependencies with Conan (Windows)
         if: runner.os == 'Windows'
         shell: cmd
-        env:
-          CC: ${{ matrix.config.cc }}
-          CXX: ${{ matrix.config.cxx }}
         run: |
-          call "%PROGRAMFILES%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          cmake -B ${{github.workspace}}/build ^
-          -G Ninja ^
-          -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} ^
-          -DPROFILE_NAME=${{ matrix.profile.cmake_name }} ^
-          -DREMOVE_DEBUG_INFO=ON ^
-          -DSTRIPPED_VERSION=${{ matrix.profile.strip }} ^
-          -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/build/conan_toolchain.cmake
+          call scripts\windows\conan-install.bat
 
-      - name: Configure CMake Unix
-        if: runner.os != 'Windows'
-        shell: bash
-        env:
-          CC: ${{ matrix.config.cc }}
-          CXX: ${{ matrix.config.cxx }}
-        run: |
-          cmake -B ${{github.workspace}}/build \
-            -G Ninja \
-            -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
-            -DPROFILE_NAME=${{ matrix.profile.cmake_name }} \
-            -DREMOVE_DEBUG_INFO=ON \
-            -DSTRIPPED_VERSION=${{ matrix.profile.strip }} \
-            -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/build/conan_toolchain.cmake
-
-      - name: Build Unix
+      - name: Install dependencies with Conan (Unix)
         if: runner.os != 'Windows'
         shell: bash
         run: |
-          cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+          chmod +x scripts/unix/conan-install.sh
+          ./scripts/unix/conan-install.sh
 
-
-      - name: Build Windows
+      - name: Build Project (Windows)
         if: runner.os == 'Windows'
         shell: cmd
         run: |
-          call "%PROGRAMFILES%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+          call scripts\windows\${{ matrix.profile.script_name }}.bat
 
-      - name: Test
-        if: runner.os == 'Windows'
-        shell: cmd
-        run: |
-          cd ${{github.workspace}}\build
-          ctest -C ${{env.BUILD_TYPE}} --output-on-failure
-      - name: Prepare artifacts Windows
-        if: runner.os == 'Windows'
-        shell: cmd
-        run: |
-          cd ${{github.workspace}}\bin\artifact_raylib\${{ matrix.profile.cmake_name }}
-          powershell Compress-Archive -Path * -DestinationPath ..\..\artifact_raylib-${{ runner.os }}-${{ matrix.profile.name }}.zip
-
-      - name: Prepare artifacts Unix
+      - name: Build Project (Unix)
         if: runner.os != 'Windows'
         shell: bash
         run: |
-          cd ${{github.workspace}}/bin/artifact_raylib/${{ matrix.profile.cmake_name }}
-          zip -r ../../artifact_raylib-${{ runner.os }}-${{ matrix.profile.name }}.zip *
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: artifact_raylib-${{ runner.os }}-${{ matrix.profile.name }}
-          path: ${{github.workspace}}/bin/artifact_raylib-${{ runner.os }}-${{ matrix.profile.name }}.zip
-          if-no-files-found: error
-  release:
-    permissions:
-      contents: write
-    needs: build
-    if: >-
-      (github.event_name == 'workflow_dispatch' && inputs.create_release) ||
-      (github.event_name == 'push' && github.ref == 'refs/heads/main')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+          chmod +x scripts/unix/${{ matrix.profile.script_name }}.sh
+          ./scripts/unix/${{ matrix.profile.script_name }}.sh
 
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: Generate release tag
-        id: tag
+      - name: Get Binary Name
+        id: get-binary-name
+        shell: bash
         run: |
-          if [[ "${{ github.event.inputs.custom_tag }}" != "" ]]; then
-            echo "tag=${{ github.event.inputs.custom_tag }}" >> $GITHUB_OUTPUT
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            echo "BINARY_PATH=bin/artifact_raylib/${{ matrix.profile.script_name }}/artifact_raylib-Windows-*-${{ matrix.profile.script_name }}.exe" >> $GITHUB_ENV
+            echo "BINARY_NAME=artifact_raylib-Windows-${{ matrix.profile.script_name }}.exe" >> $GITHUB_ENV
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            echo "BINARY_PATH=bin/artifact_raylib/${{ matrix.profile.script_name }}/artifact_raylib-Darwin-*-${{ matrix.profile.script_name }}" >> $GITHUB_ENV
+            echo "BINARY_NAME=artifact_raylib-macOS-${{ matrix.profile.script_name }}" >> $GITHUB_ENV
           else
-            echo "tag=v$(date +'%Y.%m.%d-%H%M')" >> $GITHUB_OUTPUT
+            echo "BINARY_PATH=bin/artifact_raylib/${{ matrix.profile.script_name }}/artifact_raylib-Linux-*-${{ matrix.profile.script_name }}" >> $GITHUB_ENV
+            echo "BINARY_NAME=artifact_raylib-Linux-${{ matrix.profile.script_name }}" >> $GITHUB_ENV
           fi
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
         with:
-          tag_name: ${{ steps.tag.outputs.tag }}
-          name: Release ${{ steps.tag.outputs.tag }}
-          files: artifacts/**/*.zip
-          prerelease: ${{ github.event.inputs.release_type == 'prerelease' }}
-          generate_release_notes: true
-          fail_on_unmatched_files: false
+          name: ${{ env.BINARY_NAME }}
+          path: ${{ env.BINARY_PATH }}
+          if-no-files-found: error
+
+      # Create release if requested in manual workflow run
+      - name: Determine Release Information
+        if: github.event_name == 'workflow_dispatch' && inputs.create_release == true
+        id: release_info
+        shell: bash
+        run: |
+          timestamp=$(date +'%Y%m%d%H%M%S')
+          if [[ "${{ inputs.custom_tag }}" == "" ]]; then
+            echo "TAG_NAME=v$timestamp" >> $GITHUB_ENV
+          else
+            echo "TAG_NAME=${{ inputs.custom_tag }}" >> $GITHUB_ENV
+          fi
+          
+          echo "RELEASE_NAME=Release ${{ env.TAG_NAME }}" >> $GITHUB_ENV
+          echo "IS_PRERELEASE=${{ inputs.release_type == 'prerelease' }}" >> $GITHUB_ENV
+
+      - name: Download All Artifacts for Release
+        if: github.event_name == 'workflow_dispatch' && inputs.create_release == true && matrix.config.name == 'Windows Latest MSVC' && matrix.profile.name == 'minimal'
+        uses: actions/download-artifact@v3
+        with:
+          path: release_artifacts
+
+      - name: Create Release
+        if: github.event_name == 'workflow_dispatch' && inputs.create_release == true && matrix.config.name == 'Windows Latest MSVC' && matrix.profile.name == 'minimal'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          name: ${{ env.RELEASE_NAME }}
+          prerelease: ${{ env.IS_PRERELEASE }}
+          files: |
+            release_artifacts/**/*
