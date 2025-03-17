@@ -71,6 +71,10 @@ namespace artifact
         InitWindow(0, 0, "Artifact: The Journey Unraveled");
         InitAudioDevice();
         SetWindowState(FLAG_WINDOW_RESIZABLE);
+        SetWindowIcon(window_icon);
+        SetTargetFPS(60);
+        SetExitKey(KEY_NULL);
+
 
         // Load Settings
         game->display_settings->load();
@@ -78,8 +82,6 @@ namespace artifact
         // Apply Settings
         game->display_settings->apply();
 
-        SetWindowIcon(window_icon);
-        SetTargetFPS(60);
 
         // manager->load_stage(Stages::TITLE_SCREEN);
         manager->load_stage(Stages::LEVEL1A);
