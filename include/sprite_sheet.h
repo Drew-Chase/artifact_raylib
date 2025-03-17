@@ -77,6 +77,15 @@ namespace artifact
         bool is_playing;
 
         /**
+         * Indicates whether an object or sprite is flipped horizontally.
+         *
+         * The flipped variable is typically used in rendering or animation contexts
+         * to determine if the graphical representation of an entity should be mirrored
+         * along the horizontal axis. It serves as a flag for controlling visual orientation.
+         */
+        bool flipped = false;
+
+        /**
          * Generates a fully formatted file path for a specific animation frame.
          *
          * This method replaces the placeholder format specifier in the root_path
@@ -275,5 +284,28 @@ namespace artifact
          * @return The total frame count as an integer.
          */
         int get_frame_count() const { return frame_count; }
+        /**
+         * Sets the flipped state of the sprite sheet.
+         *
+         * Changes the orientation of the sprite sheet by determining
+         * whether its frames should be drawn flipped horizontally.
+         *
+         * @param flipped A boolean value indicating the desired flipped state.
+         *                If true, the sprite sheet will be rendered flipped
+         *                horizontally; otherwise, it will be rendered normally.
+         */
+        void set_flipped(bool flipped);
+        /**
+         * Checks if the sprite sheet is currently flipped horizontally.
+         *
+         * This method determines whether the sprite sheet's frames are rendered
+         * in a horizontally flipped orientation, which can be used for effects
+         * like mirroring or directional sprites in animations.
+         *
+         * @return True if the sprite sheet is flipped horizontally, false otherwise.
+         */
+        bool is_flipped() const;
+
+        void set_framerate(float fps);
     };
 } // namespace artifact
