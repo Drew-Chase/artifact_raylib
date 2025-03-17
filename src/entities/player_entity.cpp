@@ -11,27 +11,62 @@ namespace artifact
     {
         Entity::startup();
         owner->camera.target = this->position;
-        owner->camera.zoom = 1;
         owner->camera.rotation = 0;
 
         // Load sprite sheets
-        SpriteSheet idle_sheet("game/texture/entities/player/idle%d.png", 9, 8);
+        idle_sheet = new SpriteSheet("game/texture/entities/player/idle%d.png", 9, 8);
+        run_sheet = new SpriteSheet("game/texture/entities/player/run%d.png", 8, 13);
+        jump_sheet = new SpriteSheet("game/texture/entities/player/jump_%d.png", 5, 8);
+        light_attack_sheet = new SpriteSheet("game/texture/entities/player/AttackB%d.png", 5, 8);
+        dash_attack_sheet = new SpriteSheet("game/texture/entities/player/AttackA%d.png", 7, 8);
     }
 
     void PlayerEntity::draw()
     {
         Entity::draw();
-        // DrawRectanglePro({position.x, position.y, bounds.x, bounds.y}, {0, 0}, 0, BLUE);
-        // DrawText(fmt::format("Player Pos: X{}, Y{}", this->position.x, this->position.y).c_str(), 0, 50, 16, WHITE);
-        // DrawText(fmt::format("Grounded: {}, VVel: {:.1f}, HVel: {:.1f}", is_grounded ? "true" : "false", vertical_velocity, horizontal_velocity).c_str(), 0, 70, 16, WHITE);
+        if (Game::get_instance()->debug_mode)
+        {
+            DrawRectangleRec({this->position.x - 10, this->position.y - 100, 300, 82}, ColorAlpha(BLACK, .5f));
+            DrawRectangleLinesEx({position.x, position.y, bounds.x, bounds.y}, 1, BLUE);
+            DrawText(fmt::format("Grounded: {}, VVel: {:.1f}, HVel: {:.1f}", is_grounded ? "true" : "false", vertical_velocity, horizontal_velocity).c_str(), this->position.x, this->position.y - 90, 16, WHITE);
+            DrawText(fmt::format("Player Pos: X: {:.1f}, Y: {:.1f}", this->position.x, this->position.y).c_str(), this->position.x, this->position.y - 64, 16, WHITE);
+            DrawText(fmt::format("Dash: {}, Light: {}", dash_attack_frames, light_attack_frames).c_str(), this->position.x, this->position.y - 42, 16, WHITE);
+        }
 
         // Draw animations
-        if (is_grounded)
+        if (light_attack_frames > 0)
+        {
+            if (light_attack_sheet->is_flipped())
+                light_attack_sheet->draw(Vector2{position.x - 32, position.y}, 2.2);
+            else
+                light_attack_sheet->draw(Vector2{position.x + 16, position.y}, 2.2);
+        } else if (dash_attack_frames > 0)
+        {
+            if (dash_attack_sheet->is_flipped())
+                dash_attack_sheet->draw(Vector2{position.x - 32, position.y}, 2.2);
+            else
+                dash_attack_sheet->draw(Vector2{position.x + 16, position.y}, 2.2);
+        } else if (is_grounded)
         {
             if (horizontal_velocity == 0)
             {
-                idle_sheet.draw(position);
+                if (idle_sheet->is_flipped())
+                    idle_sheet->draw(Vector2{position.x - 32, position.y}, 2.2);
+                else
+                    idle_sheet->draw(Vector2{position.x + 16, position.y}, 2.2);
+            } else
+            {
+                if (run_sheet->is_flipped())
+                    run_sheet->draw(Vector2{position.x - 32, position.y}, 2.2);
+                else
+                    run_sheet->draw(Vector2{position.x + 16, position.y}, 2.2);
             }
+        } else
+        {
+            if (jump_sheet->is_flipped())
+                jump_sheet->draw(Vector2{position.x - 32, position.y}, 2.2);
+            else
+                jump_sheet->draw(Vector2{position.x + 16, position.y}, 2.2);
         }
     }
 
@@ -41,20 +76,43 @@ namespace artifact
             return;
         Entity::update(deltaTime);
 
+        owner->camera.zoom = 1.5f * fminf(GetScreenWidth() / 1920.0f, GetScreenHeight() / 1080.0f);
+
         handle_input(deltaTime);
         check_collision();
         apply_gravity(deltaTime);
         apply_horizontal_movement(deltaTime);
 
-        idle_sheet.update(deltaTime);
+        if (light_attack_frames > 0)
+            light_attack_frames--;
+        else
+            light_attack_sheet->set_frame(0);
+        if (dash_attack_frames > 0)
+            dash_attack_frames--;
+        else
+            dash_attack_sheet->set_frame(0);
 
-        UpdateCameraCenterSmoothFollow(deltaTime);
+
+        idle_sheet->update(deltaTime);
+        if (sprinting)
+            run_sheet->set_framerate(13);
+        else
+            run_sheet->set_framerate(8);
+        run_sheet->update(deltaTime);
+        jump_sheet->update(deltaTime);
+        light_attack_sheet->update(deltaTime);
+        dash_attack_sheet->update(deltaTime);
+
+        update_camera_center_smooth_follow(deltaTime);
     }
 
     void PlayerEntity::apply_gravity(const float deltaTime)
     {
-        vertical_velocity -= gravity * deltaTime;
-        position.y -= vertical_velocity * deltaTime;
+        if (!is_grounded)
+        {
+            vertical_velocity -= gravity * deltaTime;
+            position.y -= vertical_velocity * deltaTime;
+        }
     }
 
     void PlayerEntity::apply_horizontal_movement(const float deltaTime)
@@ -203,16 +261,20 @@ namespace artifact
         }
     }
 
+
     void PlayerEntity::handle_input(const float deltaTime)
     {
         const ControlsSettings *controls = Game::get_instance()->controls_settings;
 
-        if (IsKeyDown(controls->movement_sprint))
+        if (ControlsSettings::pressed(KEY_B))
+            Game::get_instance()->debug_mode = !Game::get_instance()->debug_mode;
+
+        if (ControlsSettings::down(controls->movement_sprint))
             sprinting = controls->toggle_sprint ? !sprinting : true;
-        else if (IsKeyUp(controls->movement_sprint) && !controls->toggle_sprint)
+        else if (ControlsSettings::up(controls->movement_sprint) && !controls->toggle_sprint)
             sprinting = false;
 
-        if (IsKeyPressed(controls->movement_jump))
+        if (ControlsSettings::pressed(controls->movement_jump))
             jump();
 
         const float control_multiplier = is_grounded ? 1.0f : air_control;
@@ -220,11 +282,24 @@ namespace artifact
 
         float target_speed = 0.0f;
 
-        if (IsKeyDown(controls->movement_right))
+        if (ControlsSettings::down(controls->movement_right))
+        {
             target_speed = walk_speed * speed_multiplier;
-        else if (IsKeyDown(controls->movement_left))
+            idle_sheet->set_flipped(false);
+            run_sheet->set_flipped(false);
+            jump_sheet->set_flipped(false);
+            dash_attack_sheet->set_flipped(false);
+            light_attack_sheet->set_flipped(false);
+
+        } else if (ControlsSettings::down(controls->movement_left))
+        {
             target_speed = -walk_speed * speed_multiplier;
-        else if (is_grounded)
+            idle_sheet->set_flipped(true);
+            run_sheet->set_flipped(true);
+            jump_sheet->set_flipped(true);
+            dash_attack_sheet->set_flipped(true);
+            light_attack_sheet->set_flipped(true);
+        } else if (is_grounded)
             target_speed = 0.0f;
         else
             return;
@@ -238,9 +313,27 @@ namespace artifact
             else
                 horizontal_velocity += acc * direction;
         }
+
+        if (ControlsSettings::pressed(controls->combat_dash))
+        {
+            if (dash_attack_frames > 0 || light_attack_frames > 0)
+                return;
+            dash_attack_frames = 60;
+            constexpr int dash_momentum = 1000;
+            if (dash_attack_sheet->is_flipped())
+                horizontal_velocity = -dash_momentum;
+            else
+                horizontal_velocity = dash_momentum;
+            vertical_velocity += 200;
+        } else if (ControlsSettings::pressed(controls->combat_light))
+        {
+            if (dash_attack_frames > 0 || light_attack_frames > 0)
+                return;
+            light_attack_frames = 30;
+        }
     }
 
-    void PlayerEntity::UpdateCameraCenterSmoothFollow(const float delta) const
+    void PlayerEntity::update_camera_center_smooth_follow(const float delta) const
     {
         if (!owner)
             return;
@@ -279,5 +372,10 @@ namespace artifact
         // Clamp camera target position to stay within bounds
         owner->camera.target.x = Clamp(owner->camera.target.x, minX, maxX);
         owner->camera.target.y = Clamp(owner->camera.target.y, minY, maxY);
+    }
+    void PlayerEntity::add_momentum(const float x, const float y)
+    {
+        horizontal_velocity += x;
+        vertical_velocity += y;
     }
 } // namespace artifact
