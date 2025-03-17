@@ -92,9 +92,9 @@ namespace artifact
             return;
         }
         const int monitor = GetCurrentMonitor();
-        this->window_mode = WindowMode::FULLSCREEN;
-        this->screen_width = GetMonitorWidth(monitor);
-        this->screen_height = GetMonitorHeight(monitor);
+        this->window_mode = WindowMode::WINDOWED;
+        this->screen_width = GetMonitorWidth(monitor)/2;
+        this->screen_height = GetMonitorHeight(monitor)/2;
         this->frame_rate = 60;
         this->vsync = true;
         save();
