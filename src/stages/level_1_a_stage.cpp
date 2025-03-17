@@ -63,7 +63,6 @@ namespace artifact
     {
         BeginMode2D(camera);
         PlayableStage::draw();
-        DrawRectangle(0, 0, 10, 10, RED);
         EndMode2D();
     }
     void Level1AStage::update(const float deltaTime) { PlayableStage::update(deltaTime); }
