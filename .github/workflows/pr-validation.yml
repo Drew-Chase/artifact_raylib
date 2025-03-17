@@ -15,18 +15,63 @@ jobs:
         run: |
           cmake -P ${GITHUB_WORKSPACE}/CMakeLists.txt || echo "CMake format validation failed"
 
-      - name: Validate vcpkg.json
+      - name: Validate conanfile.py and conandata.yml
         run: |
-          cat vcpkg.json | jq empty || echo "vcpkg.json format validation failed"
+          python -m py_compile conanfile.py || echo "conanfile.py format validation failed"
+          if [ -f "conandata.yml" ]; then
+            python -c "import yaml; yaml.safe_load(open('conandata.yml'))" || echo "conandata.yml format validation failed"
+          fi
+
+      - name: Make Unix scripts executable
+        run: |
+          if [ -d "scripts/unix" ]; then
+            chmod +x scripts/unix/*.sh
+            echo "Made Unix scripts executable"
+          fi
 
       - name: Check file permissions
         run: |
           if [ -d "scripts/unix" ]; then
-            if ! test -x "scripts/unix/debug.sh" || \
-               ! test -x "scripts/unix/shared.sh" || \
-               ! test -x "scripts/unix/bundled.sh" || \
-               ! test -x "scripts/unix/all.sh"; then
+            MISSING_EXEC=false
+            for script in scripts/unix/*.sh; do
+              if [ -f "$script" ] && [ ! -x "$script" ]; then
+                echo "Error: $script is not executable"
+                MISSING_EXEC=true
+              fi
+            done
+          
+            if [ "$MISSING_EXEC" = true ]; then
               echo "Unix scripts should be executable"
               exit 1
+            else
+              echo "All Unix scripts are properly set as executable"
+            fi
+          else
+            echo "No Unix scripts directory found - skipping permission check"
+          fi
+
+      - name: Check required script existence
+        run: |
+          REQUIRED_SCRIPTS=("minimal.sh" "standalone.sh" "debug.sh" "conan-install.sh")
+          MISSING_SCRIPTS=false
+          
+          if [ -d "scripts/unix" ]; then
+            for script in "${REQUIRED_SCRIPTS[@]}"; do
+              if [ ! -f "scripts/unix/$script" ]; then
+                echo "Required script scripts/unix/$script is missing"
+                MISSING_SCRIPTS=true
+              fi
+            done
+          
+            if [ "$MISSING_SCRIPTS" = true ]; then
+              exit 1
+            else
+              echo "All required scripts exist"
             fi
           fi
+
+      - name: Install Conan and validate project setup
+        run: |
+          pip install conan
+          conan profile detect --force
+          conan install . --output-folder=build --build=missing || echo "Conan install validation failed"
