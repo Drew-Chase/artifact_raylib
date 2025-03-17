@@ -1,6 +1,5 @@
 
 #include "stages/level_1_a_stage.h"
-#include "entities/player_entity.h"
 
 namespace artifact
 {
