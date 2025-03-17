@@ -1,2 +1,2 @@
 bin/
-vcpkg_installed/
+conan_provider.cmake
