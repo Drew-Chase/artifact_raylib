@@ -23,6 +23,9 @@ namespace artifact
         void load() override;
         void save() override;
         void reset() override;
+        static bool pressed(int key);
+        static bool down(int key);
+        static bool up(int key);
 
         // Static functions
     };

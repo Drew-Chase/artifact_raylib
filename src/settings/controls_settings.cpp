@@ -52,11 +52,29 @@ namespace artifact
         movement_left = KEY_A;
         movement_right = KEY_D;
         movement_sprint = KEY_LEFT_SHIFT;
-        combat_light = MOUSE_LEFT_BUTTON;
-        combat_dash = MOUSE_RIGHT_BUTTON;
+        combat_light = MOUSE_BUTTON_RIGHT;
+        combat_dash = MOUSE_BUTTON_LEFT;
         menu_pause = KEY_ESCAPE;
         toggle_sprint = false;
 
         save();
+    }
+    bool ControlsSettings::pressed(const int key)
+    {
+        if (key <= 6)
+            return IsMouseButtonPressed(key);
+        return IsKeyPressed(key);
+    }
+    bool ControlsSettings::down(const int key)
+    {
+        if (key <= 6)
+            return IsMouseButtonDown(key);
+        return IsKeyDown(key);
+    }
+    bool ControlsSettings::up(const int key)
+    {
+        if (key <= 6)
+            return IsMouseButtonUp(key);
+        return IsKeyUp(key);
     }
 } // namespace artifact
