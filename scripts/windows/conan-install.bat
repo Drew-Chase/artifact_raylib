@@ -12,7 +12,7 @@ if %errorlevel% neq 0 (
 
 REM Create conan_provider.cmake for CMake integration
 echo Generating conan_provider.cmake...
-conan install . --output-folder=. -s build_type=Debug
+conan install . --output-folder=build -s build_type=Debug --build=missing
 if %errorlevel% neq 0 (
     echo Error: Failed to install Conan dependencies
     exit /b %errorlevel%
