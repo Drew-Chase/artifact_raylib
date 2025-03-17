@@ -39,10 +39,9 @@ namespace artifact
 
     void SpriteSheet::load_frames()
     {
-        // Frame numbers start at 1, not 0
-        for (int i = 1; i <= frame_count; i++)
+        for (int i = 0; i < frame_count; i++)
         {
-            const std::string path = get_formatted_frame_path(i);
+            const std::string path = get_formatted_frame_path(i + 1);
             frames[i] = LoadTexture(path.c_str());
         }
     }
@@ -80,14 +79,16 @@ namespace artifact
         }
 
         const Texture2D texture = frames[current_frame];
-        const Rectangle source = {0, 0, static_cast<float>(texture.width), static_cast<float>(texture.height)};
-        const Rectangle dest = {position.x, position.y, static_cast<float>(texture.width) * scale, static_cast<float>(texture.height) * scale};
-        const Vector2 origin = {0, 0};
+        const float width = static_cast<float>(texture.width);
+        const float height = static_cast<float>(texture.height);
+        const Rectangle source = {0, 0, flipped ? -width : width, height};
+        const Rectangle dest = {position.x - width / 2, position.y - height, width * scale, height * scale};
+        constexpr Vector2 origin = {0, 0};
 
         DrawTexturePro(texture, source, dest, origin, 0.0f, tint);
     }
 
-    void SpriteSheet::draw(const float x, const float y, const float scale, const Color tint) const { draw({x, y}, scale, tint); }
+    void SpriteSheet::draw(const float x, const float y, const float scale, const Color tint) const { draw(Vector2{x, y}, scale, tint); }
 
     void SpriteSheet::play() { is_playing = true; }
 
@@ -115,5 +116,12 @@ namespace artifact
             return {0}; // Return empty texture
         }
         return frames[current_frame];
+    }
+    void SpriteSheet::set_flipped(const bool flipped) { this->flipped = flipped; }
+    bool SpriteSheet::is_flipped() const { return flipped; }
+    void SpriteSheet::set_framerate(const float fps)
+    {
+        this->fps = fps;
+        frame_time = 1.0f / fps;
     }
 } // namespace artifact
