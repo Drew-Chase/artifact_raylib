@@ -74,12 +74,15 @@ scripts\windows\standalone.bat # Standalone configuration
 1. **Install Prerequisites**
 
 For Ubuntu/Debian:
+
 ```bash
 sudo apt update
 sudo apt install build-essential cmake ninja-build git python3-pip
 pip3 install conan
 ```
+
 For macOS:
+
 ```bash
 # Install Homebrew if not installed
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -88,12 +91,16 @@ For macOS:
 brew install cmake ninja git python
 pip3 install conan
 ```
+
 2. **Clone the Repository**
+
 ```bash
 git clone https://github.com/Drew-Chase/artifact_raylib.git
 cd artifact_raylib
 ```
+
 3. **Build the Project**
+
 ```bash
 # Make scripts executable
 chmod +x scripts/unix/*.sh
@@ -106,6 +113,7 @@ chmod +x scripts/unix/*.sh
 ./scripts/unix/minimal.sh     # Minimal configuration
 ./scripts/unix/standalone.sh  # Standalone configuration
 ```
+
 ## Manual Build with CMake and Conan
 
 If you prefer to build manually without using the provided scripts, follow these steps:
@@ -113,13 +121,16 @@ If you prefer to build manually without using the provided scripts, follow these
 1. **Setup Conan Provider**
 
 First, create a `conan_provider.cmake` file in the project root to let CMake find the Conan dependencies:
+
 ```bash
 # Generate the conan provider file
 conan install . --output-folder=. -s build_type=Debug
 ```
+
 2. **Configure CMake Project**
 
 For Debug configuration:
+
 ```bash
 # Windows
 cmake -B bin/obj/winx64/debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DPROFILE_NAME=debug -DSTRIPPED_VERSION=ON -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="conan_provider.cmake"
@@ -127,7 +138,9 @@ cmake -B bin/obj/winx64/debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DPROFILE_NAME=d
 # Linux/macOS
 cmake -B bin/obj/linux-amd64/debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DPROFILE_NAME=debug -DSTRIPPED_VERSION=ON -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="conan_provider.cmake"
 ```
+
 For Minimal configuration:
+
 ```bash
 # Windows
 cmake -B bin/obj/winx64/minimal -G Ninja -DCMAKE_BUILD_TYPE=Release -DPROFILE_NAME=minimal -DREMOVE_DEBUG_INFO=ON -DSTRIPPED_VERSION=ON -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="conan_provider.cmake"
@@ -135,7 +148,9 @@ cmake -B bin/obj/winx64/minimal -G Ninja -DCMAKE_BUILD_TYPE=Release -DPROFILE_NA
 # Linux/macOS
 cmake -B bin/obj/linux-amd64/minimal -G Ninja -DCMAKE_BUILD_TYPE=Release -DPROFILE_NAME=minimal -DREMOVE_DEBUG_INFO=ON -DSTRIPPED_VERSION=ON -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="conan_provider.cmake"
 ```
+
 For Standalone configuration:
+
 ```bash
 # Windows
 cmake -B bin/obj/winx64/standalone -G Ninja -DCMAKE_BUILD_TYPE=Release -DPROFILE_NAME=standalone -DREMOVE_DEBUG_INFO=ON -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="conan_provider.cmake"
@@ -143,7 +158,9 @@ cmake -B bin/obj/winx64/standalone -G Ninja -DCMAKE_BUILD_TYPE=Release -DPROFILE
 # Linux/macOS
 cmake -B bin/obj/linux-amd64/standalone -G Ninja -DCMAKE_BUILD_TYPE=Release -DPROFILE_NAME=standalone -DREMOVE_DEBUG_INFO=ON -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="conan_provider.cmake"
 ```
+
 3. **Build the Project**
+
 ```bash
 # Build using the desired configuration
 cmake --build bin/obj/winx64/debug -j 32     # For Windows Debug
@@ -153,6 +170,7 @@ cmake --build bin/obj/linux-amd64/debug -j 32 # For Linux/macOS Debug
 cmake --build bin/obj/winx64/minimal -j 32
 cmake --build bin/obj/winx64/standalone -j 32
 ```
+
 ## Build Configurations
 
 The project supports three build configurations:
@@ -176,6 +194,8 @@ The project supports three build configurations:
     - Suitable for distribution
 
 ## Build Scripts
+
+> **Note:** _These scripts must be run from the root directory._
 
 The project includes platform-specific build scripts located in:
 
