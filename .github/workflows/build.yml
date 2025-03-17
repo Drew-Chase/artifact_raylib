@@ -200,7 +200,7 @@ jobs:
 
       - name: Download All Artifacts for Release
         if: github.event_name == 'workflow_dispatch' && inputs.create_release == true && matrix.config.name == 'Windows Latest MSVC' && matrix.profile.name == 'minimal'
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: release_artifacts
 
