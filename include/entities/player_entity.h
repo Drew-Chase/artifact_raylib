@@ -35,8 +35,12 @@ namespace artifact
         float ground_friction = 10.0f;
         float air_friction = 1.0f;
         float acceleration = 2000.0f;
-
         Vector2 bounds{64, 64};
+
+        // SFX
+        Sound sfx_jump;
+        Sound sfx_hit;
+        Sound sfx_dash;
 
         void handle_input(float deltaTime);
         void apply_gravity(float deltaTime);

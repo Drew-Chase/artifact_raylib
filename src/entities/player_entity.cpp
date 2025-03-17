@@ -19,6 +19,11 @@ namespace artifact
         jump_sheet = new SpriteSheet("game/texture/entities/player/jump_%d.png", 5, 8);
         light_attack_sheet = new SpriteSheet("game/texture/entities/player/AttackB%d.png", 5, 8);
         dash_attack_sheet = new SpriteSheet("game/texture/entities/player/AttackA%d.png", 7, 8);
+
+        // Load SFX
+        sfx_jump = LoadSound("game/audio/sfx/playerjump.ogg");
+        sfx_hit = LoadSound("game/audio/sfx/playerattack.ogg");
+        sfx_dash = LoadSound("game/audio/sfx/playercharge.ogg");
     }
 
     void PlayerEntity::draw()
@@ -255,6 +260,7 @@ namespace artifact
     {
         if (jump_count < max_jump_count)
         {
+            PlaySound(sfx_jump);
             vertical_velocity = jump_force;
             is_grounded = false;
             jump_count++;
@@ -325,11 +331,13 @@ namespace artifact
             else
                 horizontal_velocity = dash_momentum;
             vertical_velocity += 200;
+            PlaySound(sfx_dash);
         } else if (ControlsSettings::pressed(controls->combat_light))
         {
             if (dash_attack_frames > 0 || light_attack_frames > 0)
                 return;
             light_attack_frames = 30;
+            PlaySound(sfx_hit);
         }
     }
 
