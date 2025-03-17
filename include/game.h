@@ -1,31 +1,36 @@
 #pragma once
 #include <cstdarg>
-
-
+#include "settings/controls_settings.h"
+#include "settings/display_settings.h"
 #include "stages/stage_manager.h"
 
 namespace artifact
 {
     class Game
     {
+        // Properties
         StageManager *manager;
-        Game(); // Keep constructor private
-        ~Game(); // Keep destructor private
+        bool isRunning = true;
 
-        // Delete copy constructor and assignment operator
-        Game(const Game &) = delete;
-        Game &operator=(const Game &) = delete;
-
+        Game();
+        ~Game();
         // Add static instance
         static Game *instance;
-        static void SpdLoggerCallback(int msgType, const char* message, va_list args);
+        static void register_log_callback(int msgType, const char *message, va_list args);
 
     public:
-        // Get singleton instance
-        static Game *getInstance();
+        // Properties
+        mutable DisplaySettings *display_settings = nullptr;
+        mutable ControlsSettings *controls_settings = nullptr;
+        bool debug_mode = false;
 
-        // Replace run with static method that uses singleton
+        // Get singleton instance
+        static Game *get_instance();
+
+
+        void exit_game() { isRunning = false; }
+        StageManager *get_stage_manager() const { return manager; }
         static void run();
-        StageManager *getManager() const { return manager; }
     };
+
 } // namespace artifact

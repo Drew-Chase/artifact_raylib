@@ -1,25 +1,26 @@
 @echo off
-echo Building All Configurations
-:: Build Debug configuration
+echo === Building all configurations ===
+echo.
+
 echo Building Debug configuration...
 call scripts\windows\debug.bat
-if %ERRORLEVEL% neq 0 goto :error
+if %errorlevel% neq 0 goto error
 
-:: Build Shared configuration
-echo Building Shared configuration...
+echo Building Minimal configuration...
 call scripts\windows\minimal.bat
-if %ERRORLEVEL% neq 0 goto :error
+if %errorlevel% neq 0 goto error
 
-:: Build Bundled configuration
-echo Building Bundled configuration...
+echo Building Standalone configuration...
 call scripts\windows\standalone.bat
-if %ERRORLEVEL% neq 0 goto :error
+if %errorlevel% neq 0 goto error
 
-echo All configurations built successfully!
-goto :end
+echo.
+echo === All configurations built successfully! ===
+goto end
 
 :error
-echo Build failed!
-exit /b 1
+echo.
+echo === Error building configurations! ===
+exit /b %errorlevel%
 
 :end

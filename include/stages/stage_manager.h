@@ -1,5 +1,6 @@
 #pragma once
 #include "stage.h"
+#include "stages.h"
 
 namespace artifact
 {
@@ -10,7 +11,8 @@ namespace artifact
     public:
         StageManager();
         ~StageManager();
-        Stage *loadStage(const char *identifier);
-        Stage *getCurrentStage() const { return current_stage; }
+
+        Stage *load_stage(Stages stage);
+        [[nodiscard]] Stage *get_current_stage() const { return current_stage; }
     };
 } // namespace artifact

@@ -1,28 +1,30 @@
 #!/bin/bash
-echo "Building All Configurations"
+echo "=== Building all configurations ==="
+echo
 
-# Build Debug configuration
 echo "Building Debug configuration..."
-bash scripts/windows/debug.bat
+bash scripts/unix/debug.sh
 if [ $? -ne 0 ]; then
-  echo "Build failed!"
-  exit 1
+    echo
+    echo "=== Error building configurations! ==="
+    exit $?
 fi
 
-# Build Shared configuration
-echo "Building Shared configuration..."
-bash scripts/windows/minimal.bat
+echo "Building Minimal configuration..."
+bash scripts/unix/minimal.sh
 if [ $? -ne 0 ]; then
-  echo "Build failed!"
-  exit 1
+    echo
+    echo "=== Error building configurations! ==="
+    exit $?
 fi
 
-# Build Bundled configuration
-echo "Building Bundled configuration..."
-bash scripts/windows/standalone.bat
+echo "Building Standalone configuration..."
+bash scripts/unix/standalone.sh
 if [ $? -ne 0 ]; then
-  echo "Build failed!"
-  exit 1
+    echo
+    echo "=== Error building configurations! ==="
+    exit $?
 fi
 
-echo "All configurations built successfully!"
+echo
+echo "=== All configurations built successfully! ==="

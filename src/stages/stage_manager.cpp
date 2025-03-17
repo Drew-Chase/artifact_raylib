@@ -1,11 +1,36 @@
 #include "../include/stages/stage_manager.h"
-artifact::StageManager::StageManager() {}
-artifact::StageManager::~StageManager() { delete this->current_stage; }
-artifact::Stage *artifact::StageManager::loadStage(const char *identifier)
+
+#include "stages/level_1_a_stage.h"
+#include "stages/title_screen.h"
+
+artifact::StageManager::StageManager() = default;
+artifact::StageManager::~StageManager()
 {
-    const auto stage = new Stage(identifier);
-    stage->update(true);
-    stage->draw(true);
-    this->current_stage = stage;
-    return stage;
+    if (current_stage != nullptr)
+    {
+        current_stage->destroy();
+        delete current_stage;
+        current_stage = nullptr;
+    }
+}
+artifact::Stage *artifact::StageManager::load_stage(const Stages stage)
+{
+    // destroy the current stage
+    if (current_stage != nullptr)
+        current_stage->destroy();
+
+    switch (stage)
+    {
+        case Stages::LEVEL1A:
+            current_stage = new Level1AStage();
+            break;
+
+        default:
+        case Stages::TITLE_SCREEN:
+            current_stage = new TitleScreen();
+            break;
+    }
+
+    current_stage->startup();
+    return current_stage;
 }
