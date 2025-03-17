@@ -1,4 +1,5 @@
-# asset_copier.cmake
+# This file will scan through the cpp source and header files to try to match resource paths, ie: paths starting with `"/game`
+# God This is a mess, but thank you to @Shroototem for the help with the regex
 function(copy_used_assets)
     set(ASSETS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/assets")
     set(ASSETS_OUTPUT_DIR "${RUNTIME_OUTPUT_DIRECTORY}/game")
@@ -29,10 +30,7 @@ function(copy_used_assets)
                 # Remove quotes
                 string(REGEX REPLACE "\"(.*)\"" "\\1" ASSET_PATH "${MATCH}")
 
-                # Check if path contains %d formatting
                 if("${ASSET_PATH}" MATCHES "%d")
-                    # Look for the first number after the path string
-                    # This handles function calls like SpriteSheet idle_sheet("game/texture/entities/player/idle%d.png", 9, 8);
                     string(REGEX MATCH "\"${ASSET_PATH}\"[^0-9]*([0-9]+)" COUNT_MATCH "${LINE}")
 
                     if(COUNT_MATCH)
