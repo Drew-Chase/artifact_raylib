@@ -8,7 +8,7 @@ namespace artifact
     {
     protected:
         // Statistics
-        int max_health = 5;
+        int max_health = 1;
         int health = max_health;
         int attack_damage = 1;
         bool is_on_ground = true;
