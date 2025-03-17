@@ -4,13 +4,12 @@ function(copy_used_assets)
     set(ASSETS_OUTPUT_DIR "${RUNTIME_OUTPUT_DIRECTORY}/game")
 
     # Create output directory if it doesn't exist
+    file(REMOVE_RECURSE ${ASSETS_OUTPUT_DIR})
     file(MAKE_DIRECTORY ${ASSETS_OUTPUT_DIR})
 
     # Get all source files
     file(GLOB_RECURSE SOURCE_FILES
             "${CMAKE_SOURCE_DIR}/src/*.cpp"
-            "${CMAKE_SOURCE_DIR}/src/*.h"
-            "${CMAKE_SOURCE_DIR}/include/*.cpp"
             "${CMAKE_SOURCE_DIR}/include/*.h"
     )
 
