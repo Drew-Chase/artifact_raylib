@@ -22,6 +22,7 @@ namespace artifact
         // Properties
         mutable DisplaySettings *display_settings = nullptr;
         mutable ControlsSettings *controls_settings = nullptr;
+        bool debug_mode = false;
 
         // Get singleton instance
         static Game *get_instance();
