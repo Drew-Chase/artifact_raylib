@@ -5,7 +5,7 @@ namespace artifact
 {
     class Level1AStage final : public PlayableStage
     {
-        Music music;
+        Music music{};
     public:
         explicit Level1AStage();
         void draw() const override;
