@@ -38,9 +38,9 @@ namespace artifact
         Vector2 bounds{64, 64};
 
         // SFX
-        Sound sfx_jump;
-        Sound sfx_hit;
-        Sound sfx_dash;
+        Sound sfx_jump{};
+        Sound sfx_hit{};
+        Sound sfx_dash{};
 
         void handle_input(float deltaTime);
         void apply_gravity(float deltaTime);
