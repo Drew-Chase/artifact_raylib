@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "entities/entity.h"
+#include "game.h"
 
 namespace artifact
 {
@@ -12,7 +13,6 @@ namespace artifact
     {
         Stage::startup();
         // Spawn the Player
-        // this->player = spawn_entity<PlayerEntity>(-150 + 32 * 2.3 * 118.5, 205 - 32 * 2.3 * 4);
         this->player = spawn_entity<PlayerEntity>(0, 0);
     }
     void PlayableStage::draw() const
@@ -20,11 +20,12 @@ namespace artifact
 
         Stage::draw();
         DrawTextureEx(background, {-1000, -3150}, 0, 2.3, WHITE);
+        if (Game::get_instance()->debug_mode)
+            debug_draw_colliders();
         for (auto &entity: entities)
         {
             entity->draw();
         }
-        debug_draw_colliders();
     }
     void PlayableStage::debug_draw_colliders() const
     {
