@@ -81,6 +81,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Make Unix scripts executable
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          chmod +x scripts/unix/*.sh
+
+      - name: Verify Unix scripts are executable
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          if [ -d "scripts/unix" ]; then
+            for script in scripts/unix/*.sh; do
+              if [ -f "$script" ] && [ ! -x "$script" ]; then
+                echo "Error: $script is not executable"
+                exit 1
+              fi
+            done
+          fi
+          echo "All Unix scripts are correctly set as executable."
+
       - name: Install Conan
         run: |
           pip install conan
@@ -126,7 +146,6 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
-          chmod +x scripts/unix/conan-install.sh
           ./scripts/unix/conan-install.sh
 
       - name: Build Project (Windows)
@@ -139,7 +158,6 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
-          chmod +x scripts/unix/${{ matrix.profile.script_name }}.sh
           ./scripts/unix/${{ matrix.profile.script_name }}.sh
 
       - name: Get Binary Name
