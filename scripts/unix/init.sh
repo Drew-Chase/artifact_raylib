@@ -1,14 +1,22 @@
 #!/bin/bash
-set -e
-
 echo "=== Initializing artifact_raylib project ==="
 echo
 
 echo "Installing Conan dependencies..."
-./scripts/unix/conan-install.sh
+bash scripts/unix/conan-install.sh
+if [ $? -ne 0 ]; then
+    echo
+    echo "=== Error initializing project! ==="
+    exit $?
+fi
 
 echo "Building all configurations..."
-./scripts/unix/all.sh
+bash scripts/unix/all.sh
+if [ $? -ne 0 ]; then
+    echo
+    echo "=== Error initializing project! ==="
+    exit $?
+fi
 
 echo
 echo "=== Project initialized successfully! ==="

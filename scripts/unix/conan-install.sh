@@ -1,6 +1,4 @@
 #!/bin/bash
-set -e
-
 echo "=== Installing Conan dependencies ==="
 echo
 
@@ -13,7 +11,11 @@ fi
 
 # Create conan_provider.cmake for CMake integration
 echo "Generating conan_provider.cmake..."
-conan install . --output-folder=. -s build_type=Debug
+conan install . --output-folder=bin/obj/conan -s build_type=Debug --build=missing
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to install Conan dependencies"
+    exit $?
+fi
 
 echo
 echo "=== Conan dependencies installed successfully ==="

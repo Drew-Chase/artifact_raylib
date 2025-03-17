@@ -1,6 +1,4 @@
 #!/bin/bash
-set -e
-
 echo "=== Building Debug configuration ==="
 echo
 
@@ -13,11 +11,24 @@ fi
 
 # Configure project with CMake
 echo "Configuring project..."
-cmake -B bin/obj/$OS_ARCH/debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DPROFILE_NAME=debug -DSTRIPPED_VERSION=ON -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="conan_provider.cmake"
+cmake -B bin/obj/$OS_ARCH/debug -G Ninja -DCMAKE_BUILD_TYPE=Debug \
+    -DPROFILE_NAME=debug -DSTRIPPED_VERSION=ON \
+    -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="$(pwd)/conan_provider.cmake"
+if [ $? -ne 0 ]; then
+    echo
+    echo "=== Error configuring Debug configuration! ==="
+    exit $?
+fi
 
 # Build project
 echo "Building project..."
-cmake --build bin/obj/$OS_ARCH/debug -j $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+PROCS=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+cmake --build bin/obj/$OS_ARCH/debug -j $PROCS
+if [ $? -ne 0 ]; then
+    echo
+    echo "=== Error building Debug configuration! ==="
+    exit $?
+fi
 
 echo
 echo "=== Debug configuration built successfully! ==="

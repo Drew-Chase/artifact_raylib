@@ -1,17 +1,30 @@
 #!/bin/bash
-set -e
-
 echo "=== Building all configurations ==="
 echo
 
 echo "Building Debug configuration..."
-./scripts/unix/debug.sh
+bash scripts/unix/debug.sh
+if [ $? -ne 0 ]; then
+    echo
+    echo "=== Error building configurations! ==="
+    exit $?
+fi
 
 echo "Building Minimal configuration..."
-./scripts/unix/minimal.sh
+bash scripts/unix/minimal.sh
+if [ $? -ne 0 ]; then
+    echo
+    echo "=== Error building configurations! ==="
+    exit $?
+fi
 
 echo "Building Standalone configuration..."
-./scripts/unix/standalone.sh
+bash scripts/unix/standalone.sh
+if [ $? -ne 0 ]; then
+    echo
+    echo "=== Error building configurations! ==="
+    exit $?
+fi
 
 echo
 echo "=== All configurations built successfully! ==="

@@ -1,6 +1,4 @@
 #!/bin/bash
-set -e
-
 echo "=== Building Minimal configuration ==="
 echo
 
@@ -13,11 +11,24 @@ fi
 
 # Configure project with CMake
 echo "Configuring project..."
-cmake -B bin/obj/$OS_ARCH/minimal -G Ninja -DCMAKE_BUILD_TYPE=Release -DPROFILE_NAME=minimal -DREMOVE_DEBUG_INFO=ON -DSTRIPPED_VERSION=ON -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="conan_provider.cmake"
+cmake -B bin/obj/$OS_ARCH/minimal -G Ninja -DCMAKE_BUILD_TYPE=Release \
+    -DPROFILE_NAME=minimal -DREMOVE_DEBUG_INFO=ON -DSTRIPPED_VERSION=ON \
+    -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="$(pwd)/conan_provider.cmake"
+if [ $? -ne 0 ]; then
+    echo
+    echo "=== Error configuring Minimal configuration! ==="
+    exit $?
+fi
 
 # Build project
 echo "Building project..."
-cmake --build bin/obj/$OS_ARCH/minimal -j $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+PROCS=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+cmake --build bin/obj/$OS_ARCH/minimal -j $PROCS
+if [ $? -ne 0 ]; then
+    echo
+    echo "=== Error building Minimal configuration! ==="
+    exit $?
+fi
 
 echo
 echo "=== Minimal configuration built successfully! ==="
