@@ -8,6 +8,10 @@ namespace artifact
     void Level1AStage::startup()
     {
         PlayableStage::startup();
+        music = LoadMusicStream("game/audio/music/level1.ogg");
+        music.looping = true;
+        SetMusicVolume(music, 0.15f);
+        PlayMusicStream(music);
 
         // Spawn enemies
         // TODO: Spawn enemies
@@ -65,6 +69,14 @@ namespace artifact
         PlayableStage::draw();
         EndMode2D();
     }
-    void Level1AStage::update(const float deltaTime) { PlayableStage::update(deltaTime); }
-    void Level1AStage::destroy() { PlayableStage::destroy(); }
+    void Level1AStage::update(const float deltaTime)
+    {
+        PlayableStage::update(deltaTime);
+        UpdateMusicStream(music);
+    }
+    void Level1AStage::destroy()
+    {
+        PlayableStage::destroy();
+        UnloadMusicStream(music);
+    }
 } // namespace artifact
