@@ -35,6 +35,7 @@ set(CMAKE_BINARY_DIR "${CMAKE_SOURCE_DIR}/bin/obj/${PROFILE_NAME}")
 set(CMAKE_CACHEFILE_DIR ${PROJECT_SOURCE_DIR}/bin/obj/cmake/${CMAKE_PROJECT_NAME})
 if (WIN32)
     target_sources(${CMAKE_PROJECT_NAME} PRIVATE "resources/resources.rc")
+    target_sources(${CMAKE_PROJECT_NAME} PRIVATE "resources/version.rc")
 endif ()
 
 build_gcc()
