@@ -1,7 +1,5 @@
 #pragma once
 #include <memory>
-
-
 #include "menu_base.h"
 #include "settings/display_settings.h"
 #include "ui/components/button_component.h"

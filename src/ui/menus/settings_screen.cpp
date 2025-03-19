@@ -1,8 +1,6 @@
 
 #include "ui/menus/settings_screen.h"
-
 #include <fmt/format.h>
-
 #include "game.h"
 #include "stages/title_screen.h"
 
