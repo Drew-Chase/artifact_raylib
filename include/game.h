@@ -4,6 +4,8 @@
 #include "settings/display_settings.h"
 #include "stages/stage_manager.h"
 
+#define VERSION "0.0.1a"
+
 namespace artifact
 {
     class Game

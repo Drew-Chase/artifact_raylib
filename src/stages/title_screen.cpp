@@ -1,6 +1,8 @@
 // title_screen.cpp
 #include "../include/stages/title_screen.h"
+#include <fmt/format.h>
 #include <raylib.h>
+
 #include "game.h"
 
 namespace artifact
@@ -92,6 +94,8 @@ namespace artifact
             if (button_container)
                 button_container->draw();
         }
+
+        DrawText(fmt::format("Artifact v{}", VERSION).c_str(), 10, GetScreenHeight() - 20, 16, ColorAlpha(WHITE, 0.5f));
     }
     void TitleScreen::update(const float deltaTime)
     {
@@ -160,6 +164,7 @@ namespace artifact
         Stage::destroy();
         if (is_being_destroyed)
             return;
+        is_being_destroyed = true;
         // Make sure to explicitly clean up textures
         UnloadTexture(sky_clouds_background_image);
         UnloadTexture(mountain_hills_background_image);
@@ -179,7 +184,9 @@ namespace artifact
         }
 
         // Clear UI components before parent destroy
+        button_container->destroy();
         button_container.reset();
+        button_container = nullptr;
         start_button.reset();
         settings_button.reset();
         exit_button.reset();
