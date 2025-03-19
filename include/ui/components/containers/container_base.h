@@ -13,6 +13,7 @@ namespace artifact
 
     public:
         explicit ContainerBase(const char *identifier, Stage *owner) : ComponentBase(identifier, owner) {}
+        virtual ~ContainerBase();
         void draw() override;
         void update(int mouse_x, int mouse_y) override;
         virtual void add_component(ComponentBase *component);

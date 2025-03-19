@@ -1,6 +1,7 @@
 #include "ui/components/containers/container_base.h"
 #include <ranges>
 
+artifact::ContainerBase::~ContainerBase() { ContainerBase::destroy(); }
 void artifact::ContainerBase::draw() {}
 void artifact::ContainerBase::update(int mouse_x, int mouse_y) {}
 void artifact::ContainerBase::add_component(ComponentBase *component) { this->components[component->get_identifier()] = component; }
@@ -29,4 +30,6 @@ void artifact::ContainerBase::destroy()
     {
         delete component;
     }
+
+    components.clear();
 }
