@@ -4,4 +4,4 @@
 requirements:
   - "nlohmann_json/3.11.3"
   - "spdlog/1.15.1"
-  - "raylib/4.0.0"
+  - "raylib/5.5"
