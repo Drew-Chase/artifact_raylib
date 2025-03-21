@@ -27,26 +27,26 @@ namespace artifact
         button_container->set_background_color(BLANK);
 
         // Create buttons
-        start_button = std::make_unique<ButtonComponent>("start_button", this, button_width, button_height, "Start Game",
-                                                         []
-                                                         {
-                                                             TraceLog(LOG_INFO, "Start button clicked!");
-                                                             Game::get_instance()->get_stage_manager()->load_stage(Stages::LEVEL1A);
-                                                         });
+        auto start_button = std::make_unique<ButtonComponent>("start_button", this, button_width, button_height, "Start Game",
+                                                              []
+                                                              {
+                                                                  TraceLog(LOG_INFO, "Start button clicked!");
+                                                                  Game::get_instance()->get_stage_manager()->load_stage(Stages::LEVEL1A);
+                                                              });
 
-        settings_button = std::make_unique<ButtonComponent>("settings_button", this, button_width, button_height, "Settings Game",
-                                                            [this]
-                                                            {
-                                                                TraceLog(LOG_INFO, "Settings button clicked!");
-                                                                settings_screen = std::make_unique<SettingsScreen>(this);
-                                                            });
+        auto settings_button = std::make_unique<ButtonComponent>("settings_button", this, button_width, button_height, "Settings Game",
+                                                                 [this]
+                                                                 {
+                                                                     TraceLog(LOG_INFO, "Settings button clicked!");
+                                                                     settings_screen = std::make_unique<SettingsScreen>(this);
+                                                                 });
 
-        exit_button = std::make_unique<ButtonComponent>("exit_button", this, button_width, button_height, "Exit Game",
-                                                        []
-                                                        {
-                                                            TraceLog(LOG_INFO, "Exit button clicked!");
-                                                            Game::get_instance()->exit_game();
-                                                        });
+        auto exit_button = std::make_unique<ButtonComponent>("exit_button", this, button_width, button_height, "Exit Game",
+                                                             []
+                                                             {
+                                                                 TraceLog(LOG_INFO, "Exit button clicked!");
+                                                                 Game::get_instance()->exit_game();
+                                                             });
 
         // Configure button appearances
         start_button->set_colors(button_normal_bg_color, button_hover_bg_color, button_pressed_bg_color, text_color);
@@ -58,9 +58,9 @@ namespace artifact
         exit_button->set_font_size(font_size);
 
         // Add buttons to container
-        button_container->add_component(start_button.get());
-        button_container->add_component(settings_button.get());
-        button_container->add_component(exit_button.get());
+        button_container->add_component(start_button.release());
+        button_container->add_component(settings_button.release());
+        button_container->add_component(exit_button.release());
 
         button_container->auto_size();
 
@@ -195,9 +195,6 @@ namespace artifact
         button_container->destroy();
         button_container.reset();
         button_container = nullptr;
-        start_button.reset();
-        settings_button.reset();
-        exit_button.reset();
     }
     void TitleScreen::close_settings_menu()
     {
