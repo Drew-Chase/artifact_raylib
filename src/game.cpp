@@ -114,6 +114,9 @@ namespace artifact
     void Game::register_log_callback(int msgType, const char *message, const va_list args)
     {
         const auto logger = spdlog::get("game_logger");
+        if (logger == nullptr)
+            return;
+
         char formattedMessage[1024];
         vsnprintf(formattedMessage, sizeof(formattedMessage), message, args);
 
