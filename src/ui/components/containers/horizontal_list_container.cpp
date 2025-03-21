@@ -22,7 +22,7 @@ namespace artifact
         }
 
         float current_x = x + padding_left;
-        for (const auto &[_, component]: std::ranges::reverse_view(components))
+        for (const auto &component: components)
         {
             if (auto *button = dynamic_cast<ButtonComponent *>(component.get()))
             {
@@ -36,9 +36,9 @@ namespace artifact
     void HorizontalListContainer::auto_width()
     {
         int current_x = x + padding_left;
-        for (const auto &it: std::ranges::reverse_view(entries()))
+        for (const auto &component: components)
         {
-            if (const auto *button = dynamic_cast<ButtonComponent *>(it))
+            if (const auto *button = dynamic_cast<ButtonComponent *>(component.get()))
             {
                 current_x += button->get_width() + gap;
             }

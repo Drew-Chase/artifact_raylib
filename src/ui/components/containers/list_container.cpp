@@ -10,9 +10,9 @@ namespace artifact
     void ListContainer::draw() { ContainerBase::draw(); }
     void ListContainer::update(const int mouse_x, const int mouse_y)
     {
-        for (const auto components = entries(); auto *component: components)
+        for (auto &component: components)
         {
-            if (component != nullptr && component != reinterpret_cast<ComponentBase *>(-1))
+            if (component != nullptr)
                 component->update(mouse_x, mouse_y);
         }
     }
@@ -41,9 +41,9 @@ namespace artifact
     void ListContainer::auto_height()
     {
         int largest_height = 0;
-        for (const auto &it: entries())
+        for (const auto &component: components)
         {
-            if (const auto *button = dynamic_cast<ButtonComponent *>(it))
+            if (const auto *button = dynamic_cast<ButtonComponent *>(component.get()))
             {
                 largest_height = std::max(largest_height, button->get_height());
             }
@@ -53,9 +53,9 @@ namespace artifact
     void ListContainer::auto_width()
     {
         int largest_width = 0;
-        for (const auto &it: entries())
+        for (const auto &component_base: components)
         {
-            if (const auto *button = dynamic_cast<ButtonComponent *>(it))
+            if (const auto *button = dynamic_cast<ButtonComponent *>(component_base.get()))
             {
                 largest_width = std::max(largest_width, button->get_width());
             }

@@ -1,5 +1,4 @@
 #pragma once
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -11,7 +10,7 @@ namespace artifact
     class ContainerBase : public ComponentBase
     {
     protected:
-        std::map<std::string, std::unique_ptr<ComponentBase>> components;
+        std::vector<std::unique_ptr<ComponentBase>> components;
 
     public:
         explicit ContainerBase(const char *identifier, Stage *owner) : ComponentBase(identifier, owner) {}
@@ -30,7 +29,6 @@ namespace artifact
         virtual void remove_component(size_t index);
         virtual void remove_component(const char *identifier);
         virtual void remove_component(ComponentBase *component);
-        virtual std::vector<ComponentBase *> entries();
         virtual void destroy();
     };
 } // namespace artifact
