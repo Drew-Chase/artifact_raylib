@@ -15,7 +15,7 @@ namespace artifact
         const Color button_normal_bg_color = ColorAlpha(BLACK, 0.5f);
         const Color button_hover_bg_color = ColorAlpha(BLACK, 0.75f);
         const Color button_pressed_bg_color = BLACK;
-        const int font_size = 24;
+        const int font_size = 18;
 
         mutable float clouds_scroll = 0.0f;
         mutable float mountains_scroll = 0.0f;
@@ -23,7 +23,7 @@ namespace artifact
         const float mountains_scroll_speed = 75.0f;
 
         // Additional Screens
-        SettingsScreen *settings_screen = nullptr;
+        std::unique_ptr<SettingsScreen> settings_screen = nullptr;
 
         // Images
         Texture2D sky_clouds_background_image{};

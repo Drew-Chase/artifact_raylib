@@ -20,28 +20,28 @@ namespace artifact
         constexpr int button_spacing = 10;
         constexpr int container_padding = 10;
 
-        button_container = std::make_unique<VerticalListContainer>("button_container", this, 0, 0, 0, 0);
+        button_container = std::make_unique<VerticalListContainer>("button_container", this);
 
         button_container->set_gap(button_spacing);
         button_container->set_padding(container_padding);
         button_container->set_background_color(BLANK);
 
         // Create buttons
-        start_button = std::make_unique<ButtonComponent>("start_button", this, 0, 0, button_width, button_height, "Start Game",
+        start_button = std::make_unique<ButtonComponent>("start_button", this, button_width, button_height, "Start Game",
                                                          []
                                                          {
                                                              TraceLog(LOG_INFO, "Start button clicked!");
                                                              Game::get_instance()->get_stage_manager()->load_stage(Stages::LEVEL1A);
                                                          });
 
-        settings_button = std::make_unique<ButtonComponent>("settings_button", this, 0, 0, button_width, button_height, "Settings Game",
+        settings_button = std::make_unique<ButtonComponent>("settings_button", this, button_width, button_height, "Settings Game",
                                                             [this]
                                                             {
                                                                 TraceLog(LOG_INFO, "Settings button clicked!");
-                                                                settings_screen = new SettingsScreen(this);
+                                                                settings_screen = std::make_unique<SettingsScreen>(this);
                                                             });
 
-        exit_button = std::make_unique<ButtonComponent>("exit_button", this, 0, 0, button_width, button_height, "Exit Game",
+        exit_button = std::make_unique<ButtonComponent>("exit_button", this, button_width, button_height, "Exit Game",
                                                         []
                                                         {
                                                             TraceLog(LOG_INFO, "Exit button clicked!");
@@ -78,7 +78,8 @@ namespace artifact
 
         if (settings_screen != nullptr)
         {
-            settings_screen->draw();
+            if (!settings_screen->is_being_removed())
+                settings_screen->draw();
         } else
         {
             // Draw title
@@ -104,9 +105,18 @@ namespace artifact
         UpdateMusicStream(menu_music);
         update_background(deltaTime);
 
-        if (settings_screen != nullptr)
+        if (settings_screen != nullptr && settings_screen)
         {
-            settings_screen->update(GetMouseX(), GetMouseY());
+            try
+            {
+                if (!settings_screen->is_being_removed())
+                    settings_screen->update(GetMouseX(), GetMouseY());
+                else
+                    settings_screen.reset();
+            } catch (...)
+            {
+                TraceLog(LOG_ERROR, "Failed to run the update function on the settings screen");
+            }
         } else
         {
             if (button_container && this->is_menu_in_focus())
@@ -179,8 +189,6 @@ namespace artifact
         if (settings_screen != nullptr)
         {
             settings_screen->destroy();
-            delete settings_screen;
-            settings_screen = nullptr;
         }
 
         // Clear UI components before parent destroy
@@ -195,8 +203,7 @@ namespace artifact
     {
         if (settings_screen != nullptr)
         {
-            delete settings_screen;
-            settings_screen = nullptr;
+            settings_screen.reset();
         }
     }
 

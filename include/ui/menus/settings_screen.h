@@ -45,8 +45,10 @@ namespace artifact
 
     public:
         explicit SettingsScreen(Stage *owner);
+        ~SettingsScreen() override;
         void draw() override;
         void update(int mouse_x, int mouse_y) override;
         void destroy() override;
+        bool is_being_removed() const;
     };
 } // namespace artifact
