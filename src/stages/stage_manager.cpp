@@ -9,8 +9,8 @@ artifact::StageManager::~StageManager()
     if (current_stage != nullptr)
     {
         current_stage->destroy();
-        delete current_stage;
         current_stage = nullptr;
+        delete current_stage;
     }
 }
 artifact::Stage *artifact::StageManager::load_stage(const Stages stage)
