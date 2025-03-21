@@ -10,6 +10,7 @@ namespace artifact
         pressed_color = DARKGRAY;
         text_color = BLACK;
     }
+    ButtonComponent::ButtonComponent(const char *identifier, Stage *owner, const int width, const int height, const char *buttonText, std::function<void()> clickHandler) : ButtonComponent(identifier, owner, 0, 0, width, height, buttonText, std::move(clickHandler)) {}
 
     void ButtonComponent::draw()
     {

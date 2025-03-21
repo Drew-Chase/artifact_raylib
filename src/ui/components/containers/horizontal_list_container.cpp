@@ -7,6 +7,7 @@
 namespace artifact
 {
     HorizontalListContainer::HorizontalListContainer(const char *identifier, Stage *owner, const int x, const int y, const int width, const int height, const int gap, const int padding, const Color background_color) : ListContainer(identifier, owner, x, y, width, height, gap, padding, background_color) {}
+    HorizontalListContainer::HorizontalListContainer(const char *identifier, Stage *owner) : ListContainer(identifier, owner) {}
 
     void HorizontalListContainer::draw()
     {
@@ -15,11 +16,15 @@ namespace artifact
             DrawRectangle(x, y, width, height, background_color);
         }
 
-        float current_x = x + padding_left;
-
-        for (const auto &it: std::ranges::reverse_view(entries()))
+        if (components.empty())
         {
-            if (auto *button = dynamic_cast<ButtonComponent *>(it))
+            return;
+        }
+
+        float current_x = x + padding_left;
+        for (const auto &[_, component]: std::ranges::reverse_view(components))
+        {
+            if (auto *button = dynamic_cast<ButtonComponent *>(component.get()))
             {
                 button->set_position(current_x, y + padding_top);
                 button->set_height(height - padding_top - padding_bottom);

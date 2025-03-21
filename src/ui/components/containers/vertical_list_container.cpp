@@ -6,6 +6,7 @@
 namespace artifact
 {
     VerticalListContainer::VerticalListContainer(const char *identifier, Stage *owner, const int x, const int y, const int width, const int height, const int gap, const int padding, const Color background_color) : ListContainer(identifier, owner, x, y, width, height, gap, padding, background_color) {}
+    VerticalListContainer::VerticalListContainer(const char *identifier, Stage *owner) : ListContainer(identifier, owner, 0, 0, 0, 0, 0, 0, BLANK) {}
 
     int VerticalListContainer::calculate_content_height()
     {

@@ -6,6 +6,7 @@
 namespace artifact
 {
     ListContainer::ListContainer(const char *identifier, Stage *owner, const int x, const int y, const int width, const int height, const int gap, const int padding, const Color background_color) : ContainerBase(identifier, owner), x(x), y(y), width(width), height(height), gap(gap), padding_top(padding), padding_bottom(padding), padding_left(padding), padding_right(padding), background_color(background_color) {}
+    ListContainer::ListContainer(const char *identifier, Stage *owner) : ContainerBase(identifier, owner), x(0), y(0), width(0), height(0), gap(0), padding_top(0), padding_bottom(0), padding_left(0), padding_right(0), background_color(BLANK) {}
     void ListContainer::draw() { ContainerBase::draw(); }
     void ListContainer::update(const int mouse_x, const int mouse_y)
     {

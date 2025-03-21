@@ -19,6 +19,7 @@ namespace artifact
 
     public:
         ListContainer(const char *identifier, Stage *owner, int x, int y, int width, int height, int gap = 0, int padding = 0, Color background_color = BLANK);
+        ListContainer(const char *identifier, Stage *owner);
 
         void draw() override;
         void update(int mouse_x, int mouse_y) override;
