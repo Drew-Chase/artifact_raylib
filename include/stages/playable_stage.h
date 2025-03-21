@@ -16,11 +16,11 @@ namespace artifact
         PlayerEntity *player;
         std::vector<std::unique_ptr<Entity>> entities;
         std::vector<Collider> colliders;
-        std::unique_ptr<PauseScreen> pause_screen;
         bool is_paused = false;
         virtual void draw_ui() const;
 
     public:
+        std::unique_ptr<PauseScreen> pause_screen;
         Camera2D camera{};
         explicit PlayableStage(const char *identifier);
         template<typename T>

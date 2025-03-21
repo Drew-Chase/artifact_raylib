@@ -12,5 +12,6 @@ namespace artifact
         void update(float deltaTime) override;
         void destroy() override;
         void startup() override;
+
     };
 } // namespace artifact

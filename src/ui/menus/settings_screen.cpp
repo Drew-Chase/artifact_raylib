@@ -2,6 +2,7 @@
 #include "ui/menus/settings_screen.h"
 #include <fmt/format.h>
 #include "game.h"
+#include "stages/playable_stage.h"
 #include "stages/title_screen.h"
 
 namespace artifact
@@ -12,16 +13,11 @@ namespace artifact
         setup_action_buttons();
         // setup_settings_tabs();
     }
-    SettingsScreen::~SettingsScreen()
-    {
-        destroy();
-    }
+    SettingsScreen::~SettingsScreen() { destroy(); }
     void SettingsScreen::draw()
     {
         if (pending_removal)
-        {
             return;
-        }
         if (settings_menu_actions_container != nullptr)
             settings_menu_actions_container->draw();
     }
@@ -29,7 +25,10 @@ namespace artifact
     {
         if (pending_removal && owner)
         {
-            dynamic_cast<TitleScreen *>(owner)->close_settings_menu();
+            if (auto *title_screen = dynamic_cast<TitleScreen *>(owner); title_screen != nullptr)
+                title_screen->close_settings_menu();
+            if (const auto *stage = dynamic_cast<PlayableStage *>(owner); stage != nullptr)
+                stage->pause_screen->close_settings_menu();
         }
 
 
