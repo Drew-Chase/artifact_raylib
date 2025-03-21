@@ -51,7 +51,7 @@ namespace artifact
 
         // Setup the async logger
         spdlog::init_thread_pool(8192, 1);
-        spdlog::set_pattern("[%H:%M:%S.%f] [%l] [thread %t] %v");
+        spdlog::set_pattern("[%l] [thread %t] %v");
         spdlog::set_level(spdlog::level::trace);
 
         const auto rotating_file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/game.log", 10 * 1024 * 1024, 6, true);
@@ -79,9 +79,9 @@ namespace artifact
         // Load Settings
         game->display_settings->load();
         game->controls_settings->load();
+
         // Apply Settings
         game->display_settings->apply();
-
 
         manager->load_stage(Stages::TITLE_SCREEN);
         // manager->load_stage(Stages::LEVEL1A);
@@ -89,7 +89,6 @@ namespace artifact
         instance->isRunning = true;
         while (!WindowShouldClose() && instance->isRunning)
         {
-
             float deltaTime = GetFrameTime();
             if (constexpr float MAX_DELTA_TIME = 0.05f; deltaTime > MAX_DELTA_TIME)
                 deltaTime = MAX_DELTA_TIME;
