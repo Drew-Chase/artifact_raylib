@@ -9,6 +9,14 @@ namespace artifact
 {
     void TitleScreen::startup()
     {
+        // UI Settings
+        constexpr auto text_color = WHITE;
+        const Color button_normal_bg_color = ColorAlpha(BLACK, 0.5f);
+        const Color button_hover_bg_color = ColorAlpha(BLACK, 0.75f);
+        constexpr auto button_pressed_bg_color = BLACK;
+        constexpr int font_size = 18;
+
+
         owner->push_to_zindex(this);
         sky_clouds_background_image = LoadTexture("game/texture/menus/title_screen/sunny-mountains-sky.png");
         mountain_hills_background_image = LoadTexture("game/texture/menus/title_screen/sunny-mountains-hills.png");
@@ -107,16 +115,10 @@ namespace artifact
 
         if (settings_screen != nullptr && settings_screen)
         {
-            try
-            {
-                if (!settings_screen->is_being_removed())
-                    settings_screen->update(GetMouseX(), GetMouseY());
-                else
-                    settings_screen.reset();
-            } catch (...)
-            {
-                TraceLog(LOG_ERROR, "Failed to run the update function on the settings screen");
-            }
+            if (!settings_screen->is_being_removed())
+                settings_screen->update(GetMouseX(), GetMouseY());
+            else
+                settings_screen.reset();
         } else
         {
             if (button_container && this->is_menu_in_focus())
