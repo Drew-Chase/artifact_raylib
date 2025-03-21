@@ -66,17 +66,24 @@ namespace artifact
     }
     void Level1AStage::draw() const
     {
+        if (is_being_destroyed)
+            return;
         BeginMode2D(camera);
         PlayableStage::draw();
         EndMode2D();
+        PlayableStage::draw_ui();
     }
     void Level1AStage::update(const float deltaTime)
     {
+        if (is_being_destroyed)
+            return;
         PlayableStage::update(deltaTime);
         UpdateMusicStream(music);
     }
     void Level1AStage::destroy()
     {
+        if (is_being_destroyed)
+            return;
         PlayableStage::destroy();
         UnloadMusicStream(music);
     }

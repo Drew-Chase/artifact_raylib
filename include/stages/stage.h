@@ -17,7 +17,7 @@ namespace artifact
         virtual ~Stage() { destroy(); }
 
         virtual void draw() const {}
-        virtual void update(float deltaTime)   {}
+        virtual void update(float deltaTime) {}
         virtual void startup() {}
         virtual void destroy()
         {
@@ -39,5 +39,6 @@ namespace artifact
             if (const auto it = std::ranges::find(zindex, menu); it != zindex.end())
                 zindex.erase(it);
         }
+        bool destroyed() const { return is_being_destroyed; }
     };
 } // namespace artifact

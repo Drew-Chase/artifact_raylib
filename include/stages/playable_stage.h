@@ -4,6 +4,7 @@
 #include "collider.h"
 #include "entities/player_entity.h"
 #include "stage.h"
+#include "ui/menus/pause_screen.h"
 namespace artifact
 {
 
@@ -15,11 +16,12 @@ namespace artifact
         PlayerEntity *player;
         std::vector<std::unique_ptr<Entity>> entities;
         std::vector<Collider> colliders;
+        std::unique_ptr<PauseScreen> pause_screen;
+        bool is_paused = false;
+        virtual void draw_ui() const;
 
     public:
         Camera2D camera{};
-
-
         explicit PlayableStage(const char *identifier);
         template<typename T>
             requires std::derived_from<T, Entity>
@@ -44,5 +46,7 @@ namespace artifact
         void set_background(const char *resource_location);
         Texture2D *get_background();
         void respawn();
+        void pause();
+        void unpause();
     };
 } // namespace artifact

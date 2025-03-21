@@ -12,11 +12,15 @@ namespace artifact
     void PlayableStage::startup()
     {
         Stage::startup();
+
         // Spawn the Player
         this->player = spawn_entity<PlayerEntity>(0, 0);
+        pause_screen = std::make_unique<PauseScreen>("pause_screen", this);
     }
     void PlayableStage::draw() const
     {
+        if (is_being_destroyed)
+            return;
 
         Stage::draw();
         DrawTextureEx(background, {-1000, -3150}, 0, 2.3, WHITE);
@@ -25,6 +29,13 @@ namespace artifact
         for (auto &entity: entities)
         {
             entity->draw();
+        }
+    }
+    void PlayableStage::draw_ui() const
+    {
+        if (is_paused)
+        {
+            pause_screen->draw();
         }
     }
     void PlayableStage::debug_draw_colliders() const
@@ -36,7 +47,18 @@ namespace artifact
     }
     void PlayableStage::update(const float deltaTime)
     {
+        if (is_being_destroyed)
+            return;
         Stage::update(deltaTime);
+
+        if (IsKeyPressed(KEY_ESCAPE))
+            is_paused = !is_paused;
+
+        if (is_paused)
+        {
+            pause_screen->update(GetMouseX(), GetMouseY());
+            return;
+        }
 
         for (const auto &entity: entities)
         {
@@ -45,6 +67,8 @@ namespace artifact
     }
     void PlayableStage::destroy()
     {
+        if (is_being_destroyed)
+            return;
         Stage::destroy();
         entities.clear();
         UnloadTexture(background);
@@ -60,4 +84,6 @@ namespace artifact
         camera.target = {0, 0};
         player->set_position(0, 0);
     }
+    void PlayableStage::pause() { is_paused = true; }
+    void PlayableStage::unpause() { is_paused = false; }
 } // namespace artifact
