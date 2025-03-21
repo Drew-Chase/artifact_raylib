@@ -51,18 +51,18 @@ namespace artifact
 
         // Setup the async logger
         spdlog::init_thread_pool(8192, 1);
-        spdlog::set_pattern("[%l] [thread %t] %v");
-        spdlog::set_level(spdlog::level::trace);
 
         const auto rotating_file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/game.log", 10 * 1024 * 1024, 6, true);
         const auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
         std::vector<spdlog::sink_ptr> sinks{rotating_file_sink, stdout_sink};
         const auto logger = std::make_shared<spdlog::async_logger>("game_logger", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+        logger->set_level(spdlog::level::trace);
+        logger->set_pattern("[%l] [thread %t] %v");
         register_logger(logger);
         spdlog::flush_every(std::chrono::seconds(3));
 
         SetTraceLogCallback(register_log_callback);
-        SetTraceLogLevel(LOG_DEBUG);
+        SetTraceLogLevel(LOG_TRACE);
 
         const auto window_icon = LoadImage("game/app-icon.png");
         StageManager *manager = game->get_stage_manager();
