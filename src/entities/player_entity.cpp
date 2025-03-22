@@ -254,7 +254,7 @@ namespace artifact
 
         if (!was_grounded && is_grounded)
         {
-            // Landing effects could go here (sound, particles, etc.)
+            // TODO: Add landing effects
         }
     }
 
