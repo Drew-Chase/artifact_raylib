@@ -278,9 +278,10 @@ namespace artifact
     {
         const ControlsSettings *controls = Game::get_instance()->controls_settings;
 
+#ifdef DEBUG
         if (ControlsSettings::pressed(KEY_B))
             Game::get_instance()->debug_mode = !Game::get_instance()->debug_mode;
-
+#endif
         if (ControlsSettings::down(controls->movement_sprint))
             sprinting = controls->toggle_sprint ? !sprinting : true;
         else if (ControlsSettings::up(controls->movement_sprint) && !controls->toggle_sprint)
