@@ -31,11 +31,17 @@ namespace artifact
         Entity::draw();
         if (Game::get_instance()->debug_mode)
         {
-            DrawRectangleRec({this->position.x - 10, this->position.y - 100, 300, 82}, ColorAlpha(BLACK, .5f));
+            const std::string grounded_text = fmt::format("Grounded: {}, VVel: {:.1f}, HVel: {:.1f}", is_grounded ? "true" : "false", vertical_velocity, horizontal_velocity);
+            const std::string position_text = fmt::format("Player Pos: X: {:.1f}, Y: {:.1f}", this->position.x, this->position.y);
+            const std::string attacks_text = fmt::format("Dash: {}, Light: {}", dash_attack_frames, light_attack_frames);
+
+            const int text_width = std::max({MeasureText(grounded_text.c_str(), 16), MeasureText(position_text.c_str(), 16), MeasureText(attacks_text.c_str(), 16)});
+
+            DrawRectangleRec({this->position.x - 10, this->position.y - 100, static_cast<float>(text_width + 20), 82}, ColorAlpha(BLACK, .5f));
             DrawRectangleLinesEx({position.x, position.y, bounds.x, bounds.y}, 1, BLUE);
-            DrawText(fmt::format("Grounded: {}, VVel: {:.1f}, HVel: {:.1f}", is_grounded ? "true" : "false", vertical_velocity, horizontal_velocity).c_str(), this->position.x, this->position.y - 90, 16, WHITE);
-            DrawText(fmt::format("Player Pos: X: {:.1f}, Y: {:.1f}", this->position.x, this->position.y).c_str(), this->position.x, this->position.y - 64, 16, WHITE);
-            DrawText(fmt::format("Dash: {}, Light: {}", dash_attack_frames, light_attack_frames).c_str(), this->position.x, this->position.y - 42, 16, WHITE);
+            DrawText(grounded_text.c_str(), this->position.x, this->position.y - 90, 16, WHITE);
+            DrawText(position_text.c_str(), this->position.x, this->position.y - 64, 16, WHITE);
+            DrawText(attacks_text.c_str(), this->position.x, this->position.y - 42, 16, WHITE);
         }
 
         // Draw animations
@@ -324,7 +330,7 @@ namespace artifact
         {
             if (dash_attack_frames > 0 || light_attack_frames > 0)
                 return;
-            dash_attack_frames = 60;
+            dash_attack_frames = 60 * (GetFPS() / 60);
             constexpr int dash_momentum = 1000;
             if (dash_attack_sheet->is_flipped())
                 horizontal_velocity = -dash_momentum;
@@ -336,7 +342,7 @@ namespace artifact
         {
             if (dash_attack_frames > 0 || light_attack_frames > 0)
                 return;
-            light_attack_frames = 30;
+            light_attack_frames = 30 * (GetFPS() / 60);
             PlaySound(sfx_hit);
         }
     }
