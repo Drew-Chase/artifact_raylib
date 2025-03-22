@@ -25,6 +25,10 @@ option(REMOVE_DEBUG_INFO "Remove debug information from the build" OFF) # Defaul
 # Add -DSTRIPPED_VERSION=ON/OFF to the compiler
 option(STRIPPED_VERSION "Create a stripped version of the build without certain flags" OFF) # Default is OFF
 
+if (PROFILE_NAME STREQUAL "debug")
+    add_compile_definitions(DEBUG)
+endif ()
+
 # Setting up the bin and obj directories as the good lord intended.
 # Non of that `cmake-build-*` crap.
 set(RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/${CMAKE_PROJECT_NAME}/${PROFILE_NAME}")
