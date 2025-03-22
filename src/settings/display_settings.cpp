@@ -9,7 +9,7 @@ using namespace std::filesystem;
 
 namespace artifact
 {
-    DisplaySettings::DisplaySettings() : SettingsBase("display.json") {  }
+    DisplaySettings::DisplaySettings() : SettingsBase("display.json") {}
     DisplaySettings::~DisplaySettings() { DisplaySettings::save(); }
     void DisplaySettings::load()
     {
@@ -75,8 +75,7 @@ namespace artifact
                 SetWindowPosition(x, y);
             } else
             {
-                SetWindowState(FLAG_WINDOW_UNDECORATED);
-                SetWindowSize(GetScreenWidth(), GetScreenHeight());
+                SetWindowState(FLAG_BORDERLESS_WINDOWED_MODE);
             }
         } else if (window_mode == WindowMode::FULLSCREEN)
         {
@@ -93,8 +92,8 @@ namespace artifact
         }
         const int monitor = GetCurrentMonitor();
         this->window_mode = WindowMode::WINDOWED;
-        this->screen_width = GetMonitorWidth(monitor)/1.5;
-        this->screen_height = GetMonitorHeight(monitor)/1.5;
+        this->screen_width = GetMonitorWidth(monitor) / 1.5;
+        this->screen_height = GetMonitorHeight(monitor) / 1.5;
         this->frame_rate = 60;
         this->vsync = true;
         save();
