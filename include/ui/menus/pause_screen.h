@@ -9,6 +9,7 @@ namespace artifact
     {
         bool is_being_destroyed = false;
         std::unique_ptr<VerticalListContainer> button_container;
+        std::unique_ptr<ButtonComponent> toggle_debug_button;
         Texture2D title_image{};
         std::unique_ptr<SettingsScreen> settings_screen = nullptr;
 

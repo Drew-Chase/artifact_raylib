@@ -60,6 +60,17 @@ namespace artifact
         button_container->add_component(exit_button.release());
 
         button_container->auto_size();
+
+
+        // Setup free buttons.
+        toggle_debug_button = std::make_unique<ButtonComponent>("toggle_debug_button", owner, GetScreenWidth() - 250, GetScreenHeight() - 70, 200, 50, "Debug: Off",
+                                                                [this]
+                                                                {
+                                                                    Game::get_instance()->debug_mode = !Game::get_instance()->debug_mode;
+                                                                    toggle_debug_button->set_text(fmt::format("Debug: {}", Game::get_instance()->debug_mode ? "On" : "Off").c_str());
+                                                                });
+        toggle_debug_button->set_font_size(16);
+        toggle_debug_button->set_colors(button_normal_bg_color, button_hover_bg_color, button_pressed_bg_color, text_color);
     }
     void PauseScreen::draw()
     {
@@ -84,6 +95,8 @@ namespace artifact
             // Draw the button container and its contents
             if (button_container)
                 button_container->draw();
+            if (toggle_debug_button)
+                toggle_debug_button->draw();
         }
 
         DrawText(fmt::format("Artifact v{}", VERSION).c_str(), 10, GetScreenHeight() - 20, 16, ColorAlpha(WHITE, 0.5f));
@@ -105,6 +118,11 @@ namespace artifact
             if (button_container && this->is_menu_in_focus())
                 button_container->update(GetMouseX(), GetMouseY());
             button_container->set_position(GetScreenWidth() / 2 - button_container->get_width() / 2, GetScreenHeight() - button_container->get_height() - 20);
+            if (toggle_debug_button)
+            {
+                toggle_debug_button->set_position(GetScreenWidth() - 250, GetScreenHeight() - 70);
+                toggle_debug_button->update(GetMouseX(), GetMouseY());
+            }
         }
     }
     void PauseScreen::destroy()
