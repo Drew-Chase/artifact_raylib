@@ -72,7 +72,6 @@ namespace artifact
         InitAudioDevice();
         SetWindowState(FLAG_WINDOW_RESIZABLE);
         SetWindowIcon(window_icon);
-        SetTargetFPS(60);
         SetExitKey(KEY_NULL);
 
 
