@@ -88,8 +88,8 @@ namespace artifact
         manager->load_stage(Stages::TITLE_SCREEN);
 #endif
 
-        instance->isRunning = true;
-        while (!WindowShouldClose() && instance->isRunning)
+        game->isRunning = true;
+        while (!WindowShouldClose() && game->isRunning)
         {
             float deltaTime = GetFrameTime();
             if (constexpr float MAX_DELTA_TIME = 0.05f; deltaTime > MAX_DELTA_TIME)
@@ -100,7 +100,8 @@ namespace artifact
             BeginDrawing();
             ClearBackground(BLACK);
             stage->draw();
-            DrawFPS(10, 10);
+            if (game->debug_mode)
+                DrawFPS(10, 10);
             EndDrawing();
         }
 
