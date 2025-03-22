@@ -1,5 +1,7 @@
 #include "ui/components/button_component.h"
 
+#include <string.h>
+
 namespace artifact
 {
     ButtonComponent::ButtonComponent(const char *identifier, Stage *owner, const int x, const int y, const int width, const int height, const char *buttonText, std::function<void()> clickHandler) : ComponentBase(identifier, owner, x, y, width, height), is_hovered(false), is_pressed(false), on_click(std::move(clickHandler)), text(buttonText)
@@ -74,6 +76,9 @@ namespace artifact
 
     void ButtonComponent::set_on_click(std::function<void()> onClick) { this->on_click = std::move(onClick); }
 
-    void ButtonComponent::set_text(const char *text) { this->text = text; }
+    void ButtonComponent::set_text(const char *text)
+    {
+        this->text = text ? strdup(text) : nullptr;
+    }
 
 } // namespace artifact
