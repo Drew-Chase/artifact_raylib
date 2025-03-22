@@ -1,6 +1,8 @@
 
 #include "stages/level_1_a_stage.h"
 
+#include "entities/roamer_entity.h"
+
 namespace artifact
 {
     Level1AStage::Level1AStage() : PlayableStage("level_1a") {}
@@ -13,7 +15,9 @@ namespace artifact
         PlayMusicStream(music);
 
         // Spawn enemies
-        // TODO: Spawn enemies
+        spawn_entity<RoamerEntity>(2067, 99, Vector2{2057, 67}, Vector2{3024, 67});
+        spawn_entity<RoamerEntity>(2131, 99, Vector2{2057, 67}, Vector2{3024, 67});
+        spawn_entity<RoamerEntity>(2195, 99, Vector2{2057, 67}, Vector2{3024, 67});
 
         // Setup features
         // TODO: Create end goal.
