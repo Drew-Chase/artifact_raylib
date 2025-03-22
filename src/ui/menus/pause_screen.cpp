@@ -69,6 +69,8 @@ namespace artifact
                                                                     Game::get_instance()->debug_mode = !Game::get_instance()->debug_mode;
                                                                     toggle_debug_button->set_text(fmt::format("Debug: {}", Game::get_instance()->debug_mode ? "On" : "Off").c_str());
                                                                 });
+
+        toggle_debug_button->set_text(fmt::format("Debug: {}", Game::get_instance()->debug_mode ? "On" : "Off").c_str());
         toggle_debug_button->set_font_size(16);
         toggle_debug_button->set_colors(button_normal_bg_color, button_hover_bg_color, button_pressed_bg_color, text_color);
     }
