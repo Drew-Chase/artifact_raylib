@@ -1,11 +1,26 @@
 #include "entities/entity.h"
 
+#include "game.h"
+
 namespace artifact
 {
-    void Entity::draw() {}
+    void Entity::draw()
+    {
+        if (Game::get_instance()->debug_mode)
+            debug_draw_colliders();
+    }
     void Entity::update(const float deltaTime) {}
-    void Entity::damage(int damage) {}
-    void Entity::kill() {}
+    void Entity::damage(const int damage)
+    {
+        if (health <= 0)
+        {
+            kill();
+        } else
+        {
+            health -= damage;
+        }
+    }
+    void Entity::kill() { health = 0; }
     void Entity::spawn(const int x, const int y, PlayableStage *owner)
     {
         this->owner = owner;
