@@ -9,11 +9,21 @@ namespace artifact
 {
     class TitleScreen final : public MenuStage
     {
+        // UI Settings
+        const Color text_color = WHITE;
+        const Color button_normal_bg_color = ColorAlpha(BLACK, 0.5f);
+        const Color button_hover_bg_color = ColorAlpha(BLACK, 0.75f);
+        const Color button_pressed_bg_color = BLACK;
+        const int font_size = 18;
+        Rectangle title_image_rect {0,0,-1,0};
+        Color title_image_tint = WHITE;
 
         mutable float clouds_scroll = 0.0f;
         mutable float mountains_scroll = 0.0f;
         const float clouds_scroll_speed = 25.0f;
         const float mountains_scroll_speed = 75.0f;
+        size_t fade_in_elapsed_time_ms = 0;
+        bool is_loaded = false;
 
         // Additional Screens
         std::unique_ptr<SettingsScreen> settings_screen = nullptr;
@@ -38,6 +48,7 @@ namespace artifact
         int calculate_required_backgrounds() const;
         static float calculate_background_scale(const Texture2D &texture);
         static int calculate_required_backgrounds(const Texture2D *texture, float scale);
+        void tick_animate_fadein(float deltaTime);
 
     public:
         TitleScreen() : MenuStage("TitleScreen"), menu_music() {}

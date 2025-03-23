@@ -37,3 +37,4 @@ void artifact::ContainerBase::remove_component(ComponentBase *component)
 
 
 void artifact::ContainerBase::destroy() { components.clear(); }
+std::vector<std::unique_ptr<artifact::ComponentBase>> &artifact::ContainerBase::get_components() { return components; }

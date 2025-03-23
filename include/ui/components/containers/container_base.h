@@ -30,5 +30,6 @@ namespace artifact
         virtual void remove_component(const char *identifier);
         virtual void remove_component(ComponentBase *component);
         virtual void destroy();
+        std::vector<std::unique_ptr<ComponentBase>> &get_components();
     };
 } // namespace artifact
