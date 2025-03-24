@@ -1,6 +1,7 @@
 
 #include "stages/level_1_a_stage.h"
 
+#include "entities/demon_bat_entity.h"
 #include "entities/roamer_entity.h"
 
 namespace artifact
@@ -15,9 +16,34 @@ namespace artifact
         PlayMusicStream(music);
 
         // Spawn enemies
+        // First Gap
         spawn_entity<RoamerEntity>(2067, 99, Vector2{2057, 67}, Vector2{3024, 67});
         spawn_entity<RoamerEntity>(2131, 99, Vector2{2057, 67}, Vector2{3024, 67});
         spawn_entity<RoamerEntity>(2195, 99, Vector2{2057, 67}, Vector2{3024, 67});
+        spawn_entity<RoamerEntity>(2259, 99, Vector2{2057, 67}, Vector2{3024, 67});
+        // Cliff Gap
+        spawn_entity<RoamerEntity>(3091, 25, Vector2{3091, -7}, Vector2{3751, -7});
+        spawn_entity<RoamerEntity>(3155, 25, Vector2{3091, -7}, Vector2{3751, -7});
+        spawn_entity<RoamerEntity>(3219, 25, Vector2{3091, -7}, Vector2{3751, -7});
+        spawn_entity<RoamerEntity>(3283, 25, Vector2{3091, -7}, Vector2{3751, -7});
+        // Small Gap
+        spawn_entity<RoamerEntity>(5183, -195, Vector2{5183, -227}, Vector2{5339, -227});
+
+        // First Demon Bat
+        spawn_entity<DemonBatEntity>(6000, -100);
+
+        spawn_entity<RoamerEntity>(6583, 25, Vector2{6583, -7}, Vector2{7182, -7});
+        spawn_entity<RoamerEntity>(6647, 25, Vector2{6583, -7}, Vector2{7182, -7});
+        spawn_entity<RoamerEntity>(6711, 25, Vector2{6583, -7}, Vector2{7182, -7});
+
+        // Second Demon Bat
+        spawn_entity<DemonBatEntity>(8400, -123);
+
+        // The end-gate killers
+        spawn_entity<RoamerEntity>(8578, 25, Vector2{8578, -7}, Vector2{9169, -7});
+        spawn_entity<RoamerEntity>(8642, 25, Vector2{8578, -7}, Vector2{9169, -7});
+        spawn_entity<RoamerEntity>(8706, 25, Vector2{8578, -7}, Vector2{9169, -7});
+        spawn_entity<RoamerEntity>(8770, 25, Vector2{8578, -7}, Vector2{9169, -7});
 
         // Setup features
         // TODO: Create end goal.
