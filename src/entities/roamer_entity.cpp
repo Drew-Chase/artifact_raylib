@@ -7,6 +7,7 @@ namespace artifact
     void RoamerEntity::startup()
     {
         EnemyEntity::startup();
+        width = height = 32;
         walk_sheet = new SpriteSheet("game/texture/entities/roaming_slime/walk%d.png", 8, 13);
         attack_sheet = new SpriteSheet("game/texture/entities/roaming_slime/attack%d.png", 8, 8);
     }
@@ -27,7 +28,7 @@ namespace artifact
             if (position.x < end_position.x)
             {
                 position.x += 100 * deltaTime;
-            }else
+            } else
             {
                 is_facing_right = false;
                 if (walk_sheet)
@@ -39,7 +40,7 @@ namespace artifact
             if (position.x > start_position.x)
             {
                 position.x -= 100 * deltaTime;
-            }else
+            } else
             {
                 is_facing_right = true;
                 if (walk_sheet)

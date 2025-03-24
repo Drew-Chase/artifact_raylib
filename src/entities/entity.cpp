@@ -1,15 +1,39 @@
 #include "entities/entity.h"
-
+#include "entities/player_entity.h"
 #include "game.h"
 
 namespace artifact
 {
+    void Entity::on_entity_collision(Entity *entity)
+    {
+        if (entity == nullptr)
+            return;
+
+        if (auto *player = dynamic_cast<PlayerEntity *>(entity))
+        {
+            player->damage(this->attack_damage);
+        }
+    }
+    void Entity::startup()
+    {
+        if (collider)
+        {
+            collider = std::make_unique<Collider>(position.x, position.y, width, height, [this](Entity *entity) { this->on_entity_collision(entity); });
+            collider->set_owner(this);
+        }
+    }
     void Entity::draw()
     {
         if (Game::get_instance()->debug_mode)
             debug_draw_colliders();
     }
-    void Entity::update(const float deltaTime) {}
+    void Entity::update(const float deltaTime)
+    {
+        if (collider)
+        {
+            collider->bounds = {position.x, position.y, width, height};
+        }
+    }
     void Entity::damage(const int damage)
     {
         if (health <= 0)
@@ -28,9 +52,30 @@ namespace artifact
         this->startup();
     }
     void Entity::set_position(const int x, const int y) { this->position = Vector2{static_cast<float>(x), static_cast<float>(y)}; }
-    void Entity::startup() {}
-    bool Entity::has_hit_obstacle() { return false; }
-    void Entity::debug_draw_colliders() { DrawRectangleLinesEx(bounds, 1, GREEN); }
-    Rectangle Entity::get_bounds() const { return bounds; }
+    void Entity::debug_draw_colliders() { DrawRectangleLinesEx(Rectangle{position.x, position.y, width, height}, 1, GREEN); }
     void Entity::destroy() {}
+    bool Entity::is_colliding_with(const Entity *other) const
+    {
+        if (!collider || !other || !other->collider)
+            return false;
+
+        return CheckCollisionRecs({position.x, position.y, width, height}, {other->position.x, other->position.y, other->width, other->height});
+    }
+    void Entity::check_entity_collisions(const std::vector<Entity *> &entities)
+    {
+        for (const auto &entity: entities)
+        {
+            if (entity == this) // Don't check collision with self
+                continue;
+
+            if (is_colliding_with(entity) && collider && entity->collider)
+            {
+                // Call overlap on both entities
+                collider->overlap(entity);
+                entity->collider->overlap(this);
+            }
+        }
+    }
+
+
 } // namespace artifact

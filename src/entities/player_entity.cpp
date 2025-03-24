@@ -2,6 +2,7 @@
 #include <cmath>
 #include <fmt/format.h>
 #include <raymath.h>
+#include "entities/enemy_entity.h"
 #include "game.h"
 #include "stages/playable_stage.h"
 
@@ -13,6 +14,7 @@ namespace artifact
         max_health = health = 4;
         owner->camera.target = this->position;
         owner->camera.rotation = 0;
+        width = height = 64;
 
         // Load sprite sheets
         idle_sheet = new SpriteSheet("game/texture/entities/player/idle%d.png", 9, 8);
@@ -30,6 +32,13 @@ namespace artifact
         heart_texture = LoadTexture("game/texture/ui/heart.png");
         life_texture = LoadTexture("game/texture/ui/life.png");
         coin_texture = LoadTexture("game/texture/ui/coin.png");
+
+        // Set up the entity collision callback
+        if (collider)
+        {
+            collider = std::make_unique<Collider>(position.x, position.y, width, height, [this](Entity *entity) { this->on_entity_collision(entity); });
+            collider->set_owner(this);
+        }
     }
 
     void PlayerEntity::draw()
@@ -44,7 +53,6 @@ namespace artifact
             const int text_width = std::max({MeasureText(grounded_text.c_str(), 16), MeasureText(position_text.c_str(), 16), MeasureText(attacks_text.c_str(), 16)});
 
             DrawRectangleRec({this->position.x - 10, this->position.y - 100, static_cast<float>(text_width + 20), 82}, ColorAlpha(BLACK, .5f));
-            DrawRectangleLinesEx({position.x, position.y, bounds.x, bounds.y}, 1, BLUE);
             DrawText(grounded_text.c_str(), this->position.x, this->position.y - 90, 16, WHITE);
             DrawText(position_text.c_str(), this->position.x, this->position.y - 64, 16, WHITE);
             DrawText(attacks_text.c_str(), this->position.x, this->position.y - 42, 16, WHITE);
@@ -284,9 +292,27 @@ namespace artifact
         }
     }
 
-    void PlayerEntity::damage(const int damage) { Entity::damage(damage); }
+    void PlayerEntity::damage(const int damage)
+    {
+        Entity::damage(damage);
 
-    void PlayerEntity::kill() { Entity::kill(); }
+        if (dash_attack_frames > 0 || light_attack_frames > 0)
+            return;
+        health -= damage;
+        if (health <= 0)
+            kill();
+    }
+
+    void PlayerEntity::kill()
+    {
+        Entity::kill();
+        lives--;
+        if (lives <= 0)
+            Game::get_instance()->get_stage_manager()->load_stage(Stages::TITLE_SCREEN);
+        else
+        {
+        }
+    }
 
     void PlayerEntity::jump()
     {
@@ -419,4 +445,17 @@ namespace artifact
         horizontal_velocity += x;
         vertical_velocity += y;
     }
+    void PlayerEntity::on_entity_collision(Entity *entity)
+    {
+        if (entity == nullptr)
+            return;
+
+        // Check if the entity is an enemy
+        if (auto *enemy = dynamic_cast<EnemyEntity *>(entity))
+        {
+            if (dash_attack_frames > 0 || light_attack_frames > 0)
+                enemy->damage(attack_damage);
+        }
+    }
+
 } // namespace artifact

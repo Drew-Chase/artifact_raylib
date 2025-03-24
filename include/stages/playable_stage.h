@@ -18,7 +18,6 @@ namespace artifact
         std::vector<Collider> colliders;
         bool is_paused = false;
         virtual void draw_ui() const;
-        void fade_in();
 
     public:
         std::unique_ptr<PauseScreen> pause_screen;
@@ -42,7 +41,6 @@ namespace artifact
         void debug_draw_colliders() const;
         void update(float deltaTime) override;
         void destroy() override;
-        bool is_entity_colliding(const Entity *entity) const;
         Collider get_collider_at(int x, int y, bool blocking_only = true) const;
         std::vector<Collider> get_colliders_closest_to(int x, int y, bool blocking_only = true) const;
         std::vector<Collider> get_blocking_colliders() const;

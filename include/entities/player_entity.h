@@ -54,6 +54,8 @@ namespace artifact
         void check_collision();
         void update_camera_center_smooth_follow(float delta) const;
         void add_momentum(float x, float y);
+        void on_entity_collision(Entity *entity) override;
+
 
     public:
         void startup() override;

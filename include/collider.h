@@ -2,14 +2,18 @@
 #include <functional>
 #include <raylib.h>
 #include <vector>
-#include "entities/entity.h"
 
 namespace artifact
 {
+    class Entity;
     class Collider
     {
         std::function<void()> on_overlap;
+        std::function<void(Entity *)> on_entity_overlap;
+
         int overlap_cooldown = 0;
+        Entity *overlapping_entity = nullptr;
+        Entity *owner = nullptr;
 
     public:
         /**
@@ -86,6 +90,8 @@ namespace artifact
         Collider(int x, int y, int width, int height, bool is_blocking);
 
         Collider(int x, int y, int width, int height, const std::function<void()> &on_overlap);
+        Collider(int x, int y, int width, int height, const std::function<void(Entity *)> &on_entity_overlap);
+
 
         /**
          * Checks whether the given collider is empty by comparing it to the predefined EMPTY_COLLIDER.
@@ -98,19 +104,6 @@ namespace artifact
          */
         static bool is_collider_empty(const Collider &collider);
 
-        /**
-         * Determines if a given entity is colliding with any of the specified colliders.
-         *
-         * This function checks whether the bounds of the given entity overlap with any
-         * of the colliders in the provided vector. It evaluates collisions based on
-         * the corners of the entity's bounds, verifying whether there is any collider
-         * present at each corner.
-         *
-         * @param entity A pointer to the entity to check for collisions.
-         * @param colliders A vector of colliders to test against the entity's bounds.
-         * @return True if the entity is colliding with any of the colliders, false otherwise.
-         */
-        static bool is_entity_colliding(const Entity *entity, const std::vector<Collider> &colliders);
         /**
          * Finds and retrieves the collider located at the specified (x, y) coordinates
          * from a vector of colliders. Can optionally filter to only consider blocking colliders.
@@ -155,6 +148,8 @@ namespace artifact
          * This is called when an entity overlaps with a collider instead of colliding with it.
          */
         void overlap();
+        void overlap(Entity *entity);
+        void set_owner(Entity *entity) { this->owner = entity; }
     };
     static const auto EMPTY_COLLIDER = Collider();
 } // namespace artifact

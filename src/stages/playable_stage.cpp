@@ -39,10 +39,6 @@ namespace artifact
             pause_screen->draw();
         }
     }
-    void PlayableStage::fade_in()
-    {
-
-    }
     void PlayableStage::debug_draw_colliders() const
     {
         for (const auto collider: colliders)
@@ -64,10 +60,18 @@ namespace artifact
             pause_screen->update(GetMouseX(), GetMouseY());
             return;
         }
+        std::vector<Entity *> entities_with_player;
+        entities_with_player.reserve(entities.size() + 1);
+        for (const auto &entity: entities)
+        {
+            entities_with_player.push_back(entity.get());
+        }
+        entities_with_player.push_back(player);
 
         for (const auto &entity: entities)
         {
             entity->update(deltaTime);
+            entity->check_entity_collisions(entities_with_player);
         }
     }
     void PlayableStage::destroy()
@@ -78,7 +82,6 @@ namespace artifact
         entities.clear();
         UnloadTexture(background);
     }
-    bool PlayableStage::is_entity_colliding(const Entity *entity) const { return Collider::is_entity_colliding(entity, colliders); }
     Collider PlayableStage::get_collider_at(const int x, const int y, const bool blocking_only) const { return Collider::get_collider_at(x, y, colliders, blocking_only); }
     std::vector<Collider> PlayableStage::get_colliders_closest_to(const int x, const int y, const bool blocking_only) const { return Collider::get_colliders_closest_to(x, y, colliders, blocking_only); }
     std::vector<Collider> PlayableStage::get_blocking_colliders() const { return Collider::get_blocking_colliders(colliders); }
@@ -91,4 +94,5 @@ namespace artifact
     }
     void PlayableStage::pause() { is_paused = true; }
     void PlayableStage::unpause() { is_paused = false; }
+
 } // namespace artifact
