@@ -33,10 +33,15 @@ namespace artifact
     }
     void PlayableStage::draw_ui() const
     {
+        this->player->draw_stats();
         if (is_paused)
         {
             pause_screen->draw();
         }
+    }
+    void PlayableStage::fade_in()
+    {
+
     }
     void PlayableStage::debug_draw_colliders() const
     {

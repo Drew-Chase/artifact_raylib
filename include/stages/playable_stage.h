@@ -18,6 +18,7 @@ namespace artifact
         std::vector<Collider> colliders;
         bool is_paused = false;
         virtual void draw_ui() const;
+        void fade_in();
 
     public:
         std::unique_ptr<PauseScreen> pause_screen;
