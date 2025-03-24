@@ -10,6 +10,7 @@ namespace artifact
     void PlayerEntity::startup()
     {
         Entity::startup();
+        max_health = health = 4;
         owner->camera.target = this->position;
         owner->camera.rotation = 0;
 
@@ -24,6 +25,11 @@ namespace artifact
         sfx_jump = LoadSound("game/audio/sfx/playerjump.ogg");
         sfx_hit = LoadSound("game/audio/sfx/playerattack.ogg");
         sfx_dash = LoadSound("game/audio/sfx/playercharge.ogg");
+
+        // Load interface sprites
+        heart_texture = LoadTexture("game/texture/ui/heart.png");
+        life_texture = LoadTexture("game/texture/ui/life.png");
+        coin_texture = LoadTexture("game/texture/ui/coin.png");
     }
 
     void PlayerEntity::draw()
@@ -78,6 +84,26 @@ namespace artifact
                 jump_sheet->draw(Vector2{position.x - 32, position.y}, 2.2);
             else
                 jump_sheet->draw(Vector2{position.x + 16, position.y}, 2.2);
+        }
+    }
+    void PlayerEntity::draw_stats() const
+    {
+        float x = 10;
+        float y = 10;
+        constexpr int gap = 10;
+        float scale = 0.2f;
+        for (int i = 0; i < health; i++)
+        {
+            DrawTextureEx(heart_texture, Vector2{x, y}, 0, scale, WHITE);
+            x += heart_texture.width * scale + gap;
+        }
+        x = 10;
+        y += heart_texture.height * scale + gap;
+        scale = 0.2f;
+        for (int i = 0; i < max_health; i++)
+        {
+            DrawTextureEx(life_texture, Vector2{x, y}, 0, scale, WHITE);
+            x += life_texture.width * scale + gap;
         }
     }
 

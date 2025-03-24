@@ -12,6 +12,8 @@ namespace artifact
         bool sprinting = false;
         int light_attack_frames = 0;
         int dash_attack_frames = 0;
+        int lives = 3;
+        int coins = 0;
 
         // Gravity and jumping variables
         float vertical_velocity = 0.0f;
@@ -29,6 +31,10 @@ namespace artifact
         SpriteSheet *light_attack_sheet = nullptr;
         SpriteSheet *dash_attack_sheet = nullptr;
 
+        // Interface Sprites
+        Texture2D heart_texture{};
+        Texture2D life_texture{};
+        Texture2D coin_texture{};
 
         // Air control and physics constants
         float air_control = 0.8f;
@@ -52,6 +58,7 @@ namespace artifact
     public:
         void startup() override;
         void draw() override;
+        void draw_stats() const;
         void update(float deltaTime) override;
         void damage(int damage) override;
         void kill() override;
