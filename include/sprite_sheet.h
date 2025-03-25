@@ -16,6 +16,21 @@ namespace artifact
     class SpriteSheet
     {
         /**
+         * Controls whether the sprite animation should play only once.
+         *
+         * When enabled, the animation runs through its sequence a single time
+         * and stops at the last frame instead of looping continuously.
+         * This is useful for cases like single-use actions or transitions.
+         */
+        bool play_once_mode = false;
+        /**
+         * Determines whether the animation freezes on the last frame when completed.
+         *
+         * When set to true, the animation will halt on its final frame instead of looping
+         * or resetting. Useful for animations that require persistence of their last state.
+         */
+        bool freeze_on_last_frame = false;
+        /**
          * The base file path pattern for the animation frames.
          *
          * This string stores the root path used to identify and load individual
@@ -306,6 +321,29 @@ namespace artifact
          */
         bool is_flipped() const;
 
+        /**
+         * Sets the playback framerate for the sprite sheet's animation.
+         *
+         * This function adjusts the number of frames displayed per second (fps)
+         * and recalculates the frame duration based on the provided framerate.
+         * A higher fps results in smoother animation, while a lower fps decreases
+         * the playback speed.
+         *
+         * @param fps The desired frames per second for the sprite sheet animation.
+         */
         void set_framerate(float fps);
+        /**
+         * Initiates the animation to play once from the beginning.
+         *
+         * This method resets the animation to its first frame and plays
+         * it until the last frame. Depending on the parameter, the animation
+         * may freeze on the last frame after completion.
+         *
+         * @param freeze_on_last_frame If true, the animation will stop and remain
+         *                              on the last frame after playing once. If false,
+         *                              the animation will reset to its initial state
+         *                              upon completion.
+         */
+        void play_once(bool freeze_on_last_frame = false);
     };
 } // namespace artifact
