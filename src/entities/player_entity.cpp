@@ -22,6 +22,8 @@ namespace artifact
         jump_sheet = new SpriteSheet("game/texture/entities/player/jump_%d.png", 5, 8);
         light_attack_sheet = new SpriteSheet("game/texture/entities/player/AttackB%d.png", 5, 8);
         dash_attack_sheet = new SpriteSheet("game/texture/entities/player/AttackA%d.png", 7, 8);
+        hurt_sheet = new SpriteSheet("game/texture/entities/player/hit%d.png", 3, 8);
+        death_sheet = new SpriteSheet("game/texture/entities/player/death%d.png", 5, 8);
 
         // Load SFX
         sfx_jump = LoadSound("game/audio/sfx/playerjump.ogg");
@@ -59,7 +61,10 @@ namespace artifact
         }
 
         // Draw animations
-        if (light_attack_frames > 0)
+        if (health <= 0)
+        {
+
+        } else if (light_attack_frames > 0)
         {
             if (light_attack_sheet->is_flipped())
                 light_attack_sheet->draw(Vector2{position.x - 32, position.y}, 2.2);
@@ -147,6 +152,8 @@ namespace artifact
         jump_sheet->update(deltaTime);
         light_attack_sheet->update(deltaTime);
         dash_attack_sheet->update(deltaTime);
+        hurt_sheet->update(deltaTime);
+        death_sheet->update(deltaTime);
 
         update_camera_center_smooth_follow(deltaTime);
     }

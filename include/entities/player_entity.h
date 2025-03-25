@@ -30,6 +30,8 @@ namespace artifact
         SpriteSheet *jump_sheet = nullptr;
         SpriteSheet *light_attack_sheet = nullptr;
         SpriteSheet *dash_attack_sheet = nullptr;
+        SpriteSheet *death_sheet = nullptr;
+        SpriteSheet *hurt_sheet = nullptr;
 
         // Interface Sprites
         Texture2D heart_texture{};
