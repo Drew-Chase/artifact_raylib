@@ -1,5 +1,5 @@
 
-#include "teleporter_feature.h"
+#include "features/teleporter_feature.h"
 
 namespace artifact {
 } // artifact
