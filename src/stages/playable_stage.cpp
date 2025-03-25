@@ -60,18 +60,11 @@ namespace artifact
             pause_screen->update(GetMouseX(), GetMouseY());
             return;
         }
-        std::vector<Entity *> entities_with_player;
-        entities_with_player.reserve(entities.size() + 1);
-        for (const auto &entity: entities)
-        {
-            entities_with_player.push_back(entity.get());
-        }
-        entities_with_player.push_back(player);
 
         for (const auto &entity: entities)
         {
             entity->update(deltaTime);
-            entity->check_entity_collisions(entities_with_player);
+            entity->check_entity_collisions(entities);
         }
     }
     void PlayableStage::destroy()

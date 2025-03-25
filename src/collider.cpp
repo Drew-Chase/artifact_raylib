@@ -56,8 +56,10 @@ namespace artifact
     }
     void Collider::overlap() { this->overlap(nullptr); }
 
-    void Collider::overlap(Entity* entity)
+    void Collider::overlap(Entity *entity)
     {
+        if (!entity)
+            return;
         if (overlap_cooldown <= 0)
         {
             overlapping_entity = entity;

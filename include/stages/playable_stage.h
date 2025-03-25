@@ -14,7 +14,7 @@ namespace artifact
     protected:
         Texture2D background;
         PlayerEntity *player;
-        std::vector<std::unique_ptr<Entity>> entities;
+        std::vector<Entity*> entities;
         std::vector<Collider> colliders;
         bool is_paused = false;
         virtual void draw_ui() const;
@@ -29,10 +29,9 @@ namespace artifact
             requires std::derived_from<T, Entity>
         T *spawn_entity(int x, int y, Args &&...args)
         {
-            auto entity = std::make_unique<T>(std::forward<Args>(args)...);
-            T *raw_ptr = entity.get();
-            entity->spawn(x, y, this);
-            entities.push_back(std::move(entity));
+            T *raw_ptr = new T(std::forward<Args>(args)...);
+            raw_ptr->spawn(x, y, this);
+            entities.push_back(raw_ptr);
             return raw_ptr;
         }
 

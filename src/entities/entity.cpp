@@ -1,4 +1,5 @@
 #include "entities/entity.h"
+#include "entities/enemy_entity.h"
 #include "entities/player_entity.h"
 #include "game.h"
 
@@ -16,7 +17,7 @@ namespace artifact
     }
     void Entity::startup()
     {
-        if (collider)
+        if (!collider)
         {
             collider = std::make_unique<Collider>(position.x, position.y, width, height, [this](Entity *entity) { this->on_entity_collision(entity); });
             collider->set_owner(this);
@@ -36,13 +37,9 @@ namespace artifact
     }
     void Entity::damage(const int damage)
     {
+        health -= damage;
         if (health <= 0)
-        {
             kill();
-        } else
-        {
-            health -= damage;
-        }
     }
     void Entity::kill() { health = 0; }
     void Entity::spawn(const int x, const int y, PlayableStage *owner)
@@ -63,16 +60,16 @@ namespace artifact
     }
     void Entity::check_entity_collisions(const std::vector<Entity *> &entities)
     {
-        for (const auto &entity: entities)
+        for (const auto &other_entity: entities)
         {
-            if (entity == this) // Don't check collision with self
+            if (other_entity == this) // Don't check collision with self
                 continue;
 
-            if (is_colliding_with(entity) && collider && entity->collider)
+            if (is_colliding_with(other_entity) && collider && other_entity && other_entity->collider)
             {
                 // Call overlap on both entities
-                collider->overlap(entity);
-                entity->collider->overlap(this);
+                collider->overlap(other_entity);
+                other_entity->collider->overlap(this);
             }
         }
     }

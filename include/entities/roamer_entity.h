@@ -21,5 +21,6 @@ namespace artifact
         void kill() override;
         void update(float deltaTime) override;
         void debug_draw_colliders() override;
+        void on_entity_collision(Entity* entity) override;
     };
 } // namespace artifact

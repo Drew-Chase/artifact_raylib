@@ -57,4 +57,8 @@ namespace artifact
         DrawRectangleLinesEx({start_position.x, start_position.y, 64, 64}, 1, BLUE);
         DrawRectangleLinesEx({end_position.x, end_position.y, 64, 64}, 1, BLUE);
     }
+    void RoamerEntity::on_entity_collision(Entity *entity)
+    {
+        EnemyEntity::on_entity_collision(entity);
+    }
 } // namespace artifact

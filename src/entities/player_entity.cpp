@@ -294,13 +294,9 @@ namespace artifact
 
     void PlayerEntity::damage(const int damage)
     {
-        Entity::damage(damage);
-
         if (dash_attack_frames > 0 || light_attack_frames > 0)
             return;
-        health -= damage;
-        if (health <= 0)
-            kill();
+        Entity::damage(damage);
     }
 
     void PlayerEntity::kill()
