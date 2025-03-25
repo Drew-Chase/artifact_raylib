@@ -23,7 +23,6 @@ namespace artifact
             return EMPTY_COLLIDER;
         }
         const auto fx = static_cast<float>(x);
-        // ReSharper disable once CppTooWideScopeInitStatement
         const auto fy = static_cast<float>(y);
         if (CheckCollisionRecs(close_colliders[0].bounds, {fx, fy, 1, 1}))
             return close_colliders[0];
@@ -58,24 +57,20 @@ namespace artifact
 
     void Collider::overlap(Entity *entity)
     {
-        if (!entity)
+        if (!entity || overlapping_entity == entity)
             return;
-        if (overlap_cooldown <= 0)
+        overlapping_entity = entity;
+
+        // Call the regular overlap function if it exists
+        if (on_overlap)
         {
-            overlapping_entity = entity;
-            overlap_cooldown = 0.25f; // Add a small cooldown to prevent spam
+            on_overlap();
+        }
 
-            // Call the regular overlap function if it exists
-            if (on_overlap)
-            {
-                on_overlap();
-            }
-
-            // Call the entity-aware overlap function if it exists
-            if (on_entity_overlap)
-            {
-                on_entity_overlap(entity);
-            }
+        // Call the entity-aware overlap function if it exists
+        if (on_entity_overlap)
+        {
+            on_entity_overlap(entity);
         }
     }
 

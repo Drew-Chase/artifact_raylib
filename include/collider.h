@@ -11,7 +11,6 @@ namespace artifact
         std::function<void()> on_overlap;
         std::function<void(Entity *)> on_entity_overlap;
 
-        int overlap_cooldown = 0;
         Entity *overlapping_entity = nullptr;
         Entity *owner = nullptr;
 
