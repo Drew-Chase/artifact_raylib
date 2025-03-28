@@ -114,7 +114,7 @@ namespace artifact
         delete game;
     }
 
-    void Game::register_log_callback(int msgType, const char *message, const va_list args)
+    void Game::register_log_callback(int msgType, const char *message, va_list args)
     {
         const auto logger = spdlog::get("game_logger");
         if (logger == nullptr)
