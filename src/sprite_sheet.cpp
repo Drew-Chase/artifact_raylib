@@ -1,5 +1,4 @@
 #include "sprite_sheet.h"
-#include <format>
 
 namespace artifact
 {
