@@ -101,10 +101,6 @@ jobs:
           fi
           echo "All Unix scripts are correctly set as executable."
 
-      - name: Install Conan
-        run: |
-          pip install conan
-
       - name: Install Linux Dependencies
         if: runner.os == 'Linux'
         run: |
@@ -132,22 +128,6 @@ jobs:
           echo "CC=${{ matrix.config.cc }}" >> $GITHUB_ENV
           echo "CXX=${{ matrix.config.cxx }}" >> $GITHUB_ENV
 
-      - name: Configure Conan profile
-        run: |
-          conan profile detect --force 
-
-      - name: Install dependencies with Conan (Windows)
-        if: runner.os == 'Windows'
-        shell: cmd
-        run: |
-          call scripts\windows\conan-install.bat
-
-      - name: Install dependencies with Conan (Unix)
-        if: runner.os != 'Windows'
-        shell: bash
-        run: |
-          ./scripts/unix/conan-install.sh
-
       - name: Build Project (Windows)
         if: runner.os == 'Windows'
         shell: cmd
@@ -160,56 +140,10 @@ jobs:
         run: |
           ./scripts/unix/${{ matrix.profile.script_name }}.sh
 
-      - name: Get Binary Name
-        id: get-binary-name
-        shell: bash
-        run: |
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
-            echo "BINARY_PATH=bin/artifact_raylib/${{ matrix.profile.script_name }}/artifact_raylib-Windows-*-${{ matrix.profile.script_name }}.exe" >> $GITHUB_ENV
-            echo "BINARY_NAME=artifact_raylib-Windows-${{ matrix.profile.script_name }}.exe" >> $GITHUB_ENV
-          elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            echo "BINARY_PATH=bin/artifact_raylib/${{ matrix.profile.script_name }}/artifact_raylib-Darwin-*-${{ matrix.profile.script_name }}" >> $GITHUB_ENV
-            echo "BINARY_NAME=artifact_raylib-macOS-${{ matrix.profile.script_name }}" >> $GITHUB_ENV
-          else
-            echo "BINARY_PATH=bin/artifact_raylib/${{ matrix.profile.script_name }}/artifact_raylib-Linux-*-${{ matrix.profile.script_name }}" >> $GITHUB_ENV
-            echo "BINARY_NAME=artifact_raylib-Linux-${{ matrix.profile.script_name }}" >> $GITHUB_ENV
-          fi
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.BINARY_NAME }}
-          path: ${{ env.BINARY_PATH }}
-          if-no-files-found: error
-
-      # Create release if requested in manual workflow run
-      - name: Determine Release Information
-        if: github.event_name == 'workflow_dispatch' && inputs.create_release == true
-        id: release_info
-        shell: bash
-        run: |
-          timestamp=$(date +'%Y%m%d%H%M%S')
-          if [[ "${{ inputs.custom_tag }}" == "" ]]; then
-            echo "TAG_NAME=v$timestamp" >> $GITHUB_ENV
-          else
-            echo "TAG_NAME=${{ inputs.custom_tag }}" >> $GITHUB_ENV
-          fi
-          
-          echo "RELEASE_NAME=Release ${{ env.TAG_NAME }}" >> $GITHUB_ENV
-          echo "IS_PRERELEASE=${{ inputs.release_type == 'prerelease' }}" >> $GITHUB_ENV
-
-      - name: Download All Artifacts for Release
-        if: github.event_name == 'workflow_dispatch' && inputs.create_release == true && matrix.config.name == 'Windows Latest MSVC' && matrix.profile.name == 'minimal'
-        uses: actions/download-artifact@v4
-        with:
-          path: release_artifacts
-
-      - name: Create Release
-        if: github.event_name == 'workflow_dispatch' && inputs.create_release == true && matrix.config.name == 'Windows Latest MSVC' && matrix.profile.name == 'minimal'
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ env.TAG_NAME }}
-          name: ${{ env.RELEASE_NAME }}
-          prerelease: ${{ env.IS_PRERELEASE }}
-          files: |
-            release_artifacts/**/*
+          name: ${{ matrix.config.name }}-${{ matrix.profile.name }}-build
+          path: |
+            bin/artifact_raylib/
+            !bin/obj/

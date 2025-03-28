@@ -29,14 +29,24 @@ if (PROFILE_NAME STREQUAL "debug")
     add_compile_definitions(DEBUG)
 endif ()
 
+# Add platform-specific subdirectory to build path
+if (CMAKE_HOST_UNIX)
+    set(PLATFORM_PREFIX "unix")
+elseif (CMAKE_HOST_WIN32)
+    set(PLATFORM_PREFIX "win")
+else ()
+    set(PLATFORM_PREFIX "other")
+endif ()
+
 # Setting up the bin and obj directories as the good lord intended.
 # Non of that `cmake-build-*` crap.
-set(RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/${CMAKE_PROJECT_NAME}/${PROFILE_NAME}")
+set(RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/${CMAKE_PROJECT_NAME}/${PLATFORM_PREFIX}/${PROFILE_NAME}")
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIRECTORY})
-set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES INTERMEDIATE_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/obj/${CMAKE_PROJECT_NAME}/${PROFILE_NAME}")
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES INTERMEDIATE_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/obj/${CMAKE_PROJECT_NAME}/${PLATFORM_PREFIX}/${PROFILE_NAME}")
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME "${CMAKE_PROJECT_NAME}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${PROFILE_NAME}")
-set(CMAKE_BINARY_DIR "${CMAKE_SOURCE_DIR}/bin/obj/${PROFILE_NAME}")
-set(CMAKE_CACHEFILE_DIR ${PROJECT_SOURCE_DIR}/bin/obj/cmake/${CMAKE_PROJECT_NAME})
+set(CMAKE_BINARY_DIR "${CMAKE_SOURCE_DIR}/bin/obj/${PLATFORM_PREFIX}/${PROFILE_NAME}")
+set(CMAKE_CACHEFILE_DIR ${PROJECT_SOURCE_DIR}/bin/obj/cmake/${PLATFORM_PREFIX}/${CMAKE_PROJECT_NAME})
+
 if (WIN32)
     target_sources(${CMAKE_PROJECT_NAME} PRIVATE "resources/resources.rc")
     target_sources(${CMAKE_PROJECT_NAME} PRIVATE "resources/version.rc")

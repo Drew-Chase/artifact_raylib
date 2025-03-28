@@ -15,13 +15,6 @@ jobs:
         run: |
           cmake -P ${GITHUB_WORKSPACE}/CMakeLists.txt || echo "CMake format validation failed"
 
-      - name: Validate conanfile.py and conandata.yml
-        run: |
-          python -m py_compile conanfile.py || echo "conanfile.py format validation failed"
-          if [ -f "conandata.yml" ]; then
-            python -c "import yaml; yaml.safe_load(open('conandata.yml'))" || echo "conandata.yml format validation failed"
-          fi
-
       - name: Make Unix scripts executable
         run: |
           if [ -d "scripts/unix" ]; then
@@ -52,7 +45,7 @@ jobs:
 
       - name: Check required script existence
         run: |
-          REQUIRED_SCRIPTS=("minimal.sh" "standalone.sh" "debug.sh" "conan-install.sh")
+          REQUIRED_SCRIPTS=("minimal.sh" "standalone.sh" "debug.sh")
           MISSING_SCRIPTS=false
           
           if [ -d "scripts/unix" ]; then
@@ -70,8 +63,12 @@ jobs:
             fi
           fi
 
-      - name: Install Conan and validate project setup
+      - name: Install Dependencies
         run: |
-          pip install conan
-          conan profile detect --force
-          conan install . --output-folder=build --build=missing || echo "Conan install validation failed"
+          sudo apt-get update
+          sudo apt-get install -y ninja-build xorg-dev libglu1-mesa-dev
+
+      - name: Basic CMake Configuration Test
+        run: |
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build --target help
