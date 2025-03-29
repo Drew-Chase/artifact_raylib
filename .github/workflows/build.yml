@@ -155,16 +155,24 @@ jobs:
         with:
           type: 'zip'
           directory: 'bin/artifact_raylib/win/${{ matrix.profile.name }}'
-          filename: '../../../artifacts/artifact-${{runner.os}}-${{ runner.arch }}.zip'
+          filename: '../../../../artifacts/artifact-${{runner.os}}-${{ runner.arch }}.zip'
           path: '.'
 
-      - name: Create artifact zip (Unix - Linux/macOS)
-        if: runner.os == 'Linux' || runner.os == 'macOS'
+      - name: Create artifact zip (Unix - macOS)
+        if: runner.os == 'macOS'
         uses: thedoctor0/zip-release@0.7.5
         with:
           type: 'zip'
           directory: 'bin/artifact_raylib/unix/${{ matrix.profile.name }}'
-          filename: '../../../../artifacts/artifact-${{runner.os}}-${{ runner.arch }}.zip'
+          filename: '../../../../artifacts/artifact-macos-${{ runner.arch }}.zip'
+          path: '.'
+      - name: Create artifact zip (Unix - Linux)
+        if: runner.os == 'Linux'
+        uses: thedoctor0/zip-release@0.7.5
+        with:
+          type: 'zip'
+          directory: 'bin/artifact_raylib/unix/${{ matrix.profile.name }}'
+          filename: '../../../../artifacts/artifact-linux-${{ runner.arch }}.zip'
           path: '.'
 
       - name: Upload build artifacts
