@@ -49,37 +49,21 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {
-            name: "Windows Latest MSVC",
-            os: windows-latest,
-            cc: "cl",
-            cxx: "cl",
-            environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
-          }
-          - {
-            name: "Ubuntu Latest GCC",
-            os: ubuntu-latest,
-            cc: "gcc-12",
-            cxx: "g++-12"
-          }
-          - {
-            name: "macOS Latest Clang",
-            os: macos-latest,
-            cc: "clang",
-            cxx: "clang++"
-          }
+          - { name: "Windows Latest MinGW", os: windows-latest, cc: "gcc", cxx: "g++" }
+          - { name: "Ubuntu Latest GCC", os: ubuntu-latest, cc: "gcc-12", cxx: "g++-12" }
+          - { name: "macOS Latest Clang", os: macos-latest, cc: "clang", cxx: "clang++" }
         profile:
-          - {
-            name: "minimal",
-            script_name: "minimal",
-          }
-          - {
-            name: "standalone",
-            script_name: "standalone",
-          }
+          - { name: "minimal", script_name: "minimal" }
+          - { name: "standalone", script_name: "standalone" }
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up MinGW
+        if: runner.os == 'Windows'
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
 
       - name: Make Unix scripts executable
         if: runner.os != 'Windows'
@@ -122,7 +106,15 @@ jobs:
         run: |
           choco install ninja
 
-      - name: Setup environment variables
+      - name: Setup environment variables (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          echo CC=${{ matrix.config.cc }}>> %GITHUB_ENV%
+          echo CXX=${{ matrix.config.cxx }}>> %GITHUB_ENV%
+
+      - name: Setup environment variables (Unix)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           echo "CC=${{ matrix.config.cc }}" >> $GITHUB_ENV
@@ -166,6 +158,7 @@ jobs:
           directory: 'bin/artifact_raylib/unix/${{ matrix.profile.name }}'
           filename: '../../../../artifacts/artifact-macos-${{ runner.arch }}.zip'
           path: '.'
+
       - name: Create artifact zip (Unix - Linux)
         if: runner.os == 'Linux'
         uses: thedoctor0/zip-release@0.7.5
