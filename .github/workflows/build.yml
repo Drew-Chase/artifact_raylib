@@ -65,6 +65,17 @@ jobs:
         with:
           platform: x64
 
+      - name: Install Windows Dependencies
+        if: runner.os == 'Windows'
+        run: |
+          choco install mingw
+          choco install ninja
+          # Ensure libpthread is installed
+          if not exist C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\x86_64-w64-mingw32\lib\libpthread.dll.a (
+              echo "Error: libpthread.dll.a is missing"
+              exit 1
+          )
+
       - name: Make Unix scripts executable
         if: runner.os != 'Windows'
         shell: bash
