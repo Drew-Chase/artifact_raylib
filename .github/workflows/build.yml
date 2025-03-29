@@ -155,7 +155,7 @@ jobs:
         with:
           type: 'zip'
           directory: 'bin/artifact_raylib/win/${{ matrix.profile.name }}'
-          filename: '../../../artifacts/artifact-win-${{ runner.arch }}.zip'
+          filename: '../../../artifacts/artifact-${{runner.os}}-${{ runner.arch }}.zip'
           path: '.'
 
       - name: Create artifact zip (Unix - Linux/macOS)
@@ -164,7 +164,7 @@ jobs:
         with:
           type: 'zip'
           directory: 'bin/artifact_raylib/unix/${{ matrix.profile.name }}'
-          filename: '../../../artifacts/artifact-unix-${{ runner.arch }}.zip'
+          filename: '../../../../artifacts/artifact-${{runner.os}}-${{ runner.arch }}.zip'
           path: '.'
 
       - name: Upload build artifacts
