@@ -59,44 +59,47 @@ namespace artifact
             DrawText(position_text.c_str(), this->position.x, this->position.y - 64, 16, WHITE);
             DrawText(attacks_text.c_str(), this->position.x, this->position.y - 42, 16, WHITE);
         }
+        const Vector2 sprite_position_flipped = {position.x - 32, position.y};
+        const Vector2 sprite_position = {position.x + 16, position.y};
+        constexpr float sprite_scale = 2.2f;
 
         // Draw animations
-        if (health <= 0)
+        if (is_dead())
         {
-
+            death_sheet->draw(sprite_position, sprite_scale);
         } else if (light_attack_frames > 0)
         {
             if (light_attack_sheet->is_flipped())
-                light_attack_sheet->draw(Vector2{position.x - 32, position.y}, 2.2);
+                light_attack_sheet->draw(sprite_position_flipped, sprite_scale);
             else
-                light_attack_sheet->draw(Vector2{position.x + 16, position.y}, 2.2);
+                light_attack_sheet->draw(sprite_position, sprite_scale);
         } else if (dash_attack_frames > 0)
         {
             if (dash_attack_sheet->is_flipped())
-                dash_attack_sheet->draw(Vector2{position.x - 32, position.y}, 2.2);
+                dash_attack_sheet->draw(sprite_position_flipped, sprite_scale);
             else
-                dash_attack_sheet->draw(Vector2{position.x + 16, position.y}, 2.2);
+                dash_attack_sheet->draw(sprite_position, sprite_scale);
         } else if (is_grounded)
         {
             if (horizontal_velocity == 0)
             {
                 if (idle_sheet->is_flipped())
-                    idle_sheet->draw(Vector2{position.x - 32, position.y}, 2.2);
+                    idle_sheet->draw(sprite_position_flipped, sprite_scale);
                 else
-                    idle_sheet->draw(Vector2{position.x + 16, position.y}, 2.2);
+                    idle_sheet->draw(sprite_position, sprite_scale);
             } else
             {
                 if (run_sheet->is_flipped())
-                    run_sheet->draw(Vector2{position.x - 32, position.y}, 2.2);
+                    run_sheet->draw(sprite_position_flipped, sprite_scale);
                 else
-                    run_sheet->draw(Vector2{position.x + 16, position.y}, 2.2);
+                    run_sheet->draw(sprite_position, sprite_scale);
             }
         } else
         {
             if (jump_sheet->is_flipped())
-                jump_sheet->draw(Vector2{position.x - 32, position.y}, 2.2);
+                jump_sheet->draw(sprite_position_flipped, sprite_scale);
             else
-                jump_sheet->draw(Vector2{position.x + 16, position.y}, 2.2);
+                jump_sheet->draw(sprite_position, sprite_scale);
         }
     }
     void PlayerEntity::draw_stats() const
@@ -128,6 +131,12 @@ namespace artifact
 
         owner->camera.zoom = 1.5f * fminf(GetScreenWidth() / 1920.0f, GetScreenHeight() / 1080.0f);
 
+        if (is_dead())
+        {
+            death_sheet->update(deltaTime);
+            return;
+        }
+
         handle_input(deltaTime);
         check_collision();
         apply_gravity(deltaTime);
@@ -153,7 +162,6 @@ namespace artifact
         light_attack_sheet->update(deltaTime);
         dash_attack_sheet->update(deltaTime);
         hurt_sheet->update(deltaTime);
-        death_sheet->update(deltaTime);
 
         update_camera_center_smooth_follow(deltaTime);
     }
@@ -301,18 +309,22 @@ namespace artifact
 
     void PlayerEntity::damage(const int damage)
     {
-        if (dash_attack_frames > 0 || light_attack_frames > 0)
+        if (dash_attack_frames > 0 || light_attack_frames > 0 || is_dead())
             return;
         Entity::damage(damage);
     }
 
     void PlayerEntity::kill()
     {
+        if (is_dead())
+            return;
         Entity::kill();
         lives--;
+        death_sheet->play_once(true);
         if (lives <= 0)
-            Game::get_instance()->get_stage_manager()->load_stage(Stages::TITLE_SCREEN);
-        else
+        {
+            // Game::get_instance()->get_stage_manager()->load_stage(Stages::TITLE_SCREEN);
+        } else
         {
         }
     }
