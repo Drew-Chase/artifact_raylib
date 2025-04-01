@@ -73,6 +73,10 @@ namespace artifact
             }
         }
     }
+    bool Entity::is_dead() const
+    {
+        return health <= 0;
+    }
 
 
 } // namespace artifact
