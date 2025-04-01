@@ -72,6 +72,7 @@ namespace artifact
                 {
                     // Stay on the last frame
                     is_playing = false;
+                    current_frame = frame_count;
                 } else
                 {
                     // Reset to the first frame and stop playing
@@ -96,8 +97,8 @@ namespace artifact
         }
 
         const Texture2D texture = frames[current_frame];
-        const float width = static_cast<float>(texture.width);
-        const float height = static_cast<float>(texture.height);
+        const auto width = static_cast<float>(texture.width);
+        const auto height = static_cast<float>(texture.height);
         const Rectangle source = {0, 0, flipped ? -width : width, height};
         const Rectangle dest = {position.x - width / 2, position.y - height, width * scale, height * scale};
         constexpr Vector2 origin = {0, 0};
@@ -130,7 +131,7 @@ namespace artifact
     {
         if (frames.empty() || current_frame >= frames.size())
         {
-            return {0}; // Return empty texture
+            return {}; // Return empty texture
         }
         return frames[current_frame];
     }
