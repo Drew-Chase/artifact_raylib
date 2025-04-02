@@ -4,6 +4,7 @@
 #include <raymath.h>
 #include "entities/enemy_entity.h"
 #include "game.h"
+#include "game_utilities.h"
 #include "stages/playable_stage.h"
 
 namespace artifact
@@ -50,7 +51,7 @@ namespace artifact
         {
             const std::string grounded_text = fmt::format("Grounded: {}, VVel: {:.1f}, HVel: {:.1f}", is_grounded ? "true" : "false", vertical_velocity, horizontal_velocity);
             const std::string position_text = fmt::format("Player Pos: X: {:.1f}, Y: {:.1f}", this->position.x, this->position.y);
-            const std::string attacks_text = fmt::format("Dash: {}, Light: {}", dash_attack_frames, light_attack_frames);
+            const std::string attacks_text = fmt::format("Dash: {}, Light: {}, Inv: {}", dash_attack_frames, light_attack_frames, invincibility_frames);
 
             const int text_width = std::max({MeasureText(grounded_text.c_str(), 16), MeasureText(position_text.c_str(), 16), MeasureText(attacks_text.c_str(), 16)});
 
@@ -102,6 +103,7 @@ namespace artifact
                 jump_sheet->draw(sprite_position, sprite_scale);
         }
     }
+
     void PlayerEntity::draw_stats() const
     {
         float x = 10;
@@ -128,7 +130,7 @@ namespace artifact
         if (!IsWindowReady())
             return;
         Entity::update(deltaTime);
-
+        this->invincibility_frames--;
         owner->camera.zoom = 1.5f * fminf(GetScreenWidth() / 1920.0f, GetScreenHeight() / 1080.0f);
 
         if (is_dead())
@@ -309,15 +311,15 @@ namespace artifact
 
     void PlayerEntity::damage(const int damage)
     {
-        if (dash_attack_frames > 0 || light_attack_frames > 0 || is_dead())
+        if (dash_attack_frames > 0 || light_attack_frames > 0 || invincibility_frames > 0 || is_dead())
             return;
+        invincibility_frames = GameUtilities::ConvertSecondsToFrames(5, GetFrameTime());
         Entity::damage(damage);
 
         if (!is_dead())
         {
             hurt_sheet->play_once(true);
         }
-
     }
 
     void PlayerEntity::kill()
@@ -345,7 +347,6 @@ namespace artifact
             jump_count++;
         }
     }
-
 
     void PlayerEntity::handle_input(const float deltaTime)
     {
@@ -404,7 +405,7 @@ namespace artifact
         {
             if (dash_attack_frames > 0 || light_attack_frames > 0)
                 return;
-            dash_attack_frames = 60 * (GetFPS() / 60);
+            dash_attack_frames = GameUtilities::ConvertSecondsToFrames(5, deltaTime);
             constexpr int dash_momentum = 1000;
             if (dash_attack_sheet->is_flipped())
                 horizontal_velocity = -dash_momentum;
@@ -416,7 +417,7 @@ namespace artifact
         {
             if (dash_attack_frames > 0 || light_attack_frames > 0)
                 return;
-            light_attack_frames = 30 * (GetFPS() / 60);
+            light_attack_frames = GameUtilities::ConvertSecondsToFrames(1, deltaTime);
             PlaySound(sfx_hit);
         }
     }
@@ -461,11 +462,13 @@ namespace artifact
         owner->camera.target.x = Clamp(owner->camera.target.x, minX, maxX);
         owner->camera.target.y = Clamp(owner->camera.target.y, minY, maxY);
     }
+
     void PlayerEntity::add_momentum(const float x, const float y)
     {
         horizontal_velocity += x;
         vertical_velocity += y;
     }
+
     void PlayerEntity::on_entity_collision(Entity *entity)
     {
         if (entity == nullptr)
