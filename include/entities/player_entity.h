@@ -10,10 +10,11 @@ namespace artifact
         float walk_speed_multiplier = 1;
         float sprint_multiplier = 1.5f;
         bool sprinting = false;
-        int light_attack_frames = 0;
-        int dash_attack_frames = 0;
-        int lives = 3;
-        int coins = 0;
+        unsigned int light_attack_frames = 0;
+        unsigned int dash_attack_frames = 0;
+        unsigned short lives = 3;
+        unsigned int coins = 0;
+        unsigned int invincibility_frames = 0;
 
         // Gravity and jumping variables
         float vertical_velocity = 0.0f;
@@ -21,8 +22,8 @@ namespace artifact
         float gravity = 1800.0f;
         float jump_force = 670.0f;
         bool is_grounded = false;
-        int jump_count = 0;
-        int max_jump_count = 2;
+        unsigned short jump_count = 0;
+        unsigned short max_jump_count = 2;
 
         // Sprite sheets
         SpriteSheet *idle_sheet = nullptr;
