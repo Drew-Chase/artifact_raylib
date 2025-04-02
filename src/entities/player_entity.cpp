@@ -312,6 +312,12 @@ namespace artifact
         if (dash_attack_frames > 0 || light_attack_frames > 0 || is_dead())
             return;
         Entity::damage(damage);
+
+        if (!is_dead())
+        {
+            hurt_sheet->play_once(true);
+        }
+
     }
 
     void PlayerEntity::kill()
