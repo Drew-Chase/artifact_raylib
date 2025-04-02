@@ -22,7 +22,12 @@ function(initialize_vendors)
                 GIT_REPOSITORY https://github.com/gabime/spdlog.git
                 GIT_TAG v1.15.1
         )
+
+        # Add these lines to configure spdlog build
+        set(SPDLOG_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+        set(SPDLOG_BUILD_EXAMPLE OFF CACHE BOOL "" FORCE)
         FetchContent_MakeAvailable(spdlog)
+
     endif()
 
     if(NOT nlohmann_json_FOUND)
