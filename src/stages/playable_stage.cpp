@@ -13,7 +13,7 @@ namespace artifact
     {
         Stage::startup();
 
-        level_open_overlay = new LevelOpenOverlay(this, 2.f);
+        level_open_overlay = new LevelOpenOverlay(this, 1.f);
         pause_screen = std::make_unique<PauseScreen>("pause_screen", this);
     }
     void PlayableStage::draw() const
@@ -21,12 +21,6 @@ namespace artifact
         if (is_being_destroyed)
             return;
         Stage::draw();
-
-        if (level_open_overlay->is_playing())
-        {
-            level_open_overlay->draw();
-        }
-
 
         DrawTextureEx(background, {-1000, -3150}, 0, 2.3, WHITE);
         if (Game::get_instance()->debug_mode)
@@ -39,6 +33,7 @@ namespace artifact
     void PlayableStage::draw_ui() const
     {
         this->player->draw_stats();
+        level_open_overlay->draw();
         if (is_paused)
         {
             pause_screen->draw();
@@ -57,10 +52,7 @@ namespace artifact
             return;
         Stage::update(delta_time);
 
-        if (level_open_overlay->is_playing())
-        {
-            level_open_overlay->update(delta_time);
-        }
+        level_open_overlay->update(delta_time);
 
         if (IsKeyPressed(KEY_ESCAPE))
             is_paused = !is_paused;

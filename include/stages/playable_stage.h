@@ -13,7 +13,6 @@ namespace artifact
     class PlayableStage : public Stage
     {
     protected:
-        LevelOpenOverlay *level_open_overlay;
         Texture2D background;
         PlayerEntity *player;
         std::vector<Entity*> entities;
@@ -22,6 +21,7 @@ namespace artifact
         virtual void draw_ui() const;
 
     public:
+        LevelOpenOverlay *level_open_overlay;
         std::unique_ptr<PauseScreen> pause_screen;
         Camera2D camera{};
         explicit PlayableStage(const char *identifier);
