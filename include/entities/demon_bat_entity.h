@@ -10,7 +10,7 @@ public:
     void destroy() override;
     void draw() override;
     void update(float deltaTime) override;
-    void damage(int damage) override;
+    void damage(int damage, Direction direction) override;
     void kill() override;
 };
 } // artifact
