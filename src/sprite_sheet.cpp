@@ -65,25 +65,33 @@ namespace artifact
 
         if (current_time >= frame_time)
         {
-            if (play_once_mode && current_frame == frame_count - 1)
+            if (current_frame == frame_to_freeze && freeze_on_last_frame)
             {
-                // We've reached the last frame in play_once mode
-                if (freeze_on_last_frame)
-                {
-                    // Stay on the last frame
-                    is_playing = false;
-                    current_frame = frame_count;
-                } else
-                {
-                    // Reset to the first frame and stop playing
-                    current_frame = 0;
-                    is_playing = false;
-                }
-                play_once_mode = false; // Exit play_once mode
+                // Stay on the last frame
+                is_playing = false;
+                current_frame = frame_to_freeze;
             } else
             {
-                // Normal update behavior
-                current_frame = (current_frame + 1) % frame_count;
+                if (play_once_mode && current_frame == frame_count - 1)
+                {
+                    // We've reached the last frame in play_once mode
+                    if (freeze_on_last_frame)
+                    {
+                        // Stay on the last frame
+                        is_playing = false;
+                        current_frame = frame_to_freeze;
+                    } else
+                    {
+                        // Reset to the first frame and stop playing
+                        current_frame = 0;
+                        is_playing = false;
+                    }
+                    play_once_mode = false; // Exit play_once mode
+                } else
+                {
+                    // Normal update behavior
+                    current_frame = (current_frame + 1) % frame_count;
+                }
             }
             current_time = 0.0f;
         }
@@ -142,7 +150,7 @@ namespace artifact
         this->fps = fps;
         frame_time = 1.0f / fps;
     }
-    void SpriteSheet::play_once(const bool freeze_on_last_frame)
+    void SpriteSheet::play_once(const bool freeze_on_frame)
     {
         // Set animation to playing state
         this->is_playing = true;
@@ -152,6 +160,16 @@ namespace artifact
 
         // Store the "play once" state and freeze preference
         this->play_once_mode = true;
-        this->freeze_on_last_frame = freeze_on_last_frame;
+        this->freeze_on_last_frame = freeze_on_frame;
+    }
+    void SpriteSheet::set_frame_to_freeze(const unsigned int frame)
+    {
+        if (frame < frames.size())
+        {
+            frame_to_freeze = frame;
+        } else
+        {
+            frame_to_freeze = frames.size() - 1;
+        }
     }
 } // namespace artifact

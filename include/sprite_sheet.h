@@ -23,6 +23,7 @@ namespace artifact
          * This is useful for cases like single-use actions or transitions.
          */
         bool play_once_mode = false;
+        unsigned int frame_to_freeze = 0;
         /**
          * Determines whether the animation freezes on the last frame when completed.
          *
@@ -339,11 +340,12 @@ namespace artifact
          * it until the last frame. Depending on the parameter, the animation
          * may freeze on the last frame after completion.
          *
-         * @param freeze_on_last_frame If true, the animation will stop and remain
+         * @param freeze_on_frame If true, the animation will stop and remain
          *                              on the last frame after playing once. If false,
          *                              the animation will reset to its initial state
          *                              upon completion.
          */
-        void play_once(bool freeze_on_last_frame = false);
+        void play_once(bool freeze_on_frame = false);
+        void set_frame_to_freeze(unsigned int frame);
     };
 } // namespace artifact
