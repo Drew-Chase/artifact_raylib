@@ -12,6 +12,6 @@ namespace artifact
          * @param deltaTime The number of milliseconds since the last frame (60fps = 16.666ms)
          * @return The amount of frames that should elapse over 'x' seconds
          */
-        static unsigned int ConvertSecondsToFrames(unsigned int seconds, float deltaTime);
+        static unsigned int ConvertSecondsToFrames(float seconds, float deltaTime);
     };
 } // namespace artifact
