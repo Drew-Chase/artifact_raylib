@@ -68,7 +68,7 @@ namespace artifact
     bool Entity::is_dead() const { return health <= 0; }
     void Entity::on_entity_collision(Entity *entity)
     {
-        if (entity == nullptr)
+        if (entity == nullptr || is_dead())
             return;
 
         if (auto *player = dynamic_cast<PlayerEntity *>(entity))

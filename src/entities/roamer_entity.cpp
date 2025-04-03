@@ -16,12 +16,14 @@ namespace artifact
     void RoamerEntity::destroy() { EnemyEntity::destroy(); }
     void RoamerEntity::draw()
     {
+        if (is_dead())return;
         EnemyEntity::draw();
         if (walk_sheet != nullptr)
             walk_sheet->draw(this->position, 2);
     }
     void RoamerEntity::update(const float delta_time)
     {
+        if (is_dead())return;
         EnemyEntity::update(delta_time);
         if (walk_sheet)
             walk_sheet->update(delta_time);
@@ -51,8 +53,15 @@ namespace artifact
         }
     }
 
-    void RoamerEntity::damage(const int damage, const Direction direction) { EnemyEntity::damage(damage, direction); }
-    void RoamerEntity::kill() { EnemyEntity::kill(); }
+    void RoamerEntity::damage(const int damage, const Direction direction)
+    {
+        EnemyEntity::damage(damage, direction);
+    }
+    void RoamerEntity::kill()
+    {
+        EnemyEntity::kill();
+
+    }
     void RoamerEntity::debug_draw_colliders()
     {
         EnemyEntity::debug_draw_colliders();
