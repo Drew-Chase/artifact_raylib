@@ -212,14 +212,7 @@ namespace artifact
         if (is_dead())
             return;
         Entity::kill();
-        lives--;
         death_sheet->play_once(true);
-        if (lives <= 0)
-        {
-            // Game::get_instance()->get_stage_manager()->load_stage(Stages::TITLE_SCREEN);
-        } else
-        {
-        }
     }
     void PlayerEntity::jump()
     {
@@ -514,4 +507,18 @@ namespace artifact
         }
     }
     bool PlayerEntity::is_facing_right() const { return idle_sheet->is_flipped(); }
+    void PlayerEntity::respawn(const bool should_remove_life)
+    {
+        if (should_remove_life)
+            lives--;
+        if (lives <= 0)
+        {
+            Game::get_instance()->get_stage_manager()->load_stage(Stages::TITLE_SCREEN);
+        } else
+        {
+            const auto [x,y] = owner->get_spawn_position();
+            set_position(x,y);
+            owner->camera.target = {x,y};
+        }
+    }
 } // namespace artifact
