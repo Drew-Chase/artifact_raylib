@@ -107,11 +107,11 @@ namespace artifact
         EndMode2D();
         PlayableStage::draw_ui();
     }
-    void Level1AStage::update(const float deltaTime)
+    void Level1AStage::update(const float delta_time)
     {
         if (is_being_destroyed)
             return;
-        PlayableStage::update(deltaTime);
+        PlayableStage::update(delta_time);
         UpdateMusicStream(music);
     }
     void Level1AStage::destroy()

@@ -91,12 +91,12 @@ namespace artifact
         game->isRunning = true;
         while (!WindowShouldClose() && game->isRunning)
         {
-            float deltaTime = GetFrameTime();
-            if (constexpr float MAX_DELTA_TIME = 0.05f; deltaTime > MAX_DELTA_TIME)
-                deltaTime = MAX_DELTA_TIME;
+            float delta_time = GetFrameTime();
+            if (constexpr float MAX_DELTA_TIME = 0.05f; delta_time > MAX_DELTA_TIME)
+                delta_time = MAX_DELTA_TIME;
 
             const auto stage = manager->get_current_stage();
-            stage->update(deltaTime);
+            stage->update(delta_time);
             BeginDrawing();
             ClearBackground(BLACK);
             stage->draw();

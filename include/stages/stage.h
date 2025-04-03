@@ -17,7 +17,7 @@ namespace artifact
         virtual ~Stage() { destroy(); }
 
         virtual void draw() const {}
-        virtual void update(float deltaTime) {}
+        virtual void update(float delta_time) {}
         virtual void startup() {}
         virtual void destroy()
         {

@@ -19,7 +19,7 @@ namespace artifact
         void draw() override;
         void damage(int damage, Direction direction) override;
         void kill() override;
-        void update(float deltaTime) override;
+        void update(float delta_time) override;
         void debug_draw_colliders() override;
         void on_entity_collision(Entity* entity) override;
     };

@@ -19,7 +19,7 @@ namespace artifact
         if (Game::get_instance()->debug_mode)
             debug_draw_colliders();
     }
-    void Entity::update(const float deltaTime)
+    void Entity::update(const float delta_time)
     {
         if (collider)
         {

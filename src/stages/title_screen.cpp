@@ -97,12 +97,12 @@ namespace artifact
 
         DrawText(fmt::format("Artifact v{}", VERSION).c_str(), 10, GetScreenHeight() - 20, 16, ColorAlpha(WHITE, 0.5f));
     }
-    void TitleScreen::update(const float deltaTime)
+    void TitleScreen::update(const float delta_time)
     {
         if (is_being_destroyed)
             return;
         UpdateMusicStream(menu_music);
-        update_background(deltaTime);
+        update_background(delta_time);
 
         if (settings_screen != nullptr && settings_screen)
         {
@@ -124,7 +124,7 @@ namespace artifact
                 button_container->set_position(GetScreenWidth() / 2 - button_container->get_width() / 2, GetScreenHeight() - button_container->get_height() - 20);
             } else
             {
-                tick_animate_fadein(deltaTime);
+                tick_animate_fadein(delta_time);
             }
         }
     }
@@ -150,14 +150,14 @@ namespace artifact
             draw_texture_scaled(mountains_scale, mountains_scroll + (static_cast<float>(i) * scaled_mountains_width), 0, mountain_hills_background_image);
         }
     }
-    void TitleScreen::update_background(const float deltaTime) const
+    void TitleScreen::update_background(const float delta_time) const
     {
 
         // Update clouds scroll
         const float clouds_scale = calculate_background_scale(sky_clouds_background_image);
         const float scaled_clouds_width = static_cast<float>(sky_clouds_background_image.width) * clouds_scale;
 
-        clouds_scroll -= clouds_scroll_speed * deltaTime;
+        clouds_scroll -= clouds_scroll_speed * delta_time;
         if (clouds_scroll <= -scaled_clouds_width)
         {
             clouds_scroll = 0.0f;
@@ -167,7 +167,7 @@ namespace artifact
         const float mountains_scale = calculate_background_scale(mountain_hills_background_image);
         const float scaled_mountains_width = static_cast<float>(mountain_hills_background_image.width) * mountains_scale;
 
-        mountains_scroll -= mountains_scroll_speed * deltaTime;
+        mountains_scroll -= mountains_scroll_speed * delta_time;
         if (mountains_scroll <= -scaled_mountains_width)
         {
             mountains_scroll = 0.0f;
@@ -222,10 +222,10 @@ namespace artifact
         const float scaled_width = static_cast<float>(texture->width) * scale;
         return static_cast<int>(static_cast<float>(GetScreenWidth()) / scaled_width) + 2;
     }
-    void TitleScreen::tick_animate_fadein(const float deltaTime)
+    void TitleScreen::tick_animate_fadein(const float delta_time)
     {
         // Increment elapsed time and calculate progress
-        fade_in_elapsed_time_ms += static_cast<size_t>(deltaTime * 1000.0f); // Convert deltaTime to milliseconds
+        fade_in_elapsed_time_ms += static_cast<size_t>(delta_time * 1000.0f); // Convert delta_time to milliseconds
         float progress = 0.0f;
 
         // Maintain start parameters until the start delay elapses

@@ -13,7 +13,7 @@ namespace artifact
     {
         Stage::startup();
 
-        level_open_overlay = new LevelOpenOverlay(this);
+        level_open_overlay = new LevelOpenOverlay(this, 2.f);
         pause_screen = std::make_unique<PauseScreen>("pause_screen", this);
     }
     void PlayableStage::draw() const
@@ -51,15 +51,15 @@ namespace artifact
             DrawRectangleLinesEx(collider.bounds, 4, collider.is_blocking ? RED : BLUE);
         }
     }
-    void PlayableStage::update(const float deltaTime)
+    void PlayableStage::update(const float delta_time)
     {
         if (is_being_destroyed)
             return;
-        Stage::update(deltaTime);
+        Stage::update(delta_time);
 
         if (level_open_overlay->is_playing())
         {
-            level_open_overlay->update(deltaTime);
+            level_open_overlay->update(delta_time);
         }
 
         if (IsKeyPressed(KEY_ESCAPE))
@@ -73,7 +73,7 @@ namespace artifact
 
         for (const auto &entity: entities)
         {
-            entity->update(deltaTime);
+            entity->update(delta_time);
             entity->check_entity_collisions(entities);
         }
     }

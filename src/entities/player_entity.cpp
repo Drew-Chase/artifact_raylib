@@ -138,23 +138,23 @@ namespace artifact
             x += life_texture.width * scale + gap;
         }
     }
-    void PlayerEntity::update(const float deltaTime)
+    void PlayerEntity::update(const float delta_time)
     {
         if (!IsWindowReady())
             return;
-        Entity::update(deltaTime);
+        Entity::update(delta_time);
         owner->camera.zoom = 1.5f * fminf(GetScreenWidth() / 1920.0f, GetScreenHeight() / 1080.0f);
 
         if (is_dead())
         {
-            death_sheet->update(deltaTime);
+            death_sheet->update(delta_time);
             return;
         }
 
-        handle_input(deltaTime);
+        handle_input(delta_time);
         check_collision();
-        apply_gravity(deltaTime);
-        apply_horizontal_movement(deltaTime);
+        apply_gravity(delta_time);
+        apply_horizontal_movement(delta_time);
 
         if (this->invincibility_frames > 0)
             this->invincibility_frames--;
@@ -170,18 +170,18 @@ namespace artifact
             dash_attack_sheet->set_frame(0);
 
 
-        idle_sheet->update(deltaTime);
+        idle_sheet->update(delta_time);
         if (sprinting)
             run_sheet->set_framerate(13);
         else
             run_sheet->set_framerate(8);
-        run_sheet->update(deltaTime);
-        jump_sheet->update(deltaTime);
-        light_attack_sheet->update(deltaTime);
-        dash_attack_sheet->update(deltaTime);
-        hurt_sheet->update(deltaTime);
+        run_sheet->update(delta_time);
+        jump_sheet->update(delta_time);
+        light_attack_sheet->update(delta_time);
+        dash_attack_sheet->update(delta_time);
+        hurt_sheet->update(delta_time);
 
-        update_camera_center_smooth_follow(deltaTime);
+        update_camera_center_smooth_follow(delta_time);
     }
     void PlayerEntity::damage(const int damage, const Direction direction)
     {
@@ -224,7 +224,7 @@ namespace artifact
             jump_count++;
         }
     }
-    void PlayerEntity::handle_input(const float deltaTime)
+    void PlayerEntity::handle_input(const float delta_time)
     {
         const ControlsSettings *controls = Game::get_instance()->controls_settings;
 
@@ -281,7 +281,7 @@ namespace artifact
         {
             const float direction = target_speed > horizontal_velocity ? 1.0f : -1.0f;
 
-            if (const float acc = acceleration * control_multiplier * deltaTime; std::abs(acc) > std::abs(target_speed - horizontal_velocity))
+            if (const float acc = acceleration * control_multiplier * delta_time; std::abs(acc) > std::abs(target_speed - horizontal_velocity))
                 horizontal_velocity = target_speed;
             else
                 horizontal_velocity += acc * direction;
@@ -291,7 +291,7 @@ namespace artifact
         {
             if (dash_attack_frames > 0 || light_attack_frames > 0)
                 return;
-            dash_attack_frames = GameUtilities::ConvertSecondsToFrames(1, deltaTime);
+            dash_attack_frames = GameUtilities::ConvertSecondsToFrames(1, delta_time);
             dash_attack_sheet->play_once();
             constexpr int dash_momentum = 1000;
             if (dash_attack_sheet->is_flipped())
@@ -305,7 +305,7 @@ namespace artifact
         {
             if (dash_attack_frames > 0 || light_attack_frames > 0)
                 return;
-            light_attack_frames = GameUtilities::ConvertSecondsToFrames(.75, deltaTime);
+            light_attack_frames = GameUtilities::ConvertSecondsToFrames(.75, delta_time);
             light_attack_sheet->play_once();
             PlaySound(sfx_hit);
         }
@@ -368,24 +368,24 @@ namespace artifact
                 enemy->damage(attack_damage, direction);
         }
     }
-    void PlayerEntity::apply_gravity(const float deltaTime)
+    void PlayerEntity::apply_gravity(const float delta_time)
     {
         if (!is_grounded)
         {
-            vertical_velocity -= gravity * deltaTime;
-            position.y -= vertical_velocity * deltaTime;
+            vertical_velocity -= gravity * delta_time;
+            position.y -= vertical_velocity * delta_time;
         }
     }
-    void PlayerEntity::apply_horizontal_movement(const float deltaTime)
+    void PlayerEntity::apply_horizontal_movement(const float delta_time)
     {
-        position.x += horizontal_velocity * deltaTime;
+        position.x += horizontal_velocity * delta_time;
 
         const float friction = is_grounded ? ground_friction : air_friction;
 
         if (std::abs(horizontal_velocity) > 0.1f)
         {
 
-            if (const float slowdown = friction * deltaTime * std::copysign(1.0f, horizontal_velocity); std::abs(slowdown) > std::abs(horizontal_velocity))
+            if (const float slowdown = friction * delta_time * std::copysign(1.0f, horizontal_velocity); std::abs(slowdown) > std::abs(horizontal_velocity))
                 horizontal_velocity = 0.0f;
             else
                 horizontal_velocity -= slowdown;

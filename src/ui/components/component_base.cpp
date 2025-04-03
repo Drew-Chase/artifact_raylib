@@ -82,8 +82,6 @@ namespace artifact
         width = static_cast<int>(static_cast<float>(texture.width) * scale);
         height = static_cast<int>(static_cast<float>(texture.height) * scale);
     }
-
-
     void ComponentBase::set_width(const int width) { bounds.width = static_cast<float>(width); }
     void ComponentBase::set_height(const int height) { bounds.height = static_cast<float>(height); }
     void ComponentBase::set_position(const int x, const int y)

@@ -19,7 +19,7 @@ namespace artifact
     public:
         explicit LevelOpenOverlay(Stage *owner, float duration);
         void draw() override;
-        void update(float deltaTime) override;
+        void update(float delta_time) override;
         bool is_playing() const;
         void play();
         void stop();

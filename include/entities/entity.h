@@ -36,7 +36,7 @@ namespace artifact
         virtual void startup();
         virtual void destroy();
         virtual void draw();
-        virtual void update(float deltaTime);
+        virtual void update(float delta_time);
         virtual void damage(int damage, Direction direction);
         virtual void kill();
         void spawn(int x, int y, PlayableStage *owner);

@@ -9,7 +9,7 @@ public:
     void startup() override;
     void destroy() override;
     void draw() override;
-    void update(float deltaTime) override;
+    void update(float delta_time) override;
     void damage(int damage, Direction direction) override;
     void kill() override;
 };

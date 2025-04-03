@@ -6,10 +6,10 @@ namespace artifact
 {
     LevelOpenOverlay::LevelOpenOverlay(Stage *owner, const float duration) : ComponentBase("level_open_overlay", owner) { this->duration = duration; }
     void LevelOpenOverlay::draw() { ComponentBase::draw(); }
-    void LevelOpenOverlay::update(const float deltaTime)
+    void LevelOpenOverlay::update(const float delta_time)
     {
-        ComponentBase::update(deltaTime);
-        last_frame = GameUtilities::ConvertSecondsToFrames(this->duration, deltaTime);
+        ComponentBase::update(delta_time);
+        last_frame = GameUtilities::ConvertSecondsToFrames(this->duration, delta_time);
     }
     void LevelOpenOverlay::reset() { current_frame = 0; }
     void LevelOpenOverlay::stop()

@@ -14,11 +14,11 @@ namespace artifact
         if (idle_sheet != nullptr)
             idle_sheet->draw(this->position, 2);
     }
-    void DemonBatEntity::update(const float deltaTime)
+    void DemonBatEntity::update(const float delta_time)
     {
-        EnemyEntity::update(deltaTime);
+        EnemyEntity::update(delta_time);
         if (idle_sheet)
-            idle_sheet->update(deltaTime);
+            idle_sheet->update(delta_time);
     }
     void DemonBatEntity::destroy() { EnemyEntity::destroy(); }
     void DemonBatEntity::damage(const int damage, const Direction direction) { EnemyEntity::damage(damage, direction); }

@@ -53,9 +53,9 @@ namespace artifact
         Sound sfx_hit{};
         Sound sfx_dash{};
 
-        void handle_input(float deltaTime);
-        void apply_gravity(float deltaTime);
-        void apply_horizontal_movement(float deltaTime);
+        void handle_input(float delta_time);
+        void apply_gravity(float delta_time);
+        void apply_horizontal_movement(float delta_time);
         void check_collision();
         void update_camera_center_smooth_follow(float delta) const;
         void add_momentum(float x, float y);
@@ -66,7 +66,7 @@ namespace artifact
         void startup() override;
         void draw() override;
         void draw_stats() const;
-        void update(float deltaTime) override;
+        void update(float delta_time) override;
         void damage(int damage, Direction direction) override;
         void kill() override;
         void jump();

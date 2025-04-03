@@ -61,9 +61,9 @@ namespace artifact
          * This method is called to apply any time-dependent updates
          * to the component's functionality.
          *
-         * @param deltaTime The time elapsed since the last update call, in seconds.
+         * @param delta_time The time elapsed since the last update call, in seconds.
          */
-        virtual void update(float deltaTime){}
+        virtual void update(float delta_time){}
 
         /**
          * Retrieves the unique identifier associated with the component.

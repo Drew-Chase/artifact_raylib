@@ -80,5 +80,4 @@ namespace artifact
     {
         this->text = text ? strdup(text) : nullptr;
     }
-
 } // namespace artifact

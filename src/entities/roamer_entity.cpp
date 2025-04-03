@@ -20,16 +20,16 @@ namespace artifact
         if (walk_sheet != nullptr)
             walk_sheet->draw(this->position, 2);
     }
-    void RoamerEntity::update(const float deltaTime)
+    void RoamerEntity::update(const float delta_time)
     {
-        EnemyEntity::update(deltaTime);
+        EnemyEntity::update(delta_time);
         if (walk_sheet)
-            walk_sheet->update(deltaTime);
+            walk_sheet->update(delta_time);
         if (is_facing_right)
         {
             if (position.x < end_position.x)
             {
-                position.x += 100 * deltaTime;
+                position.x += 100 * delta_time;
             } else
             {
                 is_facing_right = false;
@@ -41,7 +41,7 @@ namespace artifact
         {
             if (position.x > start_position.x)
             {
-                position.x -= 100 * deltaTime;
+                position.x -= 100 * delta_time;
             } else
             {
                 is_facing_right = true;

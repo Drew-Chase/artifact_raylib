@@ -40,7 +40,7 @@ namespace artifact
         std::unique_ptr<VerticalListContainer> button_container;
 
         // Component functions
-        void update_background(float deltaTime) const;
+        void update_background(float delta_time) const;
         void draw_background() const;
 
         // Utility functions
@@ -48,12 +48,12 @@ namespace artifact
         int calculate_required_backgrounds() const;
         static float calculate_background_scale(const Texture2D &texture);
         static int calculate_required_backgrounds(const Texture2D *texture, float scale);
-        void tick_animate_fadein(float deltaTime);
+        void tick_animate_fadein(float delta_time);
 
     public:
         TitleScreen() : MenuStage("TitleScreen"), menu_music() {}
         void draw() const override;
-        void update(float deltaTime) override;
+        void update(float delta_time) override;
         void startup() override;
         void destroy() override;
         void close_settings_menu();

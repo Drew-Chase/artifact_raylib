@@ -40,7 +40,7 @@ namespace artifact
         void startup() override;
         void draw() const override;
         void debug_draw_colliders() const;
-        void update(float deltaTime) override;
+        void update(float delta_time) override;
         void destroy() override;
         Collider get_collider_at(int x, int y, bool blocking_only = true) const;
         std::vector<Collider> get_colliders_closest_to(int x, int y, bool blocking_only = true) const;
