@@ -72,8 +72,7 @@ scripts\windows\standalone.bat # Standalone configuration
 For Ubuntu/Debian:
 
 ```bash
-sudo apt update
-sudo apt install build-essential cmake ninja-build git
+scripts/unix/install_deps.sh
 ```
 
 For macOS:
@@ -195,6 +194,7 @@ The project includes platform-specific build scripts located in:
 
 ### Unix Scripts
 
+- `install_deps.sh` - Installs all dependencies required for linux (_Note: **This uses APT, PACMAN, or DNF package managers, meaning this will only work in linux, if your package manager is not available see a [list of dependencies](#os-dependencies) below.**_).
 - `all.sh` - Builds all configurations
 - `debug.sh` - Builds debug configuration
 - `minimal.sh` - Builds minimal configuration
@@ -208,3 +208,18 @@ If you encounter build issues, try the following:
 2. Clear the build directory and rebuild
 3. Check compiler compatibility with C++23
 4. Verify that dependencies are downloaded by CMake's FetchContent functionality
+
+## OS Dependencies
+
+- [Git](https://git-scm.com/) - git (Windows/macOS/Linux)
+- [Xrandr Development Library](https://gitlab.freedesktop.org/xorg/lib/libxrandr) - libxrandr-dev (Linux)
+- [Xcursor Development Library](https://gitlab.freedesktop.org/xorg/lib/libxcursor) - libxcursor-dev (Linux)
+- [Xinerama Development Library](https://gitlab.freedesktop.org/xorg/lib/libxinerama) - libxinerama-dev (Linux)
+- [Xi Development Library](https://gitlab.freedesktop.org/xorg/lib/libxi) - libxi-dev (Linux)
+- [GLFW Development Library](https://github.com/glfw/glfw) - libglfw3-dev (Linux)
+- [Mesa OpenGL Development Library](https://mesa3d.org/) - libgl1-mesa-dev (Linux)
+- [Mesa GLU Development Library](https://mesa3d.org/) - libglu1-mesa-dev (Linux)
+- [OpenAL Development Library](https://openal-soft.org/) - libopenal-dev (Linux)
+- [CMake](https://cmake.org/) - cmake (Windows/macOS/Linux)
+- Build Essential Tools - build-essential (Linux)
+- [Ninja Build System](https://ninja-build.org/) - ninja-build (Windows/macOS/Linux)
