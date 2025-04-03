@@ -6,13 +6,14 @@ namespace artifact
     class LevelOpenOverlay final : public ComponentBase
     {
 
-        Rectangle left{};
-        Rectangle right{};
-        Rectangle top{};
-        Rectangle bottom{};
+        Vector2 left{0,0};
+        Vector2 right{0,0};
+        Vector2 top{0,0};
+        Vector2 bottom{0,0};
+        Rectangle rect;
         // the animation duration in seconds.
         float duration = 2;
-        bool playing = false;
+        bool playing = true;
         size_t current_frame = 0;
         size_t last_frame = 0;
 
@@ -25,5 +26,6 @@ namespace artifact
         void stop();
         void pause();
         void reset();
+        void restart();
     };
 } // namespace artifact
