@@ -50,5 +50,6 @@ namespace artifact
         void pause();
         void unpause();
         virtual Vector2 get_spawn_position() const;
+        virtual void spawn_entities(){}
     };
 } // namespace artifact

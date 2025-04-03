@@ -531,6 +531,7 @@ namespace artifact
             const auto [x, y] = owner->get_spawn_position();
             set_position(x, y);
             owner->camera.target = {x, y};
+            owner->spawn_entities();
         }
     }
 } // namespace artifact

@@ -12,6 +12,7 @@ namespace artifact
     void PlayableStage::startup()
     {
         Stage::startup();
+        spawn_entities();
 
         level_open_overlay = new LevelOpenOverlay(this, 1.f);
         pause_screen = std::make_unique<PauseScreen>("pause_screen", this);

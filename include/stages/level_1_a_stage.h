@@ -13,5 +13,6 @@ namespace artifact
         void destroy() override;
         void startup() override;
         Vector2 get_spawn_position() const override;
+        void spawn_entities() override;
     };
 } // namespace artifact
