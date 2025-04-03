@@ -5,6 +5,7 @@
 #include "entities/player_entity.h"
 #include "stage.h"
 #include "ui/menus/pause_screen.h"
+#include "ui/overlays/level_open_overlay.h"
 namespace artifact
 {
 
@@ -12,6 +13,7 @@ namespace artifact
     class PlayableStage : public Stage
     {
     protected:
+        LevelOpenOverlay *level_open_overlay;
         Texture2D background;
         PlayerEntity *player;
         std::vector<Entity*> entities;
@@ -45,8 +47,8 @@ namespace artifact
         std::vector<Collider> get_blocking_colliders() const;
         void set_background(const char *resource_location);
         Texture2D *get_background();
-        void respawn();
         void pause();
         void unpause();
+        virtual Vector2 get_spawn_position() const;
     };
 } // namespace artifact
