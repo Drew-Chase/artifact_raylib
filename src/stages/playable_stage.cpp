@@ -13,15 +13,21 @@ namespace artifact
     {
         Stage::startup();
 
-        // Spawn the Player
+        level_open_overlay = new LevelOpenOverlay(this);
         pause_screen = std::make_unique<PauseScreen>("pause_screen", this);
     }
     void PlayableStage::draw() const
     {
         if (is_being_destroyed)
             return;
-
         Stage::draw();
+
+        if (level_open_overlay->is_playing())
+        {
+            level_open_overlay->draw();
+        }
+
+
         DrawTextureEx(background, {-1000, -3150}, 0, 2.3, WHITE);
         if (Game::get_instance()->debug_mode)
             debug_draw_colliders();
@@ -51,6 +57,11 @@ namespace artifact
             return;
         Stage::update(deltaTime);
 
+        if (level_open_overlay->is_playing())
+        {
+            level_open_overlay->update(deltaTime);
+        }
+
         if (IsKeyPressed(KEY_ESCAPE))
             is_paused = !is_paused;
 
@@ -79,12 +90,8 @@ namespace artifact
     std::vector<Collider> PlayableStage::get_blocking_colliders() const { return Collider::get_blocking_colliders(colliders); }
     void PlayableStage::set_background(const char *resource_location) { this->background = LoadTexture(resource_location); }
     Texture2D *PlayableStage::get_background() { return &background; }
-    void PlayableStage::respawn()
-    {
-        camera.target = {0, 0};
-        player->set_position(0, 0);
-    }
     void PlayableStage::pause() { is_paused = true; }
     void PlayableStage::unpause() { is_paused = false; }
+    Vector2 PlayableStage::get_spawn_position() const { return {0, 0}; }
 
 } // namespace artifact
