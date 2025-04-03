@@ -9,6 +9,10 @@ function(initialize_vendors)
         set(FETCHCONTENT_BASE_DIR "${CMAKE_SOURCE_DIR}/bin/obj/other-deps")
     endif()
 
+
+    # Disable system paths for find_package
+    set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+
     # Try to find packages first
     find_package(spdlog QUIET)
     find_package(nlohmann_json QUIET)
