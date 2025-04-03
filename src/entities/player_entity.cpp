@@ -59,7 +59,7 @@ namespace artifact
         {
             const std::string grounded_text = fmt::format("Grounded: {}, VVel: {:.1f}, HVel: {:.1f}", is_grounded ? "true" : "false", vertical_velocity, horizontal_velocity);
             const std::string position_text = fmt::format("Player Pos: X: {:.1f}, Y: {:.1f}", this->position.x, this->position.y);
-            const std::string attacks_text = fmt::format("Dash: {}, Light: {}, Inv: {}", dash_attack_frames, light_attack_frames, invincibility_frames);
+            const std::string attacks_text = fmt::format("Dash: {}, Light: {}, Inv: {}, Death: {}", dash_attack_frames, light_attack_frames, invincibility_frames, death_frames);
 
             const int text_width = std::max({MeasureText(grounded_text.c_str(), 16), MeasureText(position_text.c_str(), 16), MeasureText(attacks_text.c_str(), 16)});
 
@@ -132,7 +132,7 @@ namespace artifact
         x = 10;
         y += heart_texture.height * scale + gap;
         scale = 0.2f;
-        for (int i = 0; i < max_health; i++)
+        for (int i = 0; i < lives; i++)
         {
             DrawTextureEx(life_texture, Vector2{x, y}, 0, scale, WHITE);
             x += life_texture.width * scale + gap;
@@ -147,7 +147,13 @@ namespace artifact
 
         if (is_dead())
         {
-            death_sheet->update(delta_time);
+            if (death_frames > 0)
+            {
+                death_frames--;
+                if (death_sheet->get_current_frame() < death_sheet->get_frame_count() - 1)
+                    death_sheet->update(delta_time);
+            } else
+                respawn();
             return;
         }
 
@@ -187,8 +193,15 @@ namespace artifact
     {
         if (dash_attack_frames > 0 || light_attack_frames > 0 || invincibility_frames > 0 || is_dead())
             return;
+
+        if (health - damage <= 0) // Should be dead.
+        {
+            death_sheet->play();
+            death_frames = GameUtilities::ConvertSecondsToFrames(2, GetFrameTime());
+        }
         invincibility_frames = GameUtilities::ConvertSecondsToFrames(1, GetFrameTime());
         hurt_frames = GameUtilities::ConvertSecondsToFrames(0.25, GetFrameTime());
+
         Entity::damage(damage, direction);
 
         if (!is_dead())
@@ -212,6 +225,7 @@ namespace artifact
         if (is_dead())
             return;
         Entity::kill();
+        death_sheet->play();
         death_sheet->play_once(true);
     }
     void PlayerEntity::jump()
@@ -500,25 +514,23 @@ namespace artifact
             position.y = highest_ground - bounds.y;
             vertical_velocity = 0;
         }
-
-        if (!was_grounded && is_grounded)
-        {
-            // TODO: Add landing effects
-        }
     }
     bool PlayerEntity::is_facing_right() const { return idle_sheet->is_flipped(); }
     void PlayerEntity::respawn(const bool should_remove_life)
     {
-        if (should_remove_life)
-            lives--;
         if (lives <= 0)
         {
             Game::get_instance()->get_stage_manager()->load_stage(Stages::TITLE_SCREEN);
         } else
         {
-            const auto [x,y] = owner->get_spawn_position();
-            set_position(x,y);
-            owner->camera.target = {x,y};
+            death_sheet->reset();
+            if (should_remove_life)
+                lives--;
+            owner->level_open_overlay->restart();
+            health = max_health;
+            const auto [x, y] = owner->get_spawn_position();
+            set_position(x, y);
+            owner->camera.target = {x, y};
         }
     }
 } // namespace artifact

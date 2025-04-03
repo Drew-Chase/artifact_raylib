@@ -14,6 +14,7 @@ namespace artifact
         unsigned int light_attack_frames = 0;
         unsigned int dash_attack_frames = 0;
         unsigned int invincibility_frames = 0;
+        unsigned int death_frames = 0;
         unsigned int hurt_frames = 0;
         unsigned short lives = 3;
         unsigned int coins = 0;
