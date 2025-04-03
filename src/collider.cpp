@@ -57,15 +57,16 @@ namespace artifact
 
     void Collider::overlap(Entity *entity)
     {
-        if (!entity || overlapping_entity == entity)
-            return;
-        overlapping_entity = entity;
-
         // Call the regular overlap function if it exists
         if (on_overlap)
         {
             on_overlap();
         }
+
+        if (!entity || overlapping_entity == entity)
+            return;
+        overlapping_entity = entity;
+
 
         // Call the entity-aware overlap function if it exists
         if (on_entity_overlap)

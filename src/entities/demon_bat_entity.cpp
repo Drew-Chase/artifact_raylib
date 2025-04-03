@@ -21,6 +21,6 @@ namespace artifact
             idle_sheet->update(deltaTime);
     }
     void DemonBatEntity::destroy() { EnemyEntity::destroy(); }
-    void DemonBatEntity::damage(const int damage) { EnemyEntity::damage(damage); }
+    void DemonBatEntity::damage(const int damage, const Direction direction) { EnemyEntity::damage(damage, direction); }
     void DemonBatEntity::kill() { EnemyEntity::kill(); }
 } // namespace artifact

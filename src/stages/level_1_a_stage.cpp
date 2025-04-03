@@ -15,6 +15,8 @@ namespace artifact
         SetMusicVolume(music, 0.15f);
         PlayMusicStream(music);
 
+        this->player = spawn_entity<PlayerEntity>(0, 140);
+
         // Spawn enemies
         // First Gap
         spawn_entity<RoamerEntity>(2067, 99, Vector2{2057, 67}, Vector2{3024, 67});

@@ -14,7 +14,6 @@ namespace artifact
         Stage::startup();
 
         // Spawn the Player
-        this->player = spawn_entity<PlayerEntity>(0, 0);
         pause_screen = std::make_unique<PauseScreen>("pause_screen", this);
     }
     void PlayableStage::draw() const

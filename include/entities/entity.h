@@ -2,6 +2,7 @@
 #include <memory>
 #include <raylib.h>
 
+#include "Direction.h"
 #include "collider.h"
 
 namespace artifact
@@ -36,10 +37,11 @@ namespace artifact
         virtual void destroy();
         virtual void draw();
         virtual void update(float deltaTime);
-        virtual void damage(int damage);
+        virtual void damage(int damage, Direction direction);
         virtual void kill();
         void spawn(int x, int y, PlayableStage *owner);
         virtual void set_position(int x, int y);
+        Vector2 get_position() const;
         virtual void debug_draw_colliders();
         bool is_colliding_with(const Entity *other) const;
         void check_entity_collisions(const std::vector<Entity *> &entities);

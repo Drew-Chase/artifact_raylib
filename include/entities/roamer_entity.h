@@ -17,7 +17,7 @@ namespace artifact
         void startup() override;
         void destroy() override;
         void draw() override;
-        void damage(int damage) override;
+        void damage(int damage, Direction direction) override;
         void kill() override;
         void update(float deltaTime) override;
         void debug_draw_colliders() override;

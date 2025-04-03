@@ -2,6 +2,8 @@
 #include <cmath>
 #include <fmt/format.h>
 #include <raymath.h>
+
+#include "Direction.h"
 #include "entities/enemy_entity.h"
 #include "game.h"
 #include "game_utilities.h"
@@ -26,6 +28,13 @@ namespace artifact
         hurt_sheet = new SpriteSheet("game/texture/entities/player/hit%d.png", 3, 8);
         death_sheet = new SpriteSheet("game/texture/entities/player/death%d.png", 5, 8);
 
+        // Pause animations by default
+        hurt_sheet->pause();
+        death_sheet->pause();
+        dash_attack_sheet->pause();
+        light_attack_sheet->pause();
+
+
         // Load SFX
         sfx_jump = LoadSound("game/audio/sfx/playerjump.ogg");
         sfx_hit = LoadSound("game/audio/sfx/playerattack.ogg");
@@ -43,7 +52,6 @@ namespace artifact
             collider->set_owner(this);
         }
     }
-
     void PlayerEntity::draw()
     {
         Entity::draw();
@@ -65,9 +73,16 @@ namespace artifact
         constexpr float sprite_scale = 2.2f;
 
         // Draw animations
+
         if (is_dead())
         {
             death_sheet->draw(sprite_position, sprite_scale);
+        } else if (hurt_frames > 0)
+        {
+            if (hurt_sheet->is_flipped())
+                hurt_sheet->draw(sprite_position_flipped, sprite_scale);
+            else
+                hurt_sheet->draw(sprite_position, sprite_scale);
         } else if (light_attack_frames > 0)
         {
             if (light_attack_sheet->is_flipped())
@@ -103,7 +118,6 @@ namespace artifact
                 jump_sheet->draw(sprite_position, sprite_scale);
         }
     }
-
     void PlayerEntity::draw_stats() const
     {
         float x = 10;
@@ -124,13 +138,11 @@ namespace artifact
             x += life_texture.width * scale + gap;
         }
     }
-
     void PlayerEntity::update(const float deltaTime)
     {
         if (!IsWindowReady())
             return;
         Entity::update(deltaTime);
-        this->invincibility_frames--;
         owner->camera.zoom = 1.5f * fminf(GetScreenWidth() / 1920.0f, GetScreenHeight() / 1080.0f);
 
         if (is_dead())
@@ -144,6 +156,10 @@ namespace artifact
         apply_gravity(deltaTime);
         apply_horizontal_movement(deltaTime);
 
+        if (this->invincibility_frames > 0)
+            this->invincibility_frames--;
+        if (this->hurt_frames > 0)
+            this->hurt_frames--;
         if (light_attack_frames > 0)
             light_attack_frames--;
         else
@@ -167,7 +183,198 @@ namespace artifact
 
         update_camera_center_smooth_follow(deltaTime);
     }
+    void PlayerEntity::damage(const int damage, const Direction direction)
+    {
+        if (dash_attack_frames > 0 || light_attack_frames > 0 || invincibility_frames > 0 || is_dead())
+            return;
+        invincibility_frames = GameUtilities::ConvertSecondsToFrames(1, GetFrameTime());
+        hurt_frames = GameUtilities::ConvertSecondsToFrames(0.25, GetFrameTime());
+        Entity::damage(damage, direction);
 
+        if (!is_dead())
+        {
+            hurt_sheet->play_once();
+            if (direction == Direction::RIGHT)
+            {
+                horizontal_velocity = 300;
+                vertical_velocity = 300;
+                is_grounded = false;
+            } else
+            {
+                horizontal_velocity = -300;
+                vertical_velocity = 300;
+                is_grounded = false;
+            }
+        }
+    }
+    void PlayerEntity::kill()
+    {
+        if (is_dead())
+            return;
+        Entity::kill();
+        lives--;
+        death_sheet->play_once(true);
+        if (lives <= 0)
+        {
+            // Game::get_instance()->get_stage_manager()->load_stage(Stages::TITLE_SCREEN);
+        } else
+        {
+        }
+    }
+    void PlayerEntity::jump()
+    {
+        if (jump_count < max_jump_count)
+        {
+            PlaySound(sfx_jump);
+            vertical_velocity = jump_force;
+            is_grounded = false;
+            jump_count++;
+        }
+    }
+    void PlayerEntity::handle_input(const float deltaTime)
+    {
+        const ControlsSettings *controls = Game::get_instance()->controls_settings;
+
+#ifdef DEBUG
+        if (ControlsSettings::pressed(KEY_B))
+            Game::get_instance()->debug_mode = !Game::get_instance()->debug_mode;
+        if (Game::get_instance()->debug_mode)
+        {
+            const int fps = GetFPS();
+            if (IsKeyDown(KEY_UP))
+                SetTargetFPS(fps + 10);
+            if (IsKeyDown(KEY_DOWN))
+                SetTargetFPS(fps - 10);
+        }
+#endif
+        if (ControlsSettings::down(controls->movement_sprint))
+            sprinting = controls->toggle_sprint ? !sprinting : true;
+        else if (ControlsSettings::up(controls->movement_sprint) && !controls->toggle_sprint)
+            sprinting = false;
+
+        if (ControlsSettings::pressed(controls->movement_jump))
+            jump();
+
+        const float control_multiplier = is_grounded ? 1.0f : air_control;
+        const float speed_multiplier = (sprinting ? sprint_multiplier : walk_speed_multiplier) * control_multiplier;
+
+        float target_speed = 0.0f;
+
+        if (ControlsSettings::down(controls->movement_right))
+        {
+            target_speed = walk_speed * speed_multiplier;
+            idle_sheet->set_flipped(false);
+            run_sheet->set_flipped(false);
+            jump_sheet->set_flipped(false);
+            dash_attack_sheet->set_flipped(false);
+            light_attack_sheet->set_flipped(false);
+            hurt_sheet->set_flipped(false);
+
+        } else if (ControlsSettings::down(controls->movement_left))
+        {
+            target_speed = -walk_speed * speed_multiplier;
+            idle_sheet->set_flipped(true);
+            run_sheet->set_flipped(true);
+            jump_sheet->set_flipped(true);
+            dash_attack_sheet->set_flipped(true);
+            light_attack_sheet->set_flipped(true);
+            hurt_sheet->set_flipped(true);
+        } else if (is_grounded)
+            target_speed = 0.0f;
+        else
+            return;
+
+        if (std::abs(target_speed - horizontal_velocity) > 0.1f)
+        {
+            const float direction = target_speed > horizontal_velocity ? 1.0f : -1.0f;
+
+            if (const float acc = acceleration * control_multiplier * deltaTime; std::abs(acc) > std::abs(target_speed - horizontal_velocity))
+                horizontal_velocity = target_speed;
+            else
+                horizontal_velocity += acc * direction;
+        }
+
+        if (ControlsSettings::pressed(controls->combat_dash))
+        {
+            if (dash_attack_frames > 0 || light_attack_frames > 0)
+                return;
+            dash_attack_frames = GameUtilities::ConvertSecondsToFrames(1, deltaTime);
+            dash_attack_sheet->play_once();
+            constexpr int dash_momentum = 1000;
+            if (dash_attack_sheet->is_flipped())
+                horizontal_velocity = -dash_momentum;
+            else
+                horizontal_velocity = dash_momentum;
+            vertical_velocity += 200;
+            is_grounded = false;
+            PlaySound(sfx_dash);
+        } else if (ControlsSettings::pressed(controls->combat_light))
+        {
+            if (dash_attack_frames > 0 || light_attack_frames > 0)
+                return;
+            light_attack_frames = GameUtilities::ConvertSecondsToFrames(.75, deltaTime);
+            light_attack_sheet->play_once();
+            PlaySound(sfx_hit);
+        }
+    }
+    void PlayerEntity::update_camera_center_smooth_follow(const float delta) const
+    {
+        if (!owner)
+            return;
+
+        const int background_width = owner->get_background()->width;
+        const int background_height = owner->get_background()->height;
+
+        // Background position and scale from PlayableStage::draw
+        constexpr Vector2 bg_position = {-1000, -3150};
+        constexpr float bg_scale = 2.3f;
+
+        constexpr float minEffectLength = 10;
+        owner->camera.offset = (Vector2) {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+        const Vector2 diff = Vector2Subtract(position, owner->camera.target);
+
+        // Update camera target with smooth follow
+        if (const float length = Vector2Length(diff); length > minEffectLength)
+        {
+            constexpr float fractionSpeed = 0.9f;
+            constexpr float minSpeed = 10;
+            const float distanceFactor = length / minEffectLength; // Multiplier based on distance
+            const float speed = fmaxf(fractionSpeed * length * distanceFactor, minSpeed);
+            owner->camera.target = Vector2Add(owner->camera.target, Vector2Scale(diff, speed * delta / length));
+        }
+
+        // Calculate the visible area dimensions
+        const float halfScreenWidth = owner->camera.offset.x;
+        const float halfScreenHeight = owner->camera.offset.y;
+
+        // Calculate camera bounds based on background size and screen dimensions
+        const float minX = bg_position.x + halfScreenWidth;
+        const float minY = bg_position.y + halfScreenHeight;
+        const float maxX = bg_position.x + (background_width * bg_scale) - halfScreenWidth;
+        const float maxY = bg_position.y + (background_height * bg_scale) - halfScreenHeight;
+
+        // Clamp camera target position to stay within bounds
+        owner->camera.target.x = Clamp(owner->camera.target.x, minX, maxX);
+        owner->camera.target.y = Clamp(owner->camera.target.y, minY, maxY);
+    }
+    void PlayerEntity::add_momentum(const float x, const float y)
+    {
+        horizontal_velocity += x;
+        vertical_velocity += y;
+    }
+    void PlayerEntity::on_entity_collision(Entity *entity)
+    {
+        if (entity == nullptr)
+            return;
+
+        // Check if the entity is an enemy
+        if (auto *enemy = dynamic_cast<EnemyEntity *>(entity))
+        {
+            const Direction direction = enemy->get_position().x > position.x ? Direction::RIGHT : Direction::LEFT;
+            if (dash_attack_frames > 0 || light_attack_frames > 0)
+                enemy->damage(attack_damage, direction);
+        }
+    }
     void PlayerEntity::apply_gravity(const float deltaTime)
     {
         if (!is_grounded)
@@ -176,7 +383,6 @@ namespace artifact
             position.y -= vertical_velocity * deltaTime;
         }
     }
-
     void PlayerEntity::apply_horizontal_movement(const float deltaTime)
     {
         position.x += horizontal_velocity * deltaTime;
@@ -195,7 +401,6 @@ namespace artifact
             horizontal_velocity = 0.0f;
         }
     }
-
     void PlayerEntity::check_collision()
     {
         enum EdgeType
@@ -308,178 +513,5 @@ namespace artifact
             // TODO: Add landing effects
         }
     }
-
-    void PlayerEntity::damage(const int damage)
-    {
-        if (dash_attack_frames > 0 || light_attack_frames > 0 || invincibility_frames > 0 || is_dead())
-            return;
-        invincibility_frames = GameUtilities::ConvertSecondsToFrames(5, GetFrameTime());
-        Entity::damage(damage);
-
-        if (!is_dead())
-        {
-            hurt_sheet->play_once(true);
-        }
-    }
-
-    void PlayerEntity::kill()
-    {
-        if (is_dead())
-            return;
-        Entity::kill();
-        lives--;
-        death_sheet->play_once(true);
-        if (lives <= 0)
-        {
-            // Game::get_instance()->get_stage_manager()->load_stage(Stages::TITLE_SCREEN);
-        } else
-        {
-        }
-    }
-
-    void PlayerEntity::jump()
-    {
-        if (jump_count < max_jump_count)
-        {
-            PlaySound(sfx_jump);
-            vertical_velocity = jump_force;
-            is_grounded = false;
-            jump_count++;
-        }
-    }
-
-    void PlayerEntity::handle_input(const float deltaTime)
-    {
-        const ControlsSettings *controls = Game::get_instance()->controls_settings;
-
-#ifdef DEBUG
-        if (ControlsSettings::pressed(KEY_B))
-            Game::get_instance()->debug_mode = !Game::get_instance()->debug_mode;
-#endif
-        if (ControlsSettings::down(controls->movement_sprint))
-            sprinting = controls->toggle_sprint ? !sprinting : true;
-        else if (ControlsSettings::up(controls->movement_sprint) && !controls->toggle_sprint)
-            sprinting = false;
-
-        if (ControlsSettings::pressed(controls->movement_jump))
-            jump();
-
-        const float control_multiplier = is_grounded ? 1.0f : air_control;
-        const float speed_multiplier = (sprinting ? sprint_multiplier : walk_speed_multiplier) * control_multiplier;
-
-        float target_speed = 0.0f;
-
-        if (ControlsSettings::down(controls->movement_right))
-        {
-            target_speed = walk_speed * speed_multiplier;
-            idle_sheet->set_flipped(false);
-            run_sheet->set_flipped(false);
-            jump_sheet->set_flipped(false);
-            dash_attack_sheet->set_flipped(false);
-            light_attack_sheet->set_flipped(false);
-
-        } else if (ControlsSettings::down(controls->movement_left))
-        {
-            target_speed = -walk_speed * speed_multiplier;
-            idle_sheet->set_flipped(true);
-            run_sheet->set_flipped(true);
-            jump_sheet->set_flipped(true);
-            dash_attack_sheet->set_flipped(true);
-            light_attack_sheet->set_flipped(true);
-        } else if (is_grounded)
-            target_speed = 0.0f;
-        else
-            return;
-
-        if (std::abs(target_speed - horizontal_velocity) > 0.1f)
-        {
-            const float direction = target_speed > horizontal_velocity ? 1.0f : -1.0f;
-
-            if (const float acc = acceleration * control_multiplier * deltaTime; std::abs(acc) > std::abs(target_speed - horizontal_velocity))
-                horizontal_velocity = target_speed;
-            else
-                horizontal_velocity += acc * direction;
-        }
-
-        if (ControlsSettings::pressed(controls->combat_dash))
-        {
-            if (dash_attack_frames > 0 || light_attack_frames > 0)
-                return;
-            dash_attack_frames = GameUtilities::ConvertSecondsToFrames(5, deltaTime);
-            constexpr int dash_momentum = 1000;
-            if (dash_attack_sheet->is_flipped())
-                horizontal_velocity = -dash_momentum;
-            else
-                horizontal_velocity = dash_momentum;
-            vertical_velocity += 200;
-            PlaySound(sfx_dash);
-        } else if (ControlsSettings::pressed(controls->combat_light))
-        {
-            if (dash_attack_frames > 0 || light_attack_frames > 0)
-                return;
-            light_attack_frames = GameUtilities::ConvertSecondsToFrames(1, deltaTime);
-            PlaySound(sfx_hit);
-        }
-    }
-
-    void PlayerEntity::update_camera_center_smooth_follow(const float delta) const
-    {
-        if (!owner)
-            return;
-
-        const int background_width = owner->get_background()->width;
-        const int background_height = owner->get_background()->height;
-
-        // Background position and scale from PlayableStage::draw
-        constexpr Vector2 bg_position = {-1000, -3150};
-        constexpr float bg_scale = 2.3f;
-
-        constexpr float minEffectLength = 10;
-        owner->camera.offset = (Vector2) {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
-        const Vector2 diff = Vector2Subtract(position, owner->camera.target);
-
-        // Update camera target with smooth follow
-        if (const float length = Vector2Length(diff); length > minEffectLength)
-        {
-            constexpr float fractionSpeed = 0.9f;
-            constexpr float minSpeed = 10;
-            const float distanceFactor = length / minEffectLength; // Multiplier based on distance
-            const float speed = fmaxf(fractionSpeed * length * distanceFactor, minSpeed);
-            owner->camera.target = Vector2Add(owner->camera.target, Vector2Scale(diff, speed * delta / length));
-        }
-
-        // Calculate the visible area dimensions
-        const float halfScreenWidth = owner->camera.offset.x;
-        const float halfScreenHeight = owner->camera.offset.y;
-
-        // Calculate camera bounds based on background size and screen dimensions
-        const float minX = bg_position.x + halfScreenWidth;
-        const float minY = bg_position.y + halfScreenHeight;
-        const float maxX = bg_position.x + (background_width * bg_scale) - halfScreenWidth;
-        const float maxY = bg_position.y + (background_height * bg_scale) - halfScreenHeight;
-
-        // Clamp camera target position to stay within bounds
-        owner->camera.target.x = Clamp(owner->camera.target.x, minX, maxX);
-        owner->camera.target.y = Clamp(owner->camera.target.y, minY, maxY);
-    }
-
-    void PlayerEntity::add_momentum(const float x, const float y)
-    {
-        horizontal_velocity += x;
-        vertical_velocity += y;
-    }
-
-    void PlayerEntity::on_entity_collision(Entity *entity)
-    {
-        if (entity == nullptr)
-            return;
-
-        // Check if the entity is an enemy
-        if (auto *enemy = dynamic_cast<EnemyEntity *>(entity))
-        {
-            if (dash_attack_frames > 0 || light_attack_frames > 0)
-                enemy->damage(attack_damage);
-        }
-    }
-
+    bool PlayerEntity::is_facing_right() const { return idle_sheet->is_flipped(); }
 } // namespace artifact

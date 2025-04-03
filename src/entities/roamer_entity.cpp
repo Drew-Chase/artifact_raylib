@@ -1,6 +1,8 @@
 
 #include "entities/roamer_entity.h"
 
+#include "Direction.h"
+
 namespace artifact
 {
     RoamerEntity::RoamerEntity(const Vector2 start_position, const Vector2 end_position) : start_position(start_position), end_position(end_position) {}
@@ -49,7 +51,7 @@ namespace artifact
         }
     }
 
-    void RoamerEntity::damage(const int damage) { EnemyEntity::damage(damage); }
+    void RoamerEntity::damage(const int damage, const Direction direction) { EnemyEntity::damage(damage, direction); }
     void RoamerEntity::kill() { EnemyEntity::kill(); }
     void RoamerEntity::debug_draw_colliders()
     {

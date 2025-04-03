@@ -1,4 +1,5 @@
 #pragma once
+#include "Direction.h"
 #include "entity.h"
 #include "sprite_sheet.h"
 
@@ -12,9 +13,10 @@ namespace artifact
         bool sprinting = false;
         unsigned int light_attack_frames = 0;
         unsigned int dash_attack_frames = 0;
+        unsigned int invincibility_frames = 0;
+        unsigned int hurt_frames = 0;
         unsigned short lives = 3;
         unsigned int coins = 0;
-        unsigned int invincibility_frames = 0;
 
         // Gravity and jumping variables
         float vertical_velocity = 0.0f;
@@ -65,8 +67,9 @@ namespace artifact
         void draw() override;
         void draw_stats() const;
         void update(float deltaTime) override;
-        void damage(int damage) override;
+        void damage(int damage, Direction direction) override;
         void kill() override;
         void jump();
+        bool is_facing_right() const;
     };
 } // namespace artifact
