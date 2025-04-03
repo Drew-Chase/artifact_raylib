@@ -15,7 +15,8 @@ namespace artifact
         SetMusicVolume(music, 0.15f);
         PlayMusicStream(music);
 
-        this->player = spawn_entity<PlayerEntity>(0, 140);
+        const auto [x, y] = get_spawn_position();
+        this->player = spawn_entity<PlayerEntity>(x, y);
 
         // Spawn enemies
         // First Gap
@@ -94,8 +95,9 @@ namespace artifact
         colliders.emplace_back(base_x + block_scale * 127.5, base_y - block_scale * 9, block_scale, block_scale * 7, true);
 
         // Killnet
-        colliders.emplace_back(-500, 500, block_scale * 150, block_scale, [&] { respawn(); });
+        colliders.emplace_back(-500, 500, block_scale * 150, block_scale, [&] { player->respawn(); });
     }
+    Vector2 Level1AStage::get_spawn_position() const { return {0, 140}; }
     void Level1AStage::draw() const
     {
         if (is_being_destroyed)
