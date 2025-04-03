@@ -1,20 +1,11 @@
 #include "entities/entity.h"
-#include "entities/enemy_entity.h"
+
+#include "Direction.h"
 #include "entities/player_entity.h"
 #include "game.h"
 
 namespace artifact
 {
-    void Entity::on_entity_collision(Entity *entity)
-    {
-        if (entity == nullptr)
-            return;
-
-        if (auto *player = dynamic_cast<PlayerEntity *>(entity))
-        {
-            player->damage(this->attack_damage);
-        }
-    }
     void Entity::startup()
     {
         if (!collider)
@@ -35,7 +26,7 @@ namespace artifact
             collider->bounds = {position.x, position.y, width, height};
         }
     }
-    void Entity::damage(const int damage)
+    void Entity::damage(const int damage, const Direction direction)
     {
         health -= damage;
         if (health <= 0)
@@ -49,6 +40,7 @@ namespace artifact
         this->startup();
     }
     void Entity::set_position(const int x, const int y) { this->position = Vector2{static_cast<float>(x), static_cast<float>(y)}; }
+    Vector2 Entity::get_position() const { return position; }
     void Entity::debug_draw_colliders() { DrawRectangleLinesEx(Rectangle{position.x, position.y, width, height}, 1, GREEN); }
     void Entity::destroy() {}
     bool Entity::is_colliding_with(const Entity *other) const
@@ -73,10 +65,15 @@ namespace artifact
             }
         }
     }
-    bool Entity::is_dead() const
+    bool Entity::is_dead() const { return health <= 0; }
+    void Entity::on_entity_collision(Entity *entity)
     {
-        return health <= 0;
+        if (entity == nullptr)
+            return;
+
+        if (auto *player = dynamic_cast<PlayerEntity *>(entity))
+        {
+            player->damage(this->attack_damage, player->get_position().x > this->position.x ? Direction::RIGHT : Direction::LEFT);
+        }
     }
-
-
 } // namespace artifact
