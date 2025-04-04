@@ -4,6 +4,7 @@ namespace artifact
 {
     enum class Stages
     {
+        NONE,
         TITLE_SCREEN,
         LEVEL1A,
         LEVEL1B,
