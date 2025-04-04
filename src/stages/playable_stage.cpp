@@ -8,14 +8,16 @@
 
 namespace artifact
 {
-    PlayableStage::PlayableStage(const char *identifier) : Stage(identifier) {}
+    PlayableStage::PlayableStage(const char *identifier) :
+        Stage(identifier) {}
     void PlayableStage::startup()
     {
         Stage::startup();
         spawn_entities();
 
         level_open_overlay = new LevelOpenOverlay(this, 1.f);
-        pause_screen = std::make_unique<PauseScreen>("pause_screen", this);
+        pause_screen = std::make_unique<PauseScreen>(this);
+        death_screen = std::make_unique<DeathScreen>(this);
     }
     void PlayableStage::draw() const
     {
@@ -35,6 +37,9 @@ namespace artifact
     {
         this->player->draw_stats();
         level_open_overlay->draw();
+
+        if (player->is_dead())
+            death_screen->draw();
         if (is_paused)
         {
             pause_screen->draw();
@@ -54,21 +59,24 @@ namespace artifact
         Stage::update(delta_time);
 
         level_open_overlay->update(delta_time);
-
         if (IsKeyPressed(KEY_ESCAPE))
             is_paused = !is_paused;
-
         if (is_paused)
-        {
-            pause_screen->update(GetMouseX(), GetMouseY());
             return;
-        }
 
         for (const auto &entity: entities)
         {
             entity->update(delta_time);
             entity->check_entity_collisions(entities);
         }
+    }
+    void PlayableStage::update(const int mouse_x, const int mouse_y)
+    {
+        Stage::update(mouse_x, mouse_y);
+        if (player->is_dead())
+            death_screen->update(mouse_x, mouse_y);
+        if (is_paused)
+            pause_screen->update(mouse_x, mouse_y);
     }
     void PlayableStage::destroy()
     {
@@ -86,5 +94,9 @@ namespace artifact
     void PlayableStage::pause() { is_paused = true; }
     void PlayableStage::unpause() { is_paused = false; }
     Vector2 PlayableStage::get_spawn_position() const { return {0, 0}; }
+    void PlayableStage::respawn()
+    {
+        player->respawn();
+    }
 
 } // namespace artifact

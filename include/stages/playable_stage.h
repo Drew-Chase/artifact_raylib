@@ -4,6 +4,7 @@
 #include "collider.h"
 #include "entities/player_entity.h"
 #include "stage.h"
+#include "ui/menus/death_screen.h"
 #include "ui/menus/pause_screen.h"
 #include "ui/overlays/level_open_overlay.h"
 namespace artifact
@@ -13,8 +14,8 @@ namespace artifact
     class PlayableStage : public Stage
     {
     protected:
-        Texture2D background;
         PlayerEntity *player;
+        Texture2D background;
         std::vector<Entity*> entities;
         std::vector<Collider> colliders;
         bool is_paused = false;
@@ -23,6 +24,7 @@ namespace artifact
     public:
         LevelOpenOverlay *level_open_overlay;
         std::unique_ptr<PauseScreen> pause_screen;
+        std::unique_ptr<DeathScreen> death_screen;
         Camera2D camera{};
         explicit PlayableStage(const char *identifier);
 
@@ -41,6 +43,8 @@ namespace artifact
         void draw() const override;
         void debug_draw_colliders() const;
         void update(float delta_time) override;
+        void update(int mouse_x, int mouse_y) override;
+
         void destroy() override;
         Collider get_collider_at(int x, int y, bool blocking_only = true) const;
         std::vector<Collider> get_colliders_closest_to(int x, int y, bool blocking_only = true) const;
@@ -51,5 +55,6 @@ namespace artifact
         void unpause();
         virtual Vector2 get_spawn_position() const;
         virtual void spawn_entities(){}
+        virtual void respawn();
     };
 } // namespace artifact
