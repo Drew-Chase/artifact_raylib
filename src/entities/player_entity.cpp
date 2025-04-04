@@ -48,7 +48,8 @@ namespace artifact
         // Set up the entity collision callback
         if (collider)
         {
-            collider = std::make_unique<Collider>(position.x, position.y, width, height, [this](Entity *entity) { this->on_entity_collision(entity); });
+            collider = std::make_unique<Collider>(position.x, position.y, width, height, [this](Entity *entity)
+                                                  { this->on_entity_collision(entity); });
             collider->set_owner(this);
         }
     }
@@ -57,16 +58,33 @@ namespace artifact
         Entity::draw();
         if (Game::get_instance()->debug_mode)
         {
-            const std::string grounded_text = fmt::format("Grounded: {}, VVel: {:.1f}, HVel: {:.1f}", is_grounded ? "true" : "false", vertical_velocity, horizontal_velocity);
-            const std::string position_text = fmt::format("Player Pos: X: {:.1f}, Y: {:.1f}", this->position.x, this->position.y);
-            const std::string attacks_text = fmt::format("Dash: {}, Light: {}, Inv: {}, Death: {}", dash_attack_frames, light_attack_frames, invincibility_frames, death_frames);
+            const std::string lines[] =
+                    {
+                            fmt::format("FPS: {} ({:.1f}ms)", GetFPS(), GetFrameTime() * 1000),
+                            fmt::format("Grounded: {}, VVel: {:.1f}, HVel: {:.1f}", is_grounded ? "true" : "false", vertical_velocity, horizontal_velocity),
+                            fmt::format("Player Pos: X: {:.1f}, Y: {:.1f}", this->position.x, this->position.y),
+                            fmt::format("Dash: {}, Light: {}, Inv: {}, Death: {}", dash_attack_frames, light_attack_frames, invincibility_frames, death_frames),
+                            fmt::format("Jump Count: {}/{}", jump_count, max_jump_count),
+                    };
 
-            const int text_width = std::max({MeasureText(grounded_text.c_str(), 16), MeasureText(position_text.c_str(), 16), MeasureText(attacks_text.c_str(), 16)});
+            constexpr unsigned short font_size = 16;
 
-            DrawRectangleRec({this->position.x - 10, this->position.y - 100, static_cast<float>(text_width + 20), 82}, ColorAlpha(BLACK, .5f));
-            DrawText(grounded_text.c_str(), this->position.x, this->position.y - 90, 16, WHITE);
-            DrawText(position_text.c_str(), this->position.x, this->position.y - 64, 16, WHITE);
-            DrawText(attacks_text.c_str(), this->position.x, this->position.y - 42, 16, WHITE);
+            unsigned int text_width = 0;
+            for (const auto &line: lines)
+            {
+                if (const unsigned int height = MeasureText(line.c_str(), font_size); height > text_width)
+                    text_width = height;
+            }
+
+
+            constexpr int line_height = font_size + 2;
+            constexpr int total_height = line_height * std::size(lines);
+            DrawRectangleRec({this->position.x - 10, this->position.y - total_height - 20, static_cast<float>(text_width + 20), static_cast<float>(total_height + 10)}, ColorAlpha(BLACK, .5f));
+
+            for (size_t i = 0; i < std::size(lines); i++)
+            {
+                DrawText(lines[i].c_str(), this->position.x, this->position.y - total_height - 10 + i * line_height, font_size, WHITE);
+            }
         }
         const Vector2 sprite_position_flipped = {position.x - 32, position.y};
         const Vector2 sprite_position = {position.x + 16, position.y};
@@ -410,6 +428,8 @@ namespace artifact
     }
     void PlayerEntity::check_collision()
     {
+        if (!owner || owner->destroyed())
+            return;
         enum EdgeType
         {
             LEFT,
@@ -511,13 +531,14 @@ namespace artifact
 
         if (is_grounded)
         {
-            position.y = highest_ground - bounds.y;
+            position.y = highest_ground - bounds.y; // Teleports the player up-words
             vertical_velocity = 0;
         }
     }
     bool PlayerEntity::is_facing_right() const { return idle_sheet->is_flipped(); }
     void PlayerEntity::respawn(const bool should_remove_life)
     {
+
         if (lives <= 0)
         {
             Game::get_instance()->get_stage_manager()->load_stage(Stages::TITLE_SCREEN);
