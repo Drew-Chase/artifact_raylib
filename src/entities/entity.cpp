@@ -42,7 +42,10 @@ namespace artifact
     void Entity::set_position(const int x, const int y) { this->position = Vector2{static_cast<float>(x), static_cast<float>(y)}; }
     Vector2 Entity::get_position() const { return position; }
     void Entity::debug_draw_colliders() { DrawRectangleLinesEx(Rectangle{position.x, position.y, width, height}, 1, GREEN); }
-    void Entity::destroy() {}
+    void Entity::destroy()
+    {
+        is_being_destroyed = true;
+    }
     bool Entity::is_colliding_with(const Entity *other) const
     {
         if (!collider || !other || !other->collider)
