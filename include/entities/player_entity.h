@@ -61,6 +61,7 @@ namespace artifact
         void update_camera_center_smooth_follow(float delta) const;
         void add_momentum(float x, float y);
         void on_entity_collision(Entity *entity) override;
+        bool check_is_on_ground() const;
 
 
     public:
@@ -73,5 +74,6 @@ namespace artifact
         void jump();
         bool is_facing_right() const;
         void respawn(bool should_remove_life = true);
+        void destroy() override;
     };
 } // namespace artifact
