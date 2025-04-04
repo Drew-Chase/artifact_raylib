@@ -158,7 +158,7 @@ namespace artifact
     }
     void PlayerEntity::update(const float delta_time)
     {
-        if (!IsWindowReady())
+        if (!IsWindowReady() || is_being_destroyed)
             return;
         Entity::update(delta_time);
         owner->camera.zoom = 1.5f * fminf(GetScreenWidth() / 1920.0f, GetScreenHeight() / 1080.0f);
@@ -168,7 +168,7 @@ namespace artifact
             if (death_frames > 0)
             {
                 death_frames--;
-                if (death_sheet->get_current_frame() < death_sheet->get_frame_count() - 1)
+                if (death_sheet->get_current_frame() < death_sheet->get_frame_count() - 1 && death_sheet)
                     death_sheet->update(delta_time);
             } else
                 respawn();
@@ -176,34 +176,48 @@ namespace artifact
         }
 
         handle_input(delta_time);
+        apply_horizontal_movement(delta_time);
         check_collision();
         apply_gravity(delta_time);
-        apply_horizontal_movement(delta_time);
 
         if (this->invincibility_frames > 0)
             this->invincibility_frames--;
         if (this->hurt_frames > 0)
             this->hurt_frames--;
-        if (light_attack_frames > 0)
-            light_attack_frames--;
-        else
-            light_attack_sheet->set_frame(0);
-        if (dash_attack_frames > 0)
-            dash_attack_frames--;
-        else
-            dash_attack_sheet->set_frame(0);
+        if (light_attack_sheet)
+        {
+            if (light_attack_frames > 0)
+                light_attack_frames--;
+            else
+                light_attack_sheet->set_frame(0);
+        }
+        if (dash_attack_sheet)
+        {
+            if (dash_attack_frames > 0)
+                dash_attack_frames--;
+            else
+                dash_attack_sheet->set_frame(0);
+        }
 
 
-        idle_sheet->update(delta_time);
-        if (sprinting)
-            run_sheet->set_framerate(13);
-        else
-            run_sheet->set_framerate(8);
-        run_sheet->update(delta_time);
-        jump_sheet->update(delta_time);
-        light_attack_sheet->update(delta_time);
-        dash_attack_sheet->update(delta_time);
-        hurt_sheet->update(delta_time);
+        if (idle_sheet)
+            idle_sheet->update(delta_time);
+        if (run_sheet)
+        {
+            if (sprinting)
+                run_sheet->set_framerate(13);
+            else
+                run_sheet->set_framerate(8);
+            run_sheet->update(delta_time);
+        }
+        if (jump_sheet)
+            jump_sheet->update(delta_time);
+        if (light_attack_sheet)
+            light_attack_sheet->update(delta_time);
+        if (dash_attack_sheet)
+            dash_attack_sheet->update(delta_time);
+        if (hurt_sheet)
+            hurt_sheet->update(delta_time);
 
         update_camera_center_smooth_follow(delta_time);
     }
@@ -306,8 +320,6 @@ namespace artifact
             hurt_sheet->set_flipped(true);
         } else if (is_grounded)
             target_speed = 0.0f;
-        else
-            return;
 
         if (std::abs(target_speed - horizontal_velocity) > 0.1f)
         {
@@ -400,6 +412,49 @@ namespace artifact
                 enemy->damage(attack_damage, direction);
         }
     }
+    bool PlayerEntity::check_is_on_ground() const
+    {
+        if (!owner || owner->destroyed())
+            return false;
+
+        struct CheckPoint
+        {
+            float x_percent; // Percentage of width
+            float y_percent; // Percentage of height
+        };
+
+        const std::vector<CheckPoint> check_points = {
+                // Bottom edge points (for ground detection)
+                {0.3f, 1.0f},
+                {0.5f, 1.0f},
+                {0.8f, 1.0f},
+        };
+
+        for (const auto &[x_percent, y_percent]: check_points)
+        {
+            const int check_x = static_cast<int>(position.x + bounds.x * x_percent);
+            const int check_y = static_cast<int>(position.y + bounds.y * y_percent);
+
+            std::vector<Collider> nearby_colliders = owner->get_colliders_closest_to(check_x, check_y, false);
+
+            if (nearby_colliders.empty())
+                continue;
+
+            for (const Collider &collider: nearby_colliders)
+            {
+                if (!CheckCollisionPointRec({static_cast<float>(check_x), static_cast<float>(check_y)}, collider.bounds))
+                    continue;
+                if (!collider.is_blocking)
+                    continue;
+                if (vertical_velocity <= 0)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
     void PlayerEntity::apply_gravity(const float delta_time)
     {
         if (!is_grounded)
@@ -445,27 +500,27 @@ namespace artifact
             EdgeType edge;
         };
 
-        const std::vector<CheckPoint> check_points = {// Bottom edge points (for ground detection)
-                                                      {0.2f, 1.0f, BOTTOM},
-                                                      {0.5f, 1.0f, BOTTOM},
-                                                      {0.8f, 1.0f, BOTTOM},
+        const std::vector<CheckPoint> check_points = {
+                // Bottom edge points (for ground detection)
+                {0.1f, 1.0f, BOTTOM},
+                {0.5f, 1.0f, BOTTOM},
+                {0.9f, 1.0f, BOTTOM},
 
-                                                      // Left edge points
-                                                      {0.0f, 0.3f, LEFT},
-                                                      {0.0f, 0.6f, LEFT},
+                // Left edge points
+                {0.0f, 0.3f, LEFT},
+                {0.0f, 0.6f, LEFT},
 
-                                                      // Right edge points
-                                                      {1.0f, 0.3f, RIGHT},
-                                                      {1.0f, 0.6f, RIGHT},
+                // Right edge points
+                {1.0f, 0.3f, RIGHT},
+                {1.0f, 0.6f, RIGHT},
 
-                                                      // Top edge points
-                                                      {0.2f, 0.0f, TOP},
-                                                      {0.5f, 0.0f, TOP},
-                                                      {0.8f, 0.0f, TOP}};
+                // Top edge points
+                {0.2f, 0.0f, TOP},
+                {0.5f, 0.0f, TOP},
+                {0.8f, 0.0f, TOP}};
 
-        const bool was_grounded = is_grounded;
+        bool is_colliding_bottom = false;
         is_grounded = false;
-
         float highest_ground = std::numeric_limits<float>::lowest();
 
         for (const auto &[x_percent, y_percent, edge]: check_points)
@@ -488,22 +543,10 @@ namespace artifact
                     continue;
                 switch (edge)
                 {
-                    case BOTTOM:
-                        if (vertical_velocity <= 0)
-                        {
-                            if (collider.bounds.y > highest_ground)
-                            {
-                                highest_ground = collider.bounds.y;
-                            }
-                            is_grounded = true;
-                            jump_count = 0;
-                        }
-                        break;
-
                     case LEFT:
                         if (horizontal_velocity < 0)
                         {
-                            position.x = collider.bounds.x + collider.bounds.width;
+                            position.x = collider.bounds.x + collider.bounds.width - 1;
                             horizontal_velocity = 0;
                         }
                         break;
@@ -523,30 +566,55 @@ namespace artifact
                             vertical_velocity = 0;
                         }
                         break;
+
+                    case BOTTOM:
+                        if (vertical_velocity <= 0)
+                        {
+                            if (collider.bounds.y > highest_ground)
+                            {
+                                highest_ground = collider.bounds.y;
+                            }
+                            is_colliding_bottom = true;
+                        }
+                        break;
                 }
 
                 break;
             }
         }
 
-        if (is_grounded)
+        if (check_is_on_ground())
         {
+            is_grounded = true;
+            jump_count = 0;
             position.y = highest_ground - bounds.y; // Teleports the player up-words
             vertical_velocity = 0;
+        } else if (is_colliding_bottom)
+        {
+            is_grounded = true;
         }
     }
     bool PlayerEntity::is_facing_right() const { return idle_sheet->is_flipped(); }
     void PlayerEntity::respawn(const bool should_remove_life)
     {
-
         if (lives <= 0)
         {
+            destroy();
             Game::get_instance()->get_stage_manager()->load_stage(Stages::TITLE_SCREEN);
         } else
         {
-            death_sheet->reset();
             if (should_remove_life)
                 lives--;
+            invincibility_frames = 0;
+            hurt_frames = 0;
+            dash_attack_frames = 0;
+            light_attack_frames = 0;
+            dash_attack_sheet->reset();
+            light_attack_sheet->reset();
+            horizontal_velocity = 0;
+            vertical_velocity = 0;
+
+            death_sheet->reset();
             owner->level_open_overlay->restart();
             health = max_health;
             const auto [x, y] = owner->get_spawn_position();
@@ -554,5 +622,24 @@ namespace artifact
             owner->camera.target = {x, y};
             owner->spawn_entities();
         }
+    }
+    void PlayerEntity::destroy()
+    {
+        Entity::destroy();
+        // unload sprite sheet
+        delete death_sheet;
+        death_sheet = nullptr;
+        delete hurt_sheet;
+        hurt_sheet = nullptr;
+        delete idle_sheet;
+        idle_sheet = nullptr;
+        delete run_sheet;
+        run_sheet = nullptr;
+        delete jump_sheet;
+        jump_sheet = nullptr;
+        delete dash_attack_sheet;
+        dash_attack_sheet = nullptr;
+        delete light_attack_sheet;
+        light_attack_sheet = nullptr;
     }
 } // namespace artifact
