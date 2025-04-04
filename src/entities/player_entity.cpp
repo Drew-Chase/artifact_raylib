@@ -92,7 +92,7 @@ namespace artifact
 
         // Draw animations
 
-        if (is_dead())
+        if (Entity::is_dead())
         {
             death_sheet->draw(sprite_position, sprite_scale);
         } else if (hurt_frames > 0)
@@ -163,15 +163,14 @@ namespace artifact
         Entity::update(delta_time);
         owner->camera.zoom = 1.5f * fminf(GetScreenWidth() / 1920.0f, GetScreenHeight() / 1080.0f);
 
-        if (is_dead())
+        if (Entity::is_dead())
         {
             if (death_frames > 0)
             {
                 death_frames--;
                 if (death_sheet->get_current_frame() < death_sheet->get_frame_count() - 1 && death_sheet)
                     death_sheet->update(delta_time);
-            } else
-                respawn();
+            }
             return;
         }
 
@@ -641,5 +640,9 @@ namespace artifact
         dash_attack_sheet = nullptr;
         delete light_attack_sheet;
         light_attack_sheet = nullptr;
+    }
+    bool PlayerEntity::is_dead() const
+    {
+        return Entity::is_dead() && death_frames == 0;
     }
 } // namespace artifact
