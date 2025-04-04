@@ -75,5 +75,6 @@ namespace artifact
         bool is_facing_right() const;
         void respawn(bool should_remove_life = true);
         void destroy() override;
+        bool is_dead() const override;
     };
 } // namespace artifact

@@ -47,6 +47,6 @@ namespace artifact
         virtual void debug_draw_colliders();
         bool is_colliding_with(const Entity *other) const;
         void check_entity_collisions(const std::vector<Entity *> &entities);
-        bool is_dead() const;
+        virtual bool is_dead() const;
     };
 } // namespace artifact
