@@ -30,6 +30,8 @@ namespace artifact
         std::unique_ptr<Collider> collider;
         virtual void on_entity_collision(Entity *entity);
 
+        bool is_being_destroyed = false;
+
 
     public:
         virtual ~Entity() = default;
