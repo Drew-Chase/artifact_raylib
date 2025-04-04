@@ -1,5 +1,4 @@
 #include "../include/stages/stage_manager.h"
-
 #include "stages/level_1_a_stage.h"
 #include "stages/title_screen.h"
 
@@ -13,7 +12,7 @@ artifact::StageManager::~StageManager()
         delete current_stage;
     }
 }
-artifact::Stage *artifact::StageManager::load_stage(const Stages stage)
+artifact::Stage *artifact::StageManager::load_stage(const Stages stage, const Vector2 position)
 {
     // destroy the current stage
     if (current_stage != nullptr)
@@ -32,5 +31,9 @@ artifact::Stage *artifact::StageManager::load_stage(const Stages stage)
     }
 
     current_stage->startup();
+    if (auto stage = dynamic_cast<PlayableStage*>(current_stage);position.x != 0 && position.y != 0)
+    {
+        stage->get_player()->set_position(position.x, position.y);
+    }
     return current_stage;
 }

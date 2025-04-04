@@ -1,4 +1,7 @@
 #pragma once
+#include <raylib.h>
+
+
 #include "stage.h"
 #include "stages.h"
 
@@ -12,7 +15,7 @@ namespace artifact
         StageManager();
         ~StageManager();
 
-        Stage *load_stage(Stages stage);
+        Stage *load_stage(Stages stage, Vector2 position = {});
         [[nodiscard]] Stage *get_current_stage() const { return current_stage; }
     };
 } // namespace artifact
