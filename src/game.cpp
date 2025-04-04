@@ -96,6 +96,7 @@ namespace artifact
                 delta_time = MAX_DELTA_TIME;
 
             const auto stage = manager->get_current_stage();
+            stage->update(GetMouseX(), GetMouseY());
             stage->update(delta_time);
             BeginDrawing();
             ClearBackground(BLACK);

@@ -18,6 +18,7 @@ namespace artifact
 
         virtual void draw() const {}
         virtual void update(float delta_time) {}
+        virtual void update(int mouse_x, int mouse_y) {}
         virtual void startup() {}
         virtual void destroy()
         {
