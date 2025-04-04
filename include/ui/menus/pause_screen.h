@@ -5,7 +5,7 @@
 
 namespace artifact
 {
-    class PauseScreen final : MenuBase
+    class PauseScreen final : public MenuBase
     {
         bool is_being_destroyed = false;
         std::unique_ptr<VerticalListContainer> button_container;
@@ -14,7 +14,7 @@ namespace artifact
         std::unique_ptr<SettingsScreen> settings_screen = nullptr;
 
     public:
-        explicit PauseScreen(const char *identifier, Stage *owner);
+        explicit PauseScreen(Stage *owner);
         void draw() override;
         void update(int mouse_x, int mouse_y) override;
         void destroy() override;

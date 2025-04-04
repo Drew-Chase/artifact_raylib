@@ -8,7 +8,8 @@
 
 namespace artifact
 {
-    PauseScreen::PauseScreen(const char *identifier, Stage *owner) : MenuBase(identifier, owner)
+    PauseScreen::PauseScreen(Stage *owner) :
+        MenuBase("pause_screen", owner)
     {
         // UI Settings
         constexpr auto text_color = WHITE;
@@ -41,9 +42,11 @@ namespace artifact
                                                                    }
                                                                });
 
-        auto settings_button = std::make_unique<ButtonComponent>("settings_button", owner, button_width, button_height, "Settings Game", [&] { settings_screen = std::make_unique<SettingsScreen>(owner); });
+        auto settings_button = std::make_unique<ButtonComponent>("settings_button", owner, button_width, button_height, "Settings Game", [&]
+                                                                 { settings_screen = std::make_unique<SettingsScreen>(owner); });
 
-        auto exit_button = std::make_unique<ButtonComponent>("exit_button", owner, button_width, button_height, "Exit to Main Menu", [] { Game::get_instance()->get_stage_manager()->load_stage(Stages::TITLE_SCREEN); });
+        auto exit_button = std::make_unique<ButtonComponent>("exit_button", owner, button_width, button_height, "Exit to Main Menu", []
+                                                             { Game::get_instance()->get_stage_manager()->load_stage(Stages::TITLE_SCREEN); });
 
         // Configure button appearances
         resume_button->set_colors(button_normal_bg_color, button_hover_bg_color, button_pressed_bg_color, text_color);
@@ -118,8 +121,10 @@ namespace artifact
         } else
         {
             if (button_container && this->is_menu_in_focus())
+            {
                 button_container->update(GetMouseX(), GetMouseY());
-            button_container->set_position(GetScreenWidth() / 2 - button_container->get_width() / 2, GetScreenHeight() - button_container->get_height() - 20);
+                button_container->set_position(GetScreenWidth() / 2 - button_container->get_width() / 2, GetScreenHeight() - button_container->get_height() - 20);
+            }
             if (toggle_debug_button)
             {
                 toggle_debug_button->set_position(GetScreenWidth() - 250, GetScreenHeight() - 70);
