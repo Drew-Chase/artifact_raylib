@@ -98,5 +98,9 @@ namespace artifact
     {
         player->respawn();
     }
+    PlayerEntity *PlayableStage::get_player()
+    {
+        return player;
+    }
 
 } // namespace artifact

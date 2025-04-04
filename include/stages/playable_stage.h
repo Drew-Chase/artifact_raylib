@@ -56,5 +56,6 @@ namespace artifact
         virtual Vector2 get_spawn_position() const;
         virtual void spawn_entities(){}
         virtual void respawn();
+        virtual PlayerEntity* get_player();
     };
 } // namespace artifact
