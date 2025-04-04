@@ -8,7 +8,12 @@ namespace artifact
         load_frames();
     }
 
-    SpriteSheet::~SpriteSheet() { unload_frames(); }
+    SpriteSheet::~SpriteSheet()
+    {
+        pause();
+        reset();
+        unload_frames();
+    }
 
     std::string SpriteSheet::get_formatted_frame_path(const int frame_number) const
     {
