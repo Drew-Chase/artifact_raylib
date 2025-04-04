@@ -100,8 +100,6 @@ namespace artifact
             BeginDrawing();
             ClearBackground(BLACK);
             stage->draw();
-            if (game->debug_mode)
-                DrawFPS(10, 10);
             EndDrawing();
         }
 
