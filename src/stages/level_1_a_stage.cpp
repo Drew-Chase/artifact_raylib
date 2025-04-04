@@ -6,7 +6,8 @@
 
 namespace artifact
 {
-    Level1AStage::Level1AStage() : PlayableStage("level_1a") {}
+    Level1AStage::Level1AStage() :
+        PlayableStage("level_1a") {}
     void Level1AStage::startup()
     {
         PlayableStage::startup();
@@ -65,12 +66,16 @@ namespace artifact
         colliders.emplace_back(base_x + block_scale * 127.5, base_y - block_scale * 9, block_scale, block_scale * 7, true);
 
         // Killnet
-        colliders.emplace_back(-500, 500, block_scale * 150, block_scale, [&] { player->respawn(); });
+        colliders.emplace_back(-500, 500, block_scale * 150, block_scale, [&]
+                               { player->respawn(); });
     }
     Vector2 Level1AStage::get_spawn_position() const { return {0, 140}; }
     void Level1AStage::spawn_entities()
     {
-        entities.erase(std::ranges::remove_if(entities, [this](const Entity *entity) { return entity != player; }).begin(), entities.end());
+        entities.erase(std::ranges::remove_if(entities, [this](const Entity *entity)
+                                              { return entity != player; })
+                               .begin(),
+                       entities.end());
 
         // Spawn enemies
         // First Gap
@@ -116,7 +121,9 @@ namespace artifact
         if (is_being_destroyed)
             return;
         PlayableStage::update(delta_time);
-        UpdateMusicStream(music);
+
+        if (music.stream.buffer)
+            UpdateMusicStream(music);
     }
     void Level1AStage::destroy()
     {
