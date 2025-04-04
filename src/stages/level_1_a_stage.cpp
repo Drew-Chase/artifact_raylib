@@ -67,7 +67,7 @@ namespace artifact
 
         // Killnet
         colliders.emplace_back(-500, 500, block_scale * 150, block_scale, [&]
-                               { player->respawn(); });
+                               { player->kill(); });
     }
     Vector2 Level1AStage::get_spawn_position() const { return {0, 139}; }
     void Level1AStage::spawn_entities()
