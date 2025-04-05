@@ -44,7 +44,7 @@ namespace artifact
         this->position = Vector2{x, y};
     }
     Vector2 Entity::get_position() const { return position; }
-    void Entity::debug_draw_colliders() { DrawRectangleLinesEx(Rectangle{position.x, position.y, width, height}, 1, GREEN); }
+    void Entity::debug_draw_colliders() { DrawRectangleLinesEx(Rectangle{position.x, position.y, width, height}, 4, GREEN); }
     void Entity::destroy()
     {
         is_being_destroyed = true;
