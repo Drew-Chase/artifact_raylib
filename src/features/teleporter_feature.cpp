@@ -5,24 +5,25 @@
 
 namespace artifact
 {
-    TeleporterFeature::TeleporterFeature(const Vector2 position, const Vector2 destination_position, const Stages destination_stage) :
-        destination_stage(destination_stage), destination_position(destination_position), position(position)
+    TeleporterFeature::TeleporterFeature(PlayableStage *owner, const Vector2 position, const Vector2 destination_position, const Stages destination_stage) :
+        destination_stage(destination_stage), destination_position(destination_position), position(position), owner(owner)
     {
         sheet = new SpriteSheet("game/texture/features/teleporter_%d.png", 9, 13);
-        collider = std::make_unique<Collider>(
-                position.x,
-                position.y,
-                40,
-                40,
-                [destination_stage, position](Entity *entity)
+        this->position = {position.x, position.y + 12};
+        owner->register_collider(
+                this->position.x,
+                this->position.y - 44,
+                50,
+                88,
+                [destination_stage, destination_position](Entity *entity)
                 {
-                    if (  PlayerEntity *player = dynamic_cast<PlayerEntity *>(entity))
+                    if (auto *player = dynamic_cast<PlayerEntity *>(entity))
                     {
                         if (destination_stage != Stages::NONE)
-                            Game::get_instance()->get_stage_manager()->load_stage(destination_stage, position);
+                            Game::get_instance()->get_stage_manager()->load_stage(destination_stage, destination_position);
                         else
                         {
-                            player->set_position(position.x, position.y);
+                            player->set_position(destination_position.x, destination_position.y);
                         }
                     }
                 });
@@ -30,7 +31,7 @@ namespace artifact
     void TeleporterFeature::draw() const
     {
         if (sheet)
-            sheet->draw(position);
+            sheet->draw(position, 2.2);
     }
     void TeleporterFeature::update(const float delta_time)
     {
