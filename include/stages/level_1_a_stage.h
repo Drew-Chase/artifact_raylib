@@ -1,4 +1,5 @@
 #pragma once
+#include "features/teleporter_feature.h"
 #include "playable_stage.h"
 
 namespace artifact
@@ -6,6 +7,8 @@ namespace artifact
     class Level1AStage final : public PlayableStage
     {
         Music music{};
+        TeleporterFeature* lvl2_teleporter = nullptr;
+        TeleporterFeature* secret_teleporter = nullptr;
     public:
         explicit Level1AStage();
         void draw() const override;

@@ -20,7 +20,8 @@ namespace artifact
         this->player = spawn_entity<PlayerEntity>(x, y);
 
         // Setup features
-        // TODO: Create end goal.
+        lvl2_teleporter = new TeleporterFeature(this, {9123.4, -7}, {0, -140});
+        secret_teleporter = new TeleporterFeature(this, {-982.2, -153}, {0, -140});
 
         // Initialize Textures
         set_background("game/texture/stages/level_1a/background.png");
@@ -77,6 +78,7 @@ namespace artifact
                                .begin(),
                        entities.end());
 
+
         // Spawn enemies
         // First Gap
         spawn_entity<RoamerEntity>(2067, 99, Vector2{2057, 67}, Vector2{3024, 67});
@@ -113,6 +115,10 @@ namespace artifact
             return;
         BeginMode2D(camera);
         PlayableStage::draw();
+        if (lvl2_teleporter)
+            lvl2_teleporter->draw();
+        if (secret_teleporter)
+            secret_teleporter->draw();
         EndMode2D();
         PlayableStage::draw_ui();
     }
@@ -121,6 +127,10 @@ namespace artifact
         if (is_being_destroyed)
             return;
         PlayableStage::update(delta_time);
+        if (lvl2_teleporter)
+            lvl2_teleporter->update(delta_time);
+        if (secret_teleporter)
+            secret_teleporter->update(delta_time);
 
         if (music.stream.buffer)
             UpdateMusicStream(music);
@@ -130,6 +140,17 @@ namespace artifact
         if (is_being_destroyed)
             return;
         PlayableStage::destroy();
+        if (lvl2_teleporter)
+        {
+            delete lvl2_teleporter;
+            lvl2_teleporter = nullptr;
+        }
+        if (secret_teleporter)
+        {
+            delete secret_teleporter;
+            secret_teleporter = nullptr;
+        }
+
         UnloadMusicStream(music);
     }
 } // namespace artifact
