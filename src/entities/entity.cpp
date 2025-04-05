@@ -39,7 +39,10 @@ namespace artifact
         this->position = Vector2{static_cast<float>(x), static_cast<float>(y)};
         this->startup();
     }
-    void Entity::set_position(const int x, const int y) { this->position = Vector2{static_cast<float>(x), static_cast<float>(y)}; }
+    void Entity::set_position(const float x, const float y)
+    {
+        this->position = Vector2{x, y};
+    }
     Vector2 Entity::get_position() const { return position; }
     void Entity::debug_draw_colliders() { DrawRectangleLinesEx(Rectangle{position.x, position.y, width, height}, 1, GREEN); }
     void Entity::destroy()
@@ -69,6 +72,14 @@ namespace artifact
         }
     }
     bool Entity::is_dead() const { return health <= 0; }
+    float Entity::get_width() const
+    {
+        return width;
+    }
+    float Entity::get_height() const
+    {
+        return height;
+    }
     void Entity::on_entity_collision(Entity *entity)
     {
         if (entity == nullptr || is_dead())

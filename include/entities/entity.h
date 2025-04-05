@@ -42,11 +42,13 @@ namespace artifact
         virtual void damage(int damage, Direction direction);
         virtual void kill();
         void spawn(int x, int y, PlayableStage *owner);
-        virtual void set_position(int x, int y);
+        virtual void set_position(float x, float y);
         Vector2 get_position() const;
         virtual void debug_draw_colliders();
         bool is_colliding_with(const Entity *other) const;
         void check_entity_collisions(const std::vector<Entity *> &entities);
         virtual bool is_dead() const;
+        float get_width() const;
+        float get_height() const;
     };
 } // namespace artifact
