@@ -16,7 +16,7 @@ namespace artifact
     protected:
         PlayerEntity *player;
         Texture2D background;
-        std::vector<Entity*> entities;
+        std::vector<Entity *> entities;
         std::vector<Collider> colliders;
         bool is_paused = false;
         virtual void draw_ui() const;
@@ -27,7 +27,6 @@ namespace artifact
         std::unique_ptr<DeathScreen> death_screen;
         Camera2D camera{};
         explicit PlayableStage(const char *identifier);
-
 
         template<typename T, typename... Args>
             requires std::derived_from<T, Entity>
@@ -54,8 +53,11 @@ namespace artifact
         void pause();
         void unpause();
         virtual Vector2 get_spawn_position() const;
-        virtual void spawn_entities(){}
+        virtual void spawn_entities() {}
         virtual void respawn();
-        virtual PlayerEntity* get_player();
+        virtual PlayerEntity *get_player();
+        void check_collider_overlaps();
+
+        void register_collider(int x, int y, int width, int height, const std::function<void(Entity *)> &on_entity_overlap);
     };
 } // namespace artifact

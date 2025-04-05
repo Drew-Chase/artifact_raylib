@@ -69,6 +69,8 @@ namespace artifact
             entity->update(delta_time);
             entity->check_entity_collisions(entities);
         }
+
+        check_collider_overlaps();
     }
     void PlayableStage::update(const int mouse_x, const int mouse_y)
     {
@@ -101,6 +103,30 @@ namespace artifact
     PlayerEntity *PlayableStage::get_player()
     {
         return player;
+    }
+
+    void PlayableStage::check_collider_overlaps()
+    {
+        for (const auto &entity: entities)
+        {
+            const Rectangle entityBounds = {
+                    entity->get_position().x,
+                    entity->get_position().y,
+                    entity->get_width(),
+                    entity->get_height()};
+
+            for (auto &collider: colliders)
+            {
+                if (!collider.is_blocking && CheckCollisionRecs(entityBounds, collider.bounds))
+                {
+                    collider.overlap(entity);
+                }
+            }
+        }
+    }
+    void PlayableStage::register_collider(const int x, const int y, const int width, const int height, const std::function<void(Entity *)> &on_entity_overlap)
+    {
+        colliders.emplace_back(x, y, width, height, on_entity_overlap);
     }
 
 } // namespace artifact
