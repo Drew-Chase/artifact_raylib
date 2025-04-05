@@ -62,8 +62,6 @@ namespace artifact
         void add_momentum(float x, float y);
         void on_entity_collision(Entity *entity) override;
         bool check_is_on_ground() const;
-
-
     public:
         void startup() override;
         void draw() override;
@@ -76,5 +74,6 @@ namespace artifact
         void respawn(bool should_remove_life = true);
         void destroy() override;
         bool is_dead() const override;
+        void set_position(float x, float y) override;
     };
 } // namespace artifact

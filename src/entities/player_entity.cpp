@@ -379,11 +379,11 @@ namespace artifact
             owner->camera.target = Vector2Add(owner->camera.target, Vector2Scale(diff, speed * delta / length));
         }
 
-        // Calculate the visible area dimensions
-        const float halfScreenWidth = owner->camera.offset.x;
-        const float halfScreenHeight = owner->camera.offset.y;
+        // Calculate the visible area dimensions, factoring in zoom
+        const float halfScreenWidth = owner->camera.offset.x / owner->camera.zoom;
+        const float halfScreenHeight = owner->camera.offset.y / owner->camera.zoom;
 
-        // Calculate camera bounds based on background size and screen dimensions
+        // Calculate camera bounds based on background size, screen dimensions, and zoom
         const float minX = bg_position.x + halfScreenWidth;
         const float minY = bg_position.y + halfScreenHeight;
         const float maxX = bg_position.x + (background_width * bg_scale) - halfScreenWidth;
@@ -604,22 +604,11 @@ namespace artifact
         {
             if (should_remove_life)
                 lives--;
-            invincibility_frames = 0;
-            hurt_frames = 0;
-            dash_attack_frames = 0;
-            light_attack_frames = 0;
-            dash_attack_sheet->reset();
-            light_attack_sheet->reset();
-            horizontal_velocity = 0;
-            vertical_velocity = 0;
-
-            death_sheet->reset();
-            owner->level_open_overlay->restart();
             health = max_health;
+            owner->spawn_entities();
+
             const auto [x, y] = owner->get_spawn_position();
             set_position(x, y);
-            owner->camera.target = {x, y};
-            owner->spawn_entities();
         }
     }
     void PlayerEntity::destroy()
@@ -644,5 +633,22 @@ namespace artifact
     bool PlayerEntity::is_dead() const
     {
         return Entity::is_dead() && death_frames == 0;
+    }
+    void PlayerEntity::set_position(const float x, const float y)
+    {
+        invincibility_frames = 0;
+        hurt_frames = 0;
+        dash_attack_frames = 0;
+        light_attack_frames = 0;
+        dash_attack_sheet->reset();
+        light_attack_sheet->reset();
+        horizontal_velocity = 0;
+        vertical_velocity = 0;
+
+        death_sheet->reset();
+        owner->level_open_overlay->restart();
+
+        owner->camera.target = {x, y};
+        Entity::set_position(x, y);
     }
 } // namespace artifact
