@@ -62,7 +62,15 @@ namespace artifact
         if (IsKeyPressed(KEY_ESCAPE))
             is_paused = !is_paused;
         if (is_paused)
+        {
+            if (this->peek_zindex() != pause_screen.get())
+                this->push_to_zindex(pause_screen.get());
             return;
+        }
+
+        if (this->peek_zindex() == pause_screen.get())
+            this->remove_from_zindex(pause_screen.get());
+
 
         for (const auto &entity: entities)
         {
