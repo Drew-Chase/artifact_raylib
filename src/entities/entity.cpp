@@ -10,7 +10,8 @@ namespace artifact
     {
         if (!collider)
         {
-            collider = std::make_unique<Collider>(position.x, position.y, width, height, [this](Entity *entity) { this->on_entity_collision(entity); });
+            collider = std::make_unique<Collider>(position.x, position.y, width, height, [this](Entity *entity)
+                                                  { this->on_entity_collision(entity); });
             collider->set_owner(this);
         }
     }
@@ -44,7 +45,7 @@ namespace artifact
         this->position = Vector2{x, y};
     }
     Vector2 Entity::get_position() const { return position; }
-    void Entity::debug_draw_colliders() { DrawRectangleLinesEx(Rectangle{position.x, position.y, width, height}, 4, GREEN); }
+    void Entity::debug_draw_colliders() { DrawRectangleLinesEx(collider->bounds, 2, GREEN); }
     void Entity::destroy()
     {
         is_being_destroyed = true;
