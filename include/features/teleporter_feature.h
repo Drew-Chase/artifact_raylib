@@ -13,12 +13,18 @@ namespace artifact
         Vector2 position;
         SpriteSheet *sheet;
         PlayableStage *owner;
+        PlayerEntity *captured_player;
+
+        Sound teleport_sfx{};
+
+        float timer = 0.f;
+
 
     public:
-        TeleporterFeature(PlayableStage* owner, Vector2 position, Vector2 destination_position, Stages destination_stage);
-        TeleporterFeature(PlayableStage* owner, const Vector2 position, const Vector2 destination_position) :
+        TeleporterFeature(PlayableStage *owner, Vector2 position, Vector2 destination_position, Stages destination_stage);
+        TeleporterFeature(PlayableStage *owner, const Vector2 position, const Vector2 destination_position) :
             TeleporterFeature(owner, position, destination_position, Stages::NONE) {}
-        TeleporterFeature(PlayableStage* owner, const Vector2 position, const Stages destination_stage) :
+        TeleporterFeature(PlayableStage *owner, const Vector2 position, const Stages destination_stage) :
             TeleporterFeature(owner, position, {}, destination_stage) {}
         void draw() const;
         void update(float delta_time);

@@ -15,16 +15,11 @@ namespace artifact
                 this->position.y - 44,
                 1,
                 88,
-                [destination_stage, destination_position](Entity *entity)
+                [&](Entity *entity)
                 {
                     if (auto *player = dynamic_cast<PlayerEntity *>(entity))
                     {
-                        if (destination_stage != Stages::NONE)
-                            Game::get_instance()->get_stage_manager()->load_stage(destination_stage, destination_position);
-                        else
-                        {
-                            player->set_position(destination_position.x, destination_position.y);
-                        }
+                        captured_player = player;
                     }
                 });
     }
@@ -35,7 +30,22 @@ namespace artifact
     }
     void TeleporterFeature::update(const float delta_time)
     {
+        // the number of seconds that the teleportation should last
         if (sheet)
             sheet->update(delta_time);
+
+        if (captured_player)
+        {
+            timer += delta_time;
+            if (constexpr float teleport_time = 5.f; timer >= teleport_time)
+            {
+                timer = 0;
+                if (destination_stage != Stages::NONE)
+                    Game::get_instance()->get_stage_manager()->load_stage(destination_stage, destination_position);
+                else
+                    captured_player->set_position(destination_position.x, destination_position.y);
+                captured_player = nullptr;
+            }
+        }
     }
 } // namespace artifact

@@ -1,6 +1,6 @@
 #include "entities/entity.h"
 
-#include "Direction.h"
+#include "direction.h"
 #include "entities/player_entity.h"
 #include "game.h"
 

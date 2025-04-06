@@ -2,8 +2,8 @@
 #include <memory>
 #include <raylib.h>
 
-#include "Direction.h"
 #include "collider.h"
+#include "direction.h"
 
 namespace artifact
 {

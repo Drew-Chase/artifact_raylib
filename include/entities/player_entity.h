@@ -1,5 +1,5 @@
 #pragma once
-#include "Direction.h"
+#include "direction.h"
 #include "entity.h"
 #include "sprite_sheet.h"
 

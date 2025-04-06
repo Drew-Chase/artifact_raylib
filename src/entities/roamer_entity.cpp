@@ -1,7 +1,7 @@
 
 #include "entities/roamer_entity.h"
 
-#include "Direction.h"
+#include "direction.h"
 
 namespace artifact
 {

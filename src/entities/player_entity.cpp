@@ -3,7 +3,7 @@
 #include <fmt/format.h>
 #include <raymath.h>
 
-#include "Direction.h"
+#include "direction.h"
 #include "entities/enemy_entity.h"
 #include "game.h"
 #include "game_utilities.h"
