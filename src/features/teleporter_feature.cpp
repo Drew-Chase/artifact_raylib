@@ -11,9 +11,9 @@ namespace artifact
         sheet = new SpriteSheet("game/texture/features/teleporter_%d.png", 9, 13);
         this->position = {position.x, position.y + 12};
         owner->register_collider(
-                this->position.x,
+                this->position.x + 22,
                 this->position.y - 44,
-                50,
+                1,
                 88,
                 [destination_stage, destination_position](Entity *entity)
                 {
