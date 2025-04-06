@@ -8,8 +8,8 @@ namespace artifact
     RoamerEntity::RoamerEntity(const Vector2 start_position, const Vector2 end_position) : start_position(start_position), end_position(end_position) {}
     void RoamerEntity::startup()
     {
-        EnemyEntity::startup();
         width = height = 32;
+        EnemyEntity::startup();
         walk_sheet = new SpriteSheet("game/texture/entities/roaming_slime/walk%d.png", 8, 13);
         attack_sheet = new SpriteSheet("game/texture/entities/roaming_slime/attack%d.png", 8, 8);
     }
