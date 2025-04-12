@@ -1,5 +1,6 @@
 #include "../include/stages/stage_manager.h"
 #include "stages/level_1_a_stage.h"
+#include "stages/level_1_b_stage.h"
 #include "stages/title_screen.h"
 
 artifact::StageManager::StageManager() = default;
@@ -23,6 +24,9 @@ artifact::Stage *artifact::StageManager::load_stage(const Stages stage, const Ve
         case Stages::LEVEL1A:
             current_stage = new Level1AStage();
             break;
+        case Stages::LEVEL1B:
+            current_stage = new Level1BStage();
+            break;
 
         default:
         case Stages::TITLE_SCREEN:
@@ -31,7 +35,7 @@ artifact::Stage *artifact::StageManager::load_stage(const Stages stage, const Ve
     }
 
     current_stage->startup();
-    if (auto stage = dynamic_cast<PlayableStage*>(current_stage);position.x != 0 && position.y != 0)
+    if (auto stage = dynamic_cast<PlayableStage *>(current_stage); position.x != 0 && position.y != 0)
     {
         stage->get_player()->set_position(position.x, position.y);
     }
