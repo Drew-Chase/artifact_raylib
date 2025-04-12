@@ -91,7 +91,6 @@ namespace artifact
         constexpr float sprite_scale = 2.2f;
 
         // Draw animations
-
         if (Entity::is_dead())
         {
             death_sheet->draw(sprite_position, sprite_scale);
@@ -173,11 +172,14 @@ namespace artifact
             }
             return;
         }
+        if (is_teleporting)
+            this->horizontal_velocity = 0;
 
         handle_input(delta_time);
         apply_horizontal_movement(delta_time);
         check_collision();
         apply_gravity(delta_time);
+
 
         if (this->invincibility_frames > 0)
             this->invincibility_frames--;
@@ -198,9 +200,11 @@ namespace artifact
                 dash_attack_sheet->set_frame(0);
         }
 
-
         if (idle_sheet)
+        {
             idle_sheet->update(delta_time);
+            idle_sheet->set_pulse(is_teleporting);
+        }
         if (run_sheet)
         {
             if (sprinting)
@@ -284,6 +288,10 @@ namespace artifact
             if (IsKeyDown(KEY_DOWN))
                 SetTargetFPS(fps - 10);
         }
+
+        if (is_teleporting)
+            return;
+
 #endif
         if (ControlsSettings::down(controls->movement_sprint))
             sprinting = controls->toggle_sprint ? !sprinting : true;
@@ -650,5 +658,9 @@ namespace artifact
 
         owner->camera.target = {x, y};
         Entity::set_position(x, y);
+    }
+    void PlayerEntity::set_teleporting(const bool is_teleporting)
+    {
+        this->is_teleporting = is_teleporting;
     }
 } // namespace artifact
