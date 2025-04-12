@@ -9,7 +9,6 @@ namespace artifact
         Music music{};
         TeleporterFeature* lvl2_teleporter = nullptr;
         TeleporterFeature* secret_teleporter = nullptr;
-        TeleporterFeature* test_teleporter = nullptr;
     public:
         explicit Level1AStage();
         void draw() const override;
