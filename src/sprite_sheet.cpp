@@ -1,8 +1,11 @@
 #include "sprite_sheet.h"
 
+#include <complex>
+
 namespace artifact
 {
-    SpriteSheet::SpriteSheet(const std::string &root_path, const int frame_count, const float fps) : root_path(root_path), frame_count(frame_count), fps(fps), frame_time(1.0f / fps), current_time(0.0f), current_frame(0), is_playing(true)
+    SpriteSheet::SpriteSheet(const std::string &root_path, const int frame_count, const float fps) :
+        root_path(root_path), frame_count(frame_count), fps(fps), frame_time(1.0f / fps), current_time(0.0f), current_frame(0), is_playing(true)
     {
         frames.resize(frame_count);
         load_frames();
@@ -116,7 +119,9 @@ namespace artifact
         const Rectangle dest = {position.x - width / 2, position.y - height, width * scale, height * scale};
         constexpr Vector2 origin = {0, 0};
 
-        DrawTexturePro(texture, source, dest, origin, 0.0f, tint);
+        constexpr float pulse_speed = 2.0f; // Interval speed for pulsing
+        const float alpha = is_pulsing_sprite ? std::sin(GetTime() * pulse_speed * PI) * 0.5f + 0.5f : 1.0f;
+        DrawTexturePro(texture, source, dest, origin, 0.0f, ColorAlpha(tint, alpha));
     }
 
     void SpriteSheet::draw(const float x, const float y, const float scale, const Color tint) const { draw(Vector2{x, y}, scale, tint); }
@@ -176,5 +181,9 @@ namespace artifact
         {
             frame_to_freeze = frames.size() - 1;
         }
+    }
+    void SpriteSheet::set_pulse(const bool is_pulsing)
+    {
+        this->is_pulsing_sprite = is_pulsing;
     }
 } // namespace artifact
