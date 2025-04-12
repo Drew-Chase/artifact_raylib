@@ -27,9 +27,9 @@ namespace artifact
         set_background("game/texture/stages/level_1a/background.png");
 
         // Create Colliders
-        float block_scale = 32 * 2.3;
-        float base_x = -150;
-        float base_y = 205;
+        constexpr float block_scale = 32 * 2.3;
+        constexpr float base_x = -150;
+        constexpr float base_y = 205;
 
         // Ground
         colliders.emplace_back(base_x - block_scale * 12, base_y - block_scale * 4, block_scale * 11, block_scale, true);
