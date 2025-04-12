@@ -567,9 +567,9 @@ namespace artifact
                         break;
 
                     case TOP:
-                        if (vertical_velocity < 0)
+                        if (vertical_velocity != 0)
                         {
-                            position.y = collider.bounds.y + collider.bounds.height;
+                            position.y = collider.bounds.y + collider.bounds.height + 1;
                             vertical_velocity = 0;
                         }
                         break;
