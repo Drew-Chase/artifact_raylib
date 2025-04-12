@@ -41,7 +41,7 @@ namespace artifact
                 PlayMusicStream(teleport_sfx);
             UpdateMusicStream(teleport_sfx);
             timer += delta_time;
-            if (timer >= .25f)
+            if (timer >= .05f)
             {
                 captured_player->set_teleporting(true);
             }
@@ -59,11 +59,11 @@ namespace artifact
                     owner->level_open_overlay->is_reversed = false;
                     owner->level_open_overlay->reset();
                 }
+                captured_player->set_teleporting(false);
                 if (destination_stage != Stages::NONE)
                     Game::get_instance()->get_stage_manager()->load_stage(destination_stage, destination_position);
                 else
                     captured_player->set_position(destination_position.x, destination_position.y);
-                captured_player->set_teleporting(false);
                 captured_player = nullptr;
             }
         }
