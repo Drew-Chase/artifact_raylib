@@ -83,7 +83,7 @@ namespace artifact
         game->display_settings->apply();
 
 #ifdef DEBUG
-        manager->load_stage(Stages::LEVEL1B);
+        manager->load_stage(Stages::LEVEL1A);
 #else
         manager->load_stage(Stages::TITLE_SCREEN);
 #endif
