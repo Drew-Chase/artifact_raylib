@@ -7,7 +7,6 @@ class Level1BStage final : public PlayableStage{
 
     Music music{};
     TeleporterFeature* nextlvl_teleporter = nullptr;
-    TeleporterFeature* secret_teleporter = nullptr;
 public:
     explicit Level1BStage();
     void draw() const override;
