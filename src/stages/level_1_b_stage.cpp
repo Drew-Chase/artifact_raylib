@@ -17,29 +17,119 @@ namespace artifact
         this->player = spawn_entity<PlayerEntity>(x, y);
 
         // Setup features
-        nextlvl_teleporter = new TeleporterFeature(this, {9123.4, -7}, {0, 140});
-        secret_teleporter = new TeleporterFeature(this, {-982.2, -153}, {0, 140});
+        nextlvl_teleporter = new TeleporterFeature(this, {6539.3, -676}, Stages::LEVEL1C);
 
         // Initialize Textures
         set_background("game/texture/stages/level_1b/background.png");
 
         // Create Colliders
         constexpr float block_scale = 32 * 2.3;
-        constexpr float base_x = -64;
-        constexpr float base_y = -1790;
+        float base_x = -62;
+        float base_y = -1790;
 
         // Ground
         colliders.emplace_back(base_x, base_y, block_scale * 7, block_scale, true);
+        base_y += block_scale;
+        base_x += block_scale * 7;
+        colliders.emplace_back(base_x, base_y, block_scale * 9, block_scale, true);
+        base_x += block_scale * 9;
+        base_y -= block_scale;
+        colliders.emplace_back(base_x, base_y, block_scale, block_scale, true);
+        base_x += block_scale;
+        base_y -= block_scale;
+        colliders.emplace_back(base_x, base_y, block_scale * 2, block_scale * 4, true);
+        base_x += block_scale * 2;
+        base_y += block_scale * 2;
+        colliders.emplace_back(base_x, base_y, block_scale * 3, block_scale, true);
+        base_x += block_scale * 5;
+        colliders.emplace_back(base_x, base_y, block_scale * 2, block_scale * 4, true);
+        base_x -= block_scale * 2;
+        base_y += block_scale * 3;
+        colliders.emplace_back(base_x, base_y, block_scale * 2, block_scale, true);
+        base_x -= block_scale * 4;
+        base_y += block_scale * 2;
+        colliders.emplace_back(base_x, base_y, block_scale, block_scale, true);
+        base_x += block_scale;
+        base_y += block_scale;
+        colliders.emplace_back(base_x, base_y, block_scale * 9, block_scale, true);
+        base_x += block_scale * 9;
+        base_y -= block_scale;
+        colliders.emplace_back(base_x, base_y, block_scale * 2, block_scale, true);
+        base_x += block_scale * 2;
+        base_y += block_scale;
+        colliders.emplace_back(base_x, base_y, block_scale * 2, block_scale, true);
+        base_x += block_scale * 2;
+        base_y -= block_scale;
+        colliders.emplace_back(base_x, base_y, block_scale * 2, block_scale, true);
+        base_x += block_scale * 2;
+        base_y += block_scale;
+        colliders.emplace_back(base_x, base_y, block_scale * 2, block_scale, true);
+        base_x += block_scale * 2;
+        base_y -= block_scale * 3;
+        colliders.emplace_back(base_x, base_y, block_scale * 2, block_scale * 3, true);
+        base_x += block_scale * 2;
+        base_y -= block_scale * 3;
+        colliders.emplace_back(base_x, base_y, block_scale * 11, block_scale * 23, true);
+        base_x += block_scale * 13;
+        colliders.emplace_back(base_x, base_y, block_scale * 17, block_scale * 18, true);
+        base_x -= block_scale * 2;
+        base_y += block_scale * 22;
+        colliders.emplace_back(base_x, base_y, block_scale * 12, block_scale * 6, true);
+        base_x += block_scale * 16;
+        base_y -= block_scale;
+        colliders.emplace_back(base_x, base_y, block_scale * 7, block_scale * 6, true);
+        base_x += block_scale * 7;
+        base_y -= block_scale * 2;
+        colliders.emplace_back(base_x, base_y, block_scale * 2, block_scale * 2, true);
+        base_x += block_scale * 2;
+        base_y -= block_scale * 2;
+        colliders.emplace_back(base_x, base_y, block_scale * 2, block_scale * 2, true);
+        base_x += block_scale * 2;
+        base_y -= block_scale * 2;
+        colliders.emplace_back(base_x, base_y, block_scale * 16, block_scale * 2, true);
 
         // Roof
-        colliders.emplace_back(base_x - block_scale, base_y - 4 * block_scale, block_scale * 10, block_scale, true);
+        base_x = -62;
+        base_y = -1790;
+
+        base_y -= 4 * block_scale;
+        colliders.emplace_back(base_x, base_y, block_scale * 9, block_scale, true);
+        base_y += block_scale;
+        base_x += block_scale * 9;
+        colliders.emplace_back(base_x, base_y, block_scale, block_scale, true);
+        base_y += block_scale;
+        base_x += block_scale;
+        colliders.emplace_back(base_x, base_y, block_scale * 4, block_scale, true);
+        base_y -= block_scale;
+        base_x += block_scale * 4;
+        colliders.emplace_back(base_x, base_y, block_scale, block_scale, true);
+        base_y -= block_scale;
+        base_x += block_scale;
+        colliders.emplace_back(base_x, base_y, block_scale * 10, block_scale, true);
+        base_y += block_scale;
+        base_x += block_scale * 11;
+        colliders.emplace_back(base_x, base_y, block_scale * 28, block_scale, true);
+        base_y += block_scale * 22;
+        base_x += block_scale * 39;
+        colliders.emplace_back(base_x, base_y, block_scale * 3, block_scale, true);
 
         // Walls
-        colliders.emplace_back(base_x - block_scale, base_y - 3 * block_scale, block_scale, block_scale * 3, true);
+        base_x = -62 - block_scale;
+        base_y = -1790 - 3 * block_scale;
+        colliders.emplace_back(base_x, base_y, block_scale, block_scale * 3, true);
+        base_x += block_scale * 18;
+        base_y += block_scale * 6;
+        colliders.emplace_back(base_x, base_y, block_scale, block_scale * 3, true);
+        base_x += block_scale * 8;
+        base_y -= block_scale * 6;
+        colliders.emplace_back(base_x, base_y, block_scale, block_scale * 4, true);
+        base_x += block_scale * 29;
+        base_y += block_scale;
+        colliders.emplace_back(base_x, base_y, block_scale, block_scale * 3, true);
 
         // Killnet
-        // colliders.emplace_back(-500, 500, block_scale * 150, block_scale, [&]
-        //                        { player->kill(); });
+        colliders.emplace_back(4350, block_scale * 4, block_scale * 6, block_scale, [&]
+                               { player->kill(); });
     }
     Vector2 Level1BStage::get_spawn_position() const { return {0, -1800}; }
     void Level1BStage::spawn_entities()
@@ -60,8 +150,6 @@ namespace artifact
         PlayableStage::draw();
         if (nextlvl_teleporter)
             nextlvl_teleporter->draw();
-        if (secret_teleporter)
-            secret_teleporter->draw();
         EndMode2D();
         PlayableStage::draw_ui();
     }
@@ -72,8 +160,6 @@ namespace artifact
         PlayableStage::update(delta_time);
         if (nextlvl_teleporter)
             nextlvl_teleporter->update(delta_time);
-        if (secret_teleporter)
-            secret_teleporter->update(delta_time);
 
         if (music.stream.buffer)
             UpdateMusicStream(music);
@@ -87,11 +173,6 @@ namespace artifact
         {
             delete nextlvl_teleporter;
             nextlvl_teleporter = nullptr;
-        }
-        if (secret_teleporter)
-        {
-            delete secret_teleporter;
-            secret_teleporter = nullptr;
         }
 
         UnloadMusicStream(music);
