@@ -7,7 +7,7 @@ namespace artifact
     class Level1AStage final : public PlayableStage
     {
         Music music{};
-        TeleporterFeature* lvl2_teleporter = nullptr;
+        TeleporterFeature* nextlvl_teleporter = nullptr;
         TeleporterFeature* secret_teleporter = nullptr;
     public:
         explicit Level1AStage();

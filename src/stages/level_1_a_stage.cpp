@@ -20,8 +20,8 @@ namespace artifact
         this->player = spawn_entity<PlayerEntity>(x, y);
 
         // Setup features
-        lvl2_teleporter = new TeleporterFeature(this, {9123.4, -7}, {0, 140});
-        secret_teleporter = new TeleporterFeature(this, {-982.2, -153}, {0, 140});
+        nextlvl_teleporter = new TeleporterFeature(this, {9123.4, -7}, Stages::LEVEL1B);
+        secret_teleporter = new TeleporterFeature(this, {-982.2, -153}, Stages::LEVEL1B);
 
         // Initialize Textures
         set_background("game/texture/stages/level_1a/background.png");
@@ -116,8 +116,8 @@ namespace artifact
             return;
         BeginMode2D(camera);
         PlayableStage::draw();
-        if (lvl2_teleporter)
-            lvl2_teleporter->draw();
+        if (nextlvl_teleporter)
+            nextlvl_teleporter->draw();
         if (secret_teleporter)
             secret_teleporter->draw();
         EndMode2D();
@@ -128,8 +128,8 @@ namespace artifact
         if (is_being_destroyed)
             return;
         PlayableStage::update(delta_time);
-        if (lvl2_teleporter)
-            lvl2_teleporter->update(delta_time);
+        if (nextlvl_teleporter)
+            nextlvl_teleporter->update(delta_time);
         if (secret_teleporter)
             secret_teleporter->update(delta_time);
 
@@ -141,10 +141,10 @@ namespace artifact
         if (is_being_destroyed)
             return;
         PlayableStage::destroy();
-        if (lvl2_teleporter)
+        if (nextlvl_teleporter)
         {
-            delete lvl2_teleporter;
-            lvl2_teleporter = nullptr;
+            delete nextlvl_teleporter;
+            nextlvl_teleporter = nullptr;
         }
         if (secret_teleporter)
         {
