@@ -10,7 +10,7 @@ namespace artifact
         Vector2 right{0,0};
         Vector2 top{0,0};
         Vector2 bottom{0,0};
-        Rectangle rect;
+        Rectangle rect{};
         // the animation duration in seconds.
         float duration = 2;
         bool playing = true;
@@ -18,6 +18,7 @@ namespace artifact
         size_t last_frame = 0;
 
     public:
+        bool is_reversed = false;
         explicit LevelOpenOverlay(Stage *owner, float duration);
         void draw() override;
         void update(float delta_time) override;
@@ -27,5 +28,6 @@ namespace artifact
         void pause();
         void reset();
         void restart();
+        void reverse();
     };
 } // namespace artifact
