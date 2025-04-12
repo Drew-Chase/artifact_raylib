@@ -18,6 +18,7 @@ namespace artifact
         unsigned int hurt_frames = 0;
         unsigned short lives = 3;
         unsigned int coins = 0;
+        bool is_teleporting = false;
 
         // Gravity and jumping variables
         float vertical_velocity = 0.0f;
@@ -75,5 +76,6 @@ namespace artifact
         void destroy() override;
         bool is_dead() const override;
         void set_position(float x, float y) override;
+        void set_teleporting(bool is_teleporting);
     };
 } // namespace artifact
