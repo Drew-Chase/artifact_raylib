@@ -11,11 +11,11 @@ namespace artifact
         Stages destination_stage = Stages::NONE;
         Vector2 destination_position;
         Vector2 position;
-        SpriteSheet *sheet;
-        PlayableStage *owner;
-        PlayerEntity *captured_player;
+        SpriteSheet *sheet = nullptr;
+        PlayableStage *owner = nullptr;
+        PlayerEntity *captured_player = nullptr;
 
-        Sound teleport_sfx{};
+        Music teleport_sfx{};
 
         float timer = 0.f;
 
