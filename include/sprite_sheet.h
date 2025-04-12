@@ -31,6 +31,7 @@ namespace artifact
          * or resetting. Useful for animations that require persistence of their last state.
          */
         bool freeze_on_last_frame = false;
+        bool is_pulsing_sprite = false;
         /**
          * The base file path pattern for the animation frames.
          *
@@ -347,5 +348,6 @@ namespace artifact
          */
         void play_once(bool freeze_on_frame = false);
         void set_frame_to_freeze(unsigned int frame);
+        void set_pulse(bool is_pulsing);
     };
 } // namespace artifact
