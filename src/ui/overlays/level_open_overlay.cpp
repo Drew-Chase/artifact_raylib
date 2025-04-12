@@ -3,7 +3,8 @@
 
 namespace artifact
 {
-    LevelOpenOverlay::LevelOpenOverlay(Stage *owner, const float duration) : ComponentBase("level_open_overlay", owner)
+    LevelOpenOverlay::LevelOpenOverlay(Stage *owner, const float duration) :
+        ComponentBase("level_open_overlay", owner)
     {
         this->duration = duration;
         const float width = GetScreenWidth();
@@ -18,6 +19,11 @@ namespace artifact
     }
     void LevelOpenOverlay::draw()
     {
+        if (!is_playing() && is_reversed)
+        {
+            DrawRectangleRec({0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())}, BLACK);
+            return;
+        }
         if (!is_playing())
             return;
 
@@ -49,18 +55,34 @@ namespace artifact
         const float screenWidth = GetScreenWidth();
         const float screenHeight = GetScreenHeight();
 
-        // Move rectangles from center to corners
-        // Left rectangle moves left
-        left.x = -percentage * screenWidth / 2;
+        // Move rectangles from center to corners or reverse
+        if (is_reversed)
+        {
+            // Left rectangle moves right
+            left.x = -screenWidth / 2 + percentage * screenWidth / 2;
 
-        // Right rectangle moves right
-        right.x = screenWidth / 2 + percentage * screenWidth / 2;
+            // Right rectangle moves left
+            right.x = screenWidth - percentage * screenWidth / 2;
 
-        // Top rectangle moves up
-        top.y = -percentage * screenHeight / 2;
+            // Top rectangle moves down
+            top.y = -screenHeight / 2 + percentage * screenHeight / 2;
 
-        // Bottom rectangle moves down
-        bottom.y = screenHeight / 2 + percentage * screenHeight / 2;
+            // Bottom rectangle moves up
+            bottom.y = screenHeight - percentage * screenHeight / 2;
+        } else
+        {
+            // Left rectangle moves left
+            left.x = -percentage * screenWidth / 2;
+
+            // Right rectangle moves right
+            right.x = screenWidth / 2 + percentage * screenWidth / 2;
+
+            // Top rectangle moves up
+            top.y = -percentage * screenHeight / 2;
+
+            // Bottom rectangle moves down
+            bottom.y = screenHeight / 2 + percentage * screenHeight / 2;
+        }
 
         current_frame++;
     }
@@ -69,6 +91,10 @@ namespace artifact
     {
         reset();
         play();
+    }
+    void LevelOpenOverlay::reverse()
+    {
+        this->is_reversed = !this->is_reversed;
     }
     void LevelOpenOverlay::stop()
     {
