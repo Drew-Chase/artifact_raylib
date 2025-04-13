@@ -57,15 +57,17 @@ namespace artifact
         std::vector<spdlog::sink_ptr> sinks{rotating_file_sink, stdout_sink};
         const auto logger = std::make_shared<spdlog::async_logger>("game_logger", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
         logger->set_level(spdlog::level::trace);
-        logger->set_pattern("[%l] [thread %t] %v");
+        logger->set_pattern("%^[artifact_game/%s:%#(%!)::%l]%$ %v");
         register_logger(logger);
         spdlog::flush_every(std::chrono::seconds(3));
 
         SetTraceLogCallback(register_log_callback);
         SetTraceLogLevel(LOG_TRACE);
+        set_default_logger(logger);
 
         const auto window_icon = LoadImage("game/app-icon.png");
         StageManager *manager = game->get_stage_manager();
+        SPDLOG_INFO("Starting game...");
 
 
         InitWindow(0, 0, "Artifact: The Journey Unraveled");
@@ -83,7 +85,8 @@ namespace artifact
         game->display_settings->apply();
 
 #ifdef DEBUG
-        manager->load_stage(Stages::LEVEL1A);
+        manager->load_stage(Stages::TITLE_SCREEN);
+        // manager->load_stage(Stages::LEVEL1A);
 #else
         manager->load_stage(Stages::TITLE_SCREEN);
 #endif
@@ -115,36 +118,31 @@ namespace artifact
 
     void Game::register_log_callback(int msgType, const char *message, va_list args)
     {
-        const auto logger = spdlog::get("game_logger");
-        if (logger == nullptr)
-            return;
-
         char formattedMessage[1024];
         vsnprintf(formattedMessage, sizeof(formattedMessage), message, args);
 
         switch (msgType)
         {
             case LOG_DEBUG:
-                logger->debug(formattedMessage);
+                SPDLOG_DEBUG(formattedMessage);
                 break;
             case LOG_INFO:
-                logger->info(formattedMessage);
+                SPDLOG_INFO(formattedMessage);
                 break;
             case LOG_WARNING:
-                logger->warn(formattedMessage);
+                SPDLOG_WARN(formattedMessage);
                 break;
             case LOG_ERROR:
-                logger->error(formattedMessage);
+                SPDLOG_ERROR(formattedMessage);
                 break;
             case LOG_FATAL:
-                logger->critical(formattedMessage);
+                SPDLOG_CRITICAL(formattedMessage);
                 break;
             case LOG_TRACE:
             default:
-                logger->trace(formattedMessage);
+                SPDLOG_TRACE(formattedMessage);
                 break;
         }
-        logger->flush(); // Explicit flush after each message
     }
 
 } // namespace artifact

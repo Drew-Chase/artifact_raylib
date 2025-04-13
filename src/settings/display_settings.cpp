@@ -1,6 +1,8 @@
 
 #include "settings/display_settings.h"
 #include <filesystem>
+#include <spdlog/spdlog.h>
+
 #include "nlohmann/json.hpp"
 #include "ui/menus/settings_screen.h"
 
@@ -71,7 +73,7 @@ namespace artifact
                 SetWindowSize(screen_width, screen_height);
                 const int x = monitor_width / 2 - screen_width / 2;
                 const int y = monitor_height / 2 - screen_height / 2;
-                TraceLog(LOG_INFO, "Windowed mode: w=%d,h=%d,x=%d,y=%d", monitor_width, monitor_height, x, y);
+                SPDLOG_INFO("Windowed mode: w={},h={},x={},y={}", monitor_width, monitor_height, x, y);
                 SetWindowPosition(x, y);
             } else
             {

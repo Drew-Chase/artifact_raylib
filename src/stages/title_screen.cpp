@@ -2,18 +2,22 @@
 #include "../include/stages/title_screen.h"
 #include <fmt/format.h>
 #include <raylib.h>
-
+#include <spdlog/spdlog.h>
 #include "game.h"
+
+#include <resources/texture/menus/title_screen/artifact_logo.h>
+#include <resources/texture/menus/title_screen/sunny_mountains_far_back.h>
 
 namespace artifact
 {
     void TitleScreen::startup()
     {
         owner->push_to_zindex(this);
-        sky_clouds_background_image = LoadTexture("game/texture/menus/title_screen/sunny-mountains-sky.png");
+        sky_clouds_background_image = LoadTextureFromImage(sunny_mountains_far_back);
+        // sky_clouds_background_image = LoadTexture("game/texture/menus/title_screen/sunny-mountains-sky.png");
         mountain_hills_background_image = LoadTexture("game/texture/menus/title_screen/sunny-mountains-hills.png");
         title_image = LoadTexture("game/texture/menus/title_screen/artifact_logo.png");
-
+        // title_image = LoadTextureFromImage(artifact_logo);
         // Pre-calculate title size and position.
         int title_width = -1;
         int title_height = static_cast<int>(static_cast<double>(GetScreenHeight()) / 1.5);
@@ -36,21 +40,21 @@ namespace artifact
         auto start_button = std::make_unique<ButtonComponent>("start_button", this, button_width, button_height, "Start Game",
                                                               []
                                                               {
-                                                                  TraceLog(LOG_INFO, "Start button clicked!");
+                                                                  SPDLOG_INFO("Start button clicked!");
                                                                   Game::get_instance()->get_stage_manager()->load_stage(Stages::LEVEL1A);
                                                               });
 
         auto settings_button = std::make_unique<ButtonComponent>("settings_button", this, button_width, button_height, "Settings Game",
                                                                  [this]
                                                                  {
-                                                                     TraceLog(LOG_INFO, "Settings button clicked!");
+                                                                     SPDLOG_INFO("Settings button clicked!");
                                                                      settings_screen = std::make_unique<SettingsScreen>(this);
                                                                  });
 
         auto exit_button = std::make_unique<ButtonComponent>("exit_button", this, button_width, button_height, "Exit Game",
                                                              []
                                                              {
-                                                                 TraceLog(LOG_INFO, "Exit button clicked!");
+                                                                 SPDLOG_INFO("Exit button clicked!");
                                                                  Game::get_instance()->exit_game();
                                                              });
 

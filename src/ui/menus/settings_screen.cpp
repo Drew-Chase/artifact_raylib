@@ -1,6 +1,8 @@
 
 #include "ui/menus/settings_screen.h"
 #include <fmt/format.h>
+#include <spdlog/spdlog.h>
+
 #include "game.h"
 #include "stages/playable_stage.h"
 #include "stages/title_screen.h"
@@ -87,7 +89,7 @@ namespace artifact
                     label = "Video";
                     break;
             }
-            TraceLog(LOG_DEBUG, "tab: %d, label: %s", i, label);
+            SPDLOG_DEBUG("tab: {}, label: {}", i, label);
             // settings_tabs_container->add_component<ButtonComponent>(fmt::format("settings_tab_{}", i).c_str(), owner, 0, 0, 0, 0, label, [&] { current_tab = tab; });
         }
     }
