@@ -17,6 +17,7 @@ add_executable(${CMAKE_PROJECT_NAME}
         ${HEADERS}
 )
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE include)
+add_subdirectory(tools/asset_bundle_tool)
 
 # Add -DPROFILE_NAME=profile_name_here to the compiler
 option(PROFILE_NAME "Name of the profile to use" "debug") # Default is debug
