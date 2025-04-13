@@ -7,6 +7,12 @@
 #include "entities/enemy_entity.h"
 #include "game.h"
 #include "game_utilities.h"
+#include "resources/audio/sfx/playerattack.h"
+#include "resources/audio/sfx/playercharge.h"
+#include "resources/audio/sfx/playerjump.h"
+#include "resources/texture/ui/coin.h"
+#include "resources/texture/ui/heart.h"
+#include "resources/texture/ui/life.h"
 #include "stages/playable_stage.h"
 
 namespace artifact
@@ -36,14 +42,14 @@ namespace artifact
 
 
         // Load SFX
-        sfx_jump = LoadSound("game/audio/sfx/playerjump.ogg");
-        sfx_hit = LoadSound("game/audio/sfx/playerattack.ogg");
-        sfx_dash = LoadSound("game/audio/sfx/playercharge.ogg");
+        sfx_jump = LoadSoundFromWave(playerjump);
+        sfx_hit = LoadSoundFromWave(playerattack);
+        sfx_dash = LoadSoundFromWave(playercharge);
 
         // Load interface sprites
-        heart_texture = LoadTexture("game/texture/ui/heart.png");
-        life_texture = LoadTexture("game/texture/ui/life.png");
-        coin_texture = LoadTexture("game/texture/ui/coin.png");
+        heart_texture = LoadTextureFromImage(heart);
+        life_texture = LoadTextureFromImage(life);
+        coin_texture = LoadTextureFromImage(coin);
 
         // Set up the entity collision callback
         if (collider)

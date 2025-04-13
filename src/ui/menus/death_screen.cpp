@@ -1,9 +1,7 @@
-
 #include "ui/menus/death_screen.h"
-
 #include <spdlog/fmt/bundled/format.h>
-
 #include "game.h"
+#include "resources/texture/menus/title_screen/artifact_logo.h"
 #include "stages/playable_stage.h"
 #include "stages/stages.h"
 
@@ -19,7 +17,9 @@ namespace artifact
         constexpr auto button_pressed_bg_color = BLACK;
         constexpr int font_size = 18;
         owner->push_to_zindex(this);
-        title_image = LoadTexture("game/texture/menus/title_screen/artifact_logo.png");
+        title_image = LoadTextureFromImage(artifact_logo);
+
+
 
         // Create the vertical container for buttons
         constexpr int button_height = 70;
