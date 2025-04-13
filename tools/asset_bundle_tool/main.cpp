@@ -36,13 +36,13 @@ int main()
                 {
                     SPDLOG_INFO("Found image file: {}", entry.path().string());
                     const Image image = LoadImage(entry.path().string().c_str());
-                    const size_t data_size = GetPixelDataSize(image.width, image.height, image.format);
-                    char *text_data = static_cast<char *>(RL_CALLOC(data_size * 6 + 2000, sizeof(char)));
+                    const int data_size = GetPixelDataSize(image.width, image.height, image.format);
+                    const auto text_data = static_cast<char *>(RL_CALLOC(data_size * 6 + 2000, sizeof(char)));
 
                     int byte_count = 0;
                     byte_count += sprintf(text_data + byte_count, "#pragma once\n#include <raylib.h>\n");
                     byte_count += sprintf(text_data + byte_count, "static unsigned char %s_DATA[%llu] = {", output_filename.c_str(), data_size);
-                    for (int i = 0; i <= data_size; i++)
+                    for (int i = 0; i < data_size - 1; i++)
                         byte_count += sprintf(text_data + byte_count, "0x%x,", static_cast<unsigned char *>(image.data)[i]);
                     byte_count += sprintf(text_data + byte_count, "0x%x};", static_cast<unsigned char *>(image.data)[data_size - 1]);
                     byte_count += sprintf(text_data + byte_count, "static Image %s = {.data = %s_DATA,.width = %i,.height = %i,.mipmaps = 1,.format = %i};",
@@ -56,7 +56,7 @@ int main()
                 {
                     SPDLOG_INFO("Found audio file: {}", entry.path().string());
                     const Wave wave = LoadWave(entry.path().string().c_str());
-                    const size_t data_size = wave.frameCount * wave.channels * wave.sampleSize / 8;
+                    const int data_size = wave.frameCount * wave.channels * wave.sampleSize / 8;
                     const auto text_data = static_cast<char *>(RL_CALLOC(data_size * 12 + 2000, sizeof(char)));
                     int byte_count = 0;
                     byte_count += sprintf(text_data + byte_count, "#pragma once\n#include <raylib.h>\n");
@@ -74,6 +74,9 @@ int main()
                             byte_count += sprintf(text_data + byte_count, "0x%x,", static_cast<unsigned char *>(wave.data)[i - 1]);
                         byte_count += sprintf(text_data + byte_count, "0x%x};", static_cast<unsigned char *>(wave.data)[data_size - 1]);
                     }
+
+                    byte_count += sprintf(text_data + byte_count, "static Wave %s = {.sampleRate = %i,.sampleSize = %i,.channels = %i,.data = %s_DATA};",
+                        output_filename.c_str(), wave.frameCount, wave.sampleSize, wave.channels, output_filename.c_str());
 
                     SaveFileText(output_file.c_str(), text_data);
                     RL_FREE(text_data);
