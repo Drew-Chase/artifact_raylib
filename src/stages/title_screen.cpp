@@ -6,17 +6,18 @@
 #include "game.h"
 
 #include <resources/texture/menus/title_screen/artifact_logo.h>
-#include <resources/texture/menus/title_screen/sunny_mountains_sky.h>
-#include <resources/texture/menus/title_screen/sunny_mountains_hills.h>
+#include <resources/texture/menus/title_screen/sunny_mountains_far_back.h>
 
 namespace artifact
 {
     void TitleScreen::startup()
     {
         owner->push_to_zindex(this);
-        sky_clouds_background_image = LoadTextureFromImage(sunny_mountains_sky);
-        mountain_hills_background_image = LoadTextureFromImage(sunny_mountains_hills);
-        title_image = LoadTextureFromImage(artifact_logo);
+        sky_clouds_background_image = LoadTextureFromImage(sunny_mountains_far_back);
+        // sky_clouds_background_image = LoadTexture("game/texture/menus/title_screen/sunny-mountains-sky.png");
+        mountain_hills_background_image = LoadTexture("game/texture/menus/title_screen/sunny-mountains-hills.png");
+        title_image = LoadTexture("game/texture/menus/title_screen/artifact_logo.png");
+        // title_image = LoadTextureFromImage(artifact_logo);
         // Pre-calculate title size and position.
         int title_width = -1;
         int title_height = static_cast<int>(static_cast<double>(GetScreenHeight()) / 1.5);

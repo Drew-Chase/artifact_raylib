@@ -1,6 +1,7 @@
 #include "ui/menus/pause_screen.h"
+
 #include <fmt/format.h>
-#include <resources/texture/menus/title_screen/artifact_logo.h>
+
 #include "game.h"
 #include "stages/playable_stage.h"
 #include "ui/components/button_component.h"
@@ -17,7 +18,7 @@ namespace artifact
         constexpr auto button_pressed_bg_color = BLACK;
         constexpr int font_size = 18;
         owner->push_to_zindex(this);
-        title_image = LoadTextureFromImage(artifact_logo);
+        title_image = LoadTexture("game/texture/menus/title_screen/artifact_logo.png");
 
         // Create the vertical container for buttons
         constexpr int button_height = 70;
