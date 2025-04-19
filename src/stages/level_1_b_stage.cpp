@@ -1,6 +1,9 @@
 
 #include "stages/level_1_b_stage.h"
 
+#include "entities/demon_bat_entity.h"
+#include "entities/roamer_entity.h"
+
 namespace artifact
 {
     Level1BStage::Level1BStage() :
@@ -126,6 +129,7 @@ namespace artifact
         base_x += block_scale * 29;
         base_y += block_scale;
         colliders.emplace_back(base_x, base_y, block_scale, block_scale * 3, true);
+        colliders.emplace_back(6705, -6760, block_scale, block_scale * 9, true);
 
         // Killnet
         colliders.emplace_back(4350, block_scale * 4, block_scale * 6, block_scale, [&]
@@ -141,6 +145,37 @@ namespace artifact
 
 
         // Spawn enemies
+        spawn_entity<RoamerEntity>(457, -1748, Vector2{457, -1780}, Vector2{1051, -1780});
+        spawn_entity<RoamerEntity>(544, -1748, Vector2{457, -1780}, Vector2{1051, -1780});
+        spawn_entity<RoamerEntity>(634, -1748, Vector2{457, -1780}, Vector2{1051, -1780});
+
+        spawn_entity<DemonBatEntity>(1237, -1927);
+
+        spawn_entity<RoamerEntity>(1335, -1748, Vector2{1335, -1780}, Vector2{1492, -1780});
+
+        spawn_entity<RoamerEntity>(1330, -1306, Vector2{1334, -1338}, Vector2{1934, -1338});
+        spawn_entity<RoamerEntity>(1394, -1306, Vector2{1334, -1338}, Vector2{1934, -1338});
+        spawn_entity<RoamerEntity>(1458, -1306, Vector2{1334, -1338}, Vector2{1934, -1338});
+        spawn_entity<RoamerEntity>(1522, -1306, Vector2{1334, -1338}, Vector2{1934, -1338});
+
+        spawn_entity<DemonBatEntity>(2037, -1412);
+        spawn_entity<DemonBatEntity>(2333, -1412);
+
+        spawn_entity<RoamerEntity>(2730, -1748, Vector2{2732, -1780}, Vector2{3478, -1780});
+        spawn_entity<RoamerEntity>(2794, -1748, Vector2{2732, -1780}, Vector2{3478, -1780});
+        spawn_entity<RoamerEntity>(2858, -1748, Vector2{2732, -1780}, Vector2{3478, -1780});
+        spawn_entity<RoamerEntity>(2922, -1748, Vector2{2732, -1780}, Vector2{3478, -1780});
+
+        spawn_entity<RoamerEntity>(3542, -132, Vector2{3542, -161}, Vector2{4360, -161});
+        spawn_entity<RoamerEntity>(3642, -132, Vector2{3542, -161}, Vector2{4360, -161});
+        spawn_entity<RoamerEntity>(3742, -132, Vector2{3542, -161}, Vector2{4360, -161});
+        spawn_entity<RoamerEntity>(3842, -132, Vector2{3542, -161}, Vector2{4360, -161});
+        spawn_entity<RoamerEntity>(3842, -132, Vector2{3542, -161}, Vector2{4360, -161});
+
+        spawn_entity<RoamerEntity>(5534, -644, Vector2{5534, -676}, Vector2{6641, -676});
+        spawn_entity<RoamerEntity>(5634, -644, Vector2{5534, -676}, Vector2{6641, -676});
+        spawn_entity<RoamerEntity>(5734, -644, Vector2{5534, -676}, Vector2{6641, -676});
+        spawn_entity<RoamerEntity>(5834, -644, Vector2{5534, -676}, Vector2{6641, -676});
     }
     void Level1BStage::draw() const
     {
