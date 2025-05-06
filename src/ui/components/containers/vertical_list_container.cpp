@@ -5,8 +5,10 @@
 
 namespace artifact
 {
-    VerticalListContainer::VerticalListContainer(const char *identifier, Stage *owner, const int x, const int y, const int width, const int height, const int gap, const int padding, const Color background_color) : ListContainer(identifier, owner, x, y, width, height, gap, padding, background_color) {}
-    VerticalListContainer::VerticalListContainer(const char *identifier, Stage *owner) : ListContainer(identifier, owner, 0, 0, 0, 0, 0, 0, BLANK) {}
+    VerticalListContainer::VerticalListContainer(const char *identifier, Stage *owner, const int x, const int y, const int width, const int height, const int gap, const int padding, const Color background_color) :
+        ListContainer(identifier, owner, x, y, width, height, gap, padding, background_color) {}
+    VerticalListContainer::VerticalListContainer(const char *identifier, Stage *owner) :
+        ListContainer(identifier, owner, 0, 0, 0, 0, 0, 0, BLANK) {}
 
     int VerticalListContainer::calculate_content_height()
     {
@@ -44,27 +46,20 @@ namespace artifact
         if (has_scrollbar)
             content_width -= scroll_width;
 
-        // Apply scissor mode to clip content to the container's visible area
-        BeginScissorMode(x, y, width, height);
-
         int current_y = y + padding_top - static_cast<int>(scroll_offset);
 
         for (const auto &component: components)
         {
-            if (auto *button = dynamic_cast<ButtonComponent *>(component.get()))
-            {
-                button->set_position(x + padding_left, current_y);
-                button->set_width(content_width);
+            component->set_position(x + padding_left, current_y);
+            component->set_width(content_width);
 
-                // Only draw if within visible area (with a small margin)
-                if (current_y + button->get_height() >= y - 50 && current_y <= y + height + 50)
-                    button->draw();
+            // Only draw if within a visible area (with a small margin)
+            if (current_y + component->get_height() >= y - 50 && current_y <= y + height + 50)
+                component->draw();
 
-                current_y += button->get_height() + gap;
-            }
+            current_y += component->get_height() + gap;
         }
 
-        EndScissorMode();
 
         // Draw the scrollbar if needed
         if (has_scrollbar)
@@ -74,22 +69,22 @@ namespace artifact
             DrawRectangleRec(scrollbar_track, BLACK);
 
             // Calculate content height and scroll parameters
-            int content_height = calculate_content_height();
+            const int content_height = calculate_content_height();
             scroll_max = std::max(0, content_height - height);
 
             // Calculate and draw thumb (white rectangle)
             float thumb_height = height * height / static_cast<float>(content_height);
             thumb_height = std::max(20.0f, thumb_height); // Minimum thumb size
 
-            float thumb_position_ratio = scroll_offset / scroll_max;
-            float thumb_y = y + (height - thumb_height) * thumb_position_ratio;
+            const float thumb_position_ratio = scroll_offset / scroll_max;
+            const float thumb_y = y + (height - thumb_height) * thumb_position_ratio;
 
             scrollbar_thumb = {static_cast<float>(x + width - scroll_width), thumb_y, static_cast<float>(scroll_width), thumb_height};
             DrawRectangleRec(scrollbar_thumb, WHITE);
         }
     }
 
-    void VerticalListContainer::update(int mouse_x, int mouse_y)
+    void VerticalListContainer::update(const int mouse_x, const int mouse_y)
     {
         // Check if we need a scrollbar
         has_scrollbar = needs_scrollbar();
@@ -147,8 +142,10 @@ namespace artifact
             }
         } else
         {
-            // No scrollbar, update all components normally
-            ListContainer::update(mouse_x, mouse_y);
+            for (const auto &component: components)
+            {
+                component->update(mouse_x, mouse_y);
+            }
             scroll_offset = 0.0f;
         }
     }
@@ -157,5 +154,26 @@ namespace artifact
     {
         int content_height = calculate_content_height();
         this->height = content_height;
+    }
+
+    void VerticalListContainer::auto_size()
+    {
+        // First set the height based on content
+        auto_height();
+
+        // Then calculate the width based on the widest component
+        int max_width = padding_left + padding_right;
+        for (const auto &component: components)
+        {
+            max_width = std::max(max_width, component->get_width() + padding_left + padding_right);
+        }
+
+        // If we need a scrollbar, add its width
+        if (needs_scrollbar())
+        {
+            max_width += scroll_width;
+        }
+
+        this->width = max_width;
     }
 } // namespace artifact
