@@ -175,9 +175,9 @@ namespace artifact
     }
     void TitleScreen::destroy()
     {
-        Stage::destroy();
         if (is_being_destroyed)
             return;
+        Stage::destroy();
         is_being_destroyed = true;
         // Make sure to explicitly clean up textures
         UnloadTexture(sky_clouds_background_image);
