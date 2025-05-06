@@ -3,7 +3,7 @@
 
 namespace artifact
 {
-    class HorizontalListContainer : public ListContainer
+    class HorizontalListContainer final : public ListContainer
     {
 
     public:
@@ -11,5 +11,6 @@ namespace artifact
         HorizontalListContainer(const char *identifier, Stage *owner);
         void draw() override;
         void auto_width() override;
+        void auto_size() override;
     };
 } // namespace artifact
