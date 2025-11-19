@@ -6,7 +6,7 @@ namespace artifact
 
     ComponentBase::ComponentBase(const char *identifier, Stage *owner) : identifier(identifier), owner(owner), bounds() {}
     ComponentBase::ComponentBase(const char *identifier, Stage *owner, const int x, const int y, const int width, const int height) : identifier(identifier), owner(owner), bounds{static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)} {}
-    void ComponentBase::draw_texture_to_fill_rect(const int width, const int height, const int x, const int y, const Texture2D &texture)
+    void ComponentBase::draw_texture_to_fill_rect(const int width, const int height, const int x, const int y, const Texture2D &texture, const Color tint)
     {
         // Calculate scaling factors for both dimensions
         const float scaleX = static_cast<float>(width) / static_cast<float>(texture.width);
@@ -30,9 +30,9 @@ namespace artifact
         const Rectangle dest = {dx, dy, scaledWidth, scaledHeight};
 
         // Draw the texture
-        DrawTexturePro(texture, source, dest, {static_cast<float>(x), static_cast<float>(y)}, 0.0f, WHITE);
+        DrawTexturePro(texture, source, dest, {static_cast<float>(x), static_cast<float>(y)}, 0.0f, tint);
     }
-    void ComponentBase::draw_texture_scaled(const float scale, const float x, const float y, const Texture2D &texture)
+    void ComponentBase::draw_texture_scaled(const float scale, const float x, const float y, const Texture2D &texture, const Color tint)
     {
         const float scaledWidth = static_cast<float>(texture.width) * scale;
         const float scaledHeight = static_cast<float>(texture.height) * scale;
@@ -40,9 +40,9 @@ namespace artifact
         const Rectangle source = {0.0f, 0.0f, static_cast<float>(texture.width), static_cast<float>(texture.height)};
         const Rectangle dest = {x, y, scaledWidth, scaledHeight};
 
-        DrawTexturePro(texture, source, dest, {0.0f, 0.0f}, 0.0f, WHITE);
+        DrawTexturePro(texture, source, dest, {0.0f, 0.0f}, 0.0f, tint);
     }
-    void ComponentBase::draw_texture_scaled(const int width, const int height, const int x, const int y, const Texture2D &texture)
+    void ComponentBase::draw_texture_scaled(const int width, const int height, const int x, const int y, const Texture2D &texture, const Color tint)
     {
         int adjustedWidth = width;
         int adjustedHeight = height;
@@ -65,7 +65,7 @@ namespace artifact
         const Rectangle source = {0.0f, 0.0f, static_cast<float>(texture.width), static_cast<float>(texture.height)};
         const Rectangle dest = {dx, dy, scaledWidth, scaledHeight};
 
-        DrawTexturePro(texture, source, dest, {0.0f, 0.0f}, 0.0f, WHITE);
+        DrawTexturePro(texture, source, dest, {0.0f, 0.0f}, 0.0f, tint);
     }
     void ComponentBase::scale_texture(int &width, int &height, const Texture2D &texture)
     {
@@ -82,8 +82,6 @@ namespace artifact
         width = static_cast<int>(static_cast<float>(texture.width) * scale);
         height = static_cast<int>(static_cast<float>(texture.height) * scale);
     }
-
-
     void ComponentBase::set_width(const int width) { bounds.width = static_cast<float>(width); }
     void ComponentBase::set_height(const int height) { bounds.height = static_cast<float>(height); }
     void ComponentBase::set_position(const int x, const int y)

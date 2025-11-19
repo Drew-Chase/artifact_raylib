@@ -1,0 +1,74 @@
+name: Pull Request Validation
+
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  validate:
+    name: Validate PR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Validate CMake format
+        run: |
+          cmake -P ${GITHUB_WORKSPACE}/CMakeLists.txt || echo "CMake format validation failed"
+
+      - name: Make Unix scripts executable
+        run: |
+          if [ -d "scripts/unix" ]; then
+            chmod +x scripts/unix/*.sh
+            echo "Made Unix scripts executable"
+          fi
+
+      - name: Check file permissions
+        run: |
+          if [ -d "scripts/unix" ]; then
+            MISSING_EXEC=false
+            for script in scripts/unix/*.sh; do
+              if [ -f "$script" ] && [ ! -x "$script" ]; then
+                echo "Error: $script is not executable"
+                MISSING_EXEC=true
+              fi
+            done
+          
+            if [ "$MISSING_EXEC" = true ]; then
+              echo "Unix scripts should be executable"
+              exit 1
+            else
+              echo "All Unix scripts are properly set as executable"
+            fi
+          else
+            echo "No Unix scripts directory found - skipping permission check"
+          fi
+
+      - name: Check required script existence
+        run: |
+          REQUIRED_SCRIPTS=("minimal.sh" "standalone.sh" "debug.sh")
+          MISSING_SCRIPTS=false
+          
+          if [ -d "scripts/unix" ]; then
+            for script in "${REQUIRED_SCRIPTS[@]}"; do
+              if [ ! -f "scripts/unix/$script" ]; then
+                echo "Required script scripts/unix/$script is missing"
+                MISSING_SCRIPTS=true
+              fi
+            done
+          
+            if [ "$MISSING_SCRIPTS" = true ]; then
+              exit 1
+            else
+              echo "All required scripts exist"
+            fi
+          fi
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build xorg-dev libglu1-mesa-dev
+
+      - name: Basic CMake Configuration Test
+        run: |
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build --target help

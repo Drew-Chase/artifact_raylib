@@ -1,4 +1,5 @@
 #pragma once
+#include "direction.h"
 #include "entity.h"
 #include "sprite_sheet.h"
 
@@ -10,8 +11,14 @@ namespace artifact
         float walk_speed_multiplier = 1;
         float sprint_multiplier = 1.5f;
         bool sprinting = false;
-        int light_attack_frames = 0;
-        int dash_attack_frames = 0;
+        unsigned int light_attack_frames = 0;
+        unsigned int dash_attack_frames = 0;
+        unsigned int invincibility_frames = 0;
+        unsigned int death_frames = 0;
+        unsigned int hurt_frames = 0;
+        unsigned short lives = 3;
+        unsigned int coins = 0;
+        bool is_teleporting = false;
 
         // Gravity and jumping variables
         float vertical_velocity = 0.0f;
@@ -19,8 +26,8 @@ namespace artifact
         float gravity = 1800.0f;
         float jump_force = 670.0f;
         bool is_grounded = false;
-        int jump_count = 0;
-        int max_jump_count = 2;
+        unsigned short jump_count = 0;
+        unsigned short max_jump_count = 2;
 
         // Sprite sheets
         SpriteSheet *idle_sheet = nullptr;
@@ -28,7 +35,13 @@ namespace artifact
         SpriteSheet *jump_sheet = nullptr;
         SpriteSheet *light_attack_sheet = nullptr;
         SpriteSheet *dash_attack_sheet = nullptr;
+        SpriteSheet *death_sheet = nullptr;
+        SpriteSheet *hurt_sheet = nullptr;
 
+        // Interface Sprites
+        Texture2D heart_texture{};
+        Texture2D life_texture{};
+        Texture2D coin_texture{};
 
         // Air control and physics constants
         float air_control = 0.8f;
@@ -42,19 +55,27 @@ namespace artifact
         Sound sfx_hit{};
         Sound sfx_dash{};
 
-        void handle_input(float deltaTime);
-        void apply_gravity(float deltaTime);
-        void apply_horizontal_movement(float deltaTime);
+        void handle_input(float delta_time);
+        void apply_gravity(float delta_time);
+        void apply_horizontal_movement(float delta_time);
         void check_collision();
         void update_camera_center_smooth_follow(float delta) const;
         void add_momentum(float x, float y);
-
+        void on_entity_collision(Entity *entity) override;
+        bool check_is_on_ground() const;
     public:
         void startup() override;
         void draw() override;
-        void update(float deltaTime) override;
-        void damage(int damage) override;
+        void draw_stats() const;
+        void update(float delta_time) override;
+        void damage(int damage, Direction direction) override;
         void kill() override;
         void jump();
+        bool is_facing_right() const;
+        void respawn(bool should_remove_life = true);
+        void destroy() override;
+        bool is_dead() const override;
+        void set_position(float x, float y) override;
+        void set_teleporting(bool is_teleporting);
     };
 } // namespace artifact

@@ -2,14 +2,17 @@
 #include <functional>
 #include <raylib.h>
 #include <vector>
-#include "entities/entity.h"
 
 namespace artifact
 {
+    class Entity;
     class Collider
     {
         std::function<void()> on_overlap;
-        int overlap_cooldown = 0;
+        std::function<void(Entity *)> on_entity_overlap;
+
+        Entity *overlapping_entity = nullptr;
+        Entity *owner = nullptr;
 
     public:
         /**
@@ -85,7 +88,34 @@ namespace artifact
          */
         Collider(int x, int y, int width, int height, bool is_blocking);
 
+        /**
+         * Constructs a Collider with specified position, size, and overlap callback function.
+         *
+         * This constructor initializes the rectangular boundaries of the collider and sets
+         * the callback function to be executed when an overlap event occurs between colliders.
+         *
+         * @param x The x-coordinate of the collider's position in the game world.
+         * @param y The y-coordinate of the collider's position in the game world.
+         * @param width The width of the collider.
+         * @param height The height of the collider.
+         * @param on_overlap A callback function to be triggered when the collider overlaps with another.
+         * @return A constructed Collider object.
+         */
         Collider(int x, int y, int width, int height, const std::function<void()> &on_overlap);
+        /**
+         * Constructs a Collider instance with specified position, size, and overlap handling logic.
+         *
+         * This constructor initializes the collider's position and dimensions in the game world,
+         * and sets up a callback to handle interactions with overlapping entities.
+         *
+         * @param x The x-coordinate of the collider's top-left corner.
+         * @param y The y-coordinate of the collider's top-left corner.
+         * @param width The width of the collider.
+         * @param height The height of the collider.
+         * @param on_entity_overlap A callback function triggered when an entity overlaps with this collider.
+         */
+        Collider(int x, int y, int width, int height, const std::function<void(Entity *)> &on_entity_overlap);
+
 
         /**
          * Checks whether the given collider is empty by comparing it to the predefined EMPTY_COLLIDER.
@@ -98,19 +128,6 @@ namespace artifact
          */
         static bool is_collider_empty(const Collider &collider);
 
-        /**
-         * Determines if a given entity is colliding with any of the specified colliders.
-         *
-         * This function checks whether the bounds of the given entity overlap with any
-         * of the colliders in the provided vector. It evaluates collisions based on
-         * the corners of the entity's bounds, verifying whether there is any collider
-         * present at each corner.
-         *
-         * @param entity A pointer to the entity to check for collisions.
-         * @param colliders A vector of colliders to test against the entity's bounds.
-         * @return True if the entity is colliding with any of the colliders, false otherwise.
-         */
-        static bool is_entity_colliding(const Entity *entity, const std::vector<Collider> &colliders);
         /**
          * Finds and retrieves the collider located at the specified (x, y) coordinates
          * from a vector of colliders. Can optionally filter to only consider blocking colliders.
@@ -155,6 +172,24 @@ namespace artifact
          * This is called when an entity overlaps with a collider instead of colliding with it.
          */
         void overlap();
+        /**
+         * Handles the overlap event when this collider interacts with the specified entity.
+         *
+         * This method is responsible for setting the overlapping entity, triggering any associated
+         * overlap callbacks, and applying a cooldown to avoid repeated overlap events in quick succession.
+         *
+         * @param entity A pointer to the Entity instance that this collider overlaps with.
+         */
+        void overlap(Entity *entity);
+        /**
+         * Assigns an owner entity to this collider.
+         *
+         * This method links the collider to a specific entity, establishing ownership and allowing the collider
+         * to associate its behavior or properties with the entity it belongs to.
+         *
+         * @param entity A pointer to the Entity object that will be set as the owner of the collider.
+         */
+        void set_owner(Entity *entity) { this->owner = entity; }
     };
     static const auto EMPTY_COLLIDER = Collider();
 } // namespace artifact

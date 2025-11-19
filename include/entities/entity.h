@@ -1,5 +1,9 @@
 #pragma once
+#include <memory>
 #include <raylib.h>
+
+#include "collider.h"
+#include "direction.h"
 
 namespace artifact
 {
@@ -16,9 +20,17 @@ namespace artifact
 
         // Multipliers
         float walk_speed_multiplier = 1.f;
-        Rectangle bounds = {0, 0, 1, 2};
+
+        // Entity variables
+        float width = 0;
+        float height = 0;
         Vector2 position = {0.0f, 0.0f};
+
         PlayableStage *owner = nullptr;
+        std::unique_ptr<Collider> collider;
+        virtual void on_entity_collision(Entity *entity);
+
+        bool is_being_destroyed = false;
 
 
     public:
@@ -26,13 +38,17 @@ namespace artifact
         virtual void startup();
         virtual void destroy();
         virtual void draw();
-        virtual void update(float deltaTime);
-        virtual void damage(int damage);
+        virtual void update(float delta_time);
+        virtual void damage(int damage, Direction direction);
         virtual void kill();
         void spawn(int x, int y, PlayableStage *owner);
-        virtual void set_position(int x, int y);
-        virtual bool has_hit_obstacle();
+        virtual void set_position(float x, float y);
+        Vector2 get_position() const;
         virtual void debug_draw_colliders();
-        Rectangle get_bounds() const;
+        bool is_colliding_with(const Entity *other) const;
+        void check_entity_collisions(const std::vector<Entity *> &entities);
+        virtual bool is_dead() const;
+        float get_width() const;
+        float get_height() const;
     };
 } // namespace artifact

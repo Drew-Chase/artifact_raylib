@@ -1,0 +1,30 @@
+#include <windows.h>
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     0,0,0,1
+PRODUCTVERSION  0,0,0,1
+FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+FILEFLAGS       0
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_APP
+FILESUBTYPE     VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4" // U.S. English - multilingual (hex)
+        BEGIN
+            VALUE "CompanyName",      "LFInteractive LLC."
+            VALUE "FileDescription",  "Artifact Game"
+            VALUE "FileVersion",      "0.0.0.1"
+            VALUE "InternalName",     "artifact_raylib"
+            VALUE "LegalCopyright",   "Copyright (C) 2025 LFInteractive LLC."
+            VALUE "OriginalFilename", "artifact_raylib.exe"
+            VALUE "ProductName",      "Artifact Game"
+            VALUE "ProductVersion",   "0.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252 // U.S. English, Windows multilingual
+    END
+END

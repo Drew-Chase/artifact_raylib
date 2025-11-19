@@ -6,12 +6,13 @@
 namespace artifact
 {
     ListContainer::ListContainer(const char *identifier, Stage *owner, const int x, const int y, const int width, const int height, const int gap, const int padding, const Color background_color) : ContainerBase(identifier, owner), x(x), y(y), width(width), height(height), gap(gap), padding_top(padding), padding_bottom(padding), padding_left(padding), padding_right(padding), background_color(background_color) {}
+    ListContainer::ListContainer(const char *identifier, Stage *owner) : ContainerBase(identifier, owner), x(0), y(0), width(0), height(0), gap(0), padding_top(0), padding_bottom(0), padding_left(0), padding_right(0), background_color(BLANK) {}
     void ListContainer::draw() { ContainerBase::draw(); }
     void ListContainer::update(const int mouse_x, const int mouse_y)
     {
-        for (const auto components = entries(); auto *component: components)
+        for (auto &component: components)
         {
-            if (component != nullptr && component != reinterpret_cast<ComponentBase *>(-1))
+            if (component != nullptr)
                 component->update(mouse_x, mouse_y);
         }
     }
@@ -40,9 +41,9 @@ namespace artifact
     void ListContainer::auto_height()
     {
         int largest_height = 0;
-        for (const auto &it: entries())
+        for (const auto &component: components)
         {
-            if (const auto *button = dynamic_cast<ButtonComponent *>(it))
+            if (const auto *button = dynamic_cast<ButtonComponent *>(component.get()))
             {
                 largest_height = std::max(largest_height, button->get_height());
             }
@@ -52,9 +53,9 @@ namespace artifact
     void ListContainer::auto_width()
     {
         int largest_width = 0;
-        for (const auto &it: entries())
+        for (const auto &component_base: components)
         {
-            if (const auto *button = dynamic_cast<ButtonComponent *>(it))
+            if (const auto *button = dynamic_cast<ButtonComponent *>(component_base.get()))
             {
                 largest_width = std::max(largest_width, button->get_width());
             }

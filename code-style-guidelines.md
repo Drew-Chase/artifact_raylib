@@ -46,7 +46,7 @@ class SpriteSheet
 - Use `snake_case` (all lowercase with underscores between words)
 ```c++
 void startup()
-void apply_horizontal_movement(float deltaTime)
+void apply_horizontal_movement(float delta_time)
 void get_formatted_frame_path(const int frame_number)
 ```
 

@@ -4,6 +4,8 @@
 #include "settings/display_settings.h"
 #include "stages/stage_manager.h"
 
+#define VERSION "0.0.1a"
+
 namespace artifact
 {
     class Game
@@ -22,7 +24,11 @@ namespace artifact
         // Properties
         mutable DisplaySettings *display_settings = nullptr;
         mutable ControlsSettings *controls_settings = nullptr;
+#ifdef DEBUG
+        bool debug_mode = true;
+#else
         bool debug_mode = false;
+#endif
 
         // Get singleton instance
         static Game *get_instance();

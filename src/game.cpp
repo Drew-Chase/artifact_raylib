@@ -51,56 +51,66 @@ namespace artifact
 
         // Setup the async logger
         spdlog::init_thread_pool(8192, 1);
-        spdlog::set_pattern("[%H:%M:%S.%f] [%l] [thread %t] %v");
-        spdlog::set_level(spdlog::level::trace);
 
         const auto rotating_file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("logs/game.log", 10 * 1024 * 1024, 6, true);
         const auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
         std::vector<spdlog::sink_ptr> sinks{rotating_file_sink, stdout_sink};
         const auto logger = std::make_shared<spdlog::async_logger>("game_logger", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+        logger->set_level(spdlog::level::trace);
+        logger->set_pattern("%^[artifact_game/%s:%#(%!)::%l]%$ %v");
         register_logger(logger);
         spdlog::flush_every(std::chrono::seconds(3));
 
         SetTraceLogCallback(register_log_callback);
-        SetTraceLogLevel(LOG_DEBUG);
+        SetTraceLogLevel(LOG_TRACE);
+        set_default_logger(logger);
 
         const auto window_icon = LoadImage("game/app-icon.png");
         StageManager *manager = game->get_stage_manager();
+        SPDLOG_INFO("Starting game...");
 
 
         InitWindow(0, 0, "Artifact: The Journey Unraveled");
         InitAudioDevice();
         SetWindowState(FLAG_WINDOW_RESIZABLE);
         SetWindowIcon(window_icon);
-        SetTargetFPS(60);
         SetExitKey(KEY_NULL);
 
 
         // Load Settings
         game->display_settings->load();
         game->controls_settings->load();
+
         // Apply Settings
         game->display_settings->apply();
 
+#ifdef DEBUG
+        // manager->request_stage_change(Stages::LEVEL1A);
+        manager->request_stage_change(Stages::TITLE_SCREEN);
+#else
+        manager->request_stage_change(Stages::TITLE_SCREEN);
+#endif
 
-        manager->load_stage(Stages::TITLE_SCREEN);
-        // manager->load_stage(Stages::LEVEL1A);
+        // Process the initial stage load immediately before entering game loop
+        manager->process_pending_stage_change();
 
-        instance->isRunning = true;
-        while (!WindowShouldClose() && instance->isRunning)
+        game->isRunning = true;
+        while (!WindowShouldClose() && game->isRunning)
         {
-
-            float deltaTime = GetFrameTime();
-            if (constexpr float MAX_DELTA_TIME = 0.05f; deltaTime > MAX_DELTA_TIME)
-                deltaTime = MAX_DELTA_TIME;
+            float delta_time = GetFrameTime();
+            if (constexpr float MAX_DELTA_TIME = 0.05f; delta_time > MAX_DELTA_TIME)
+                delta_time = MAX_DELTA_TIME;
 
             const auto stage = manager->get_current_stage();
-            stage->update(deltaTime);
+            stage->update(GetMouseX(), GetMouseY());
+            stage->update(delta_time);
             BeginDrawing();
             ClearBackground(BLACK);
             stage->draw();
-            DrawFPS(10, 10);
             EndDrawing();
+
+            // Process any pending stage changes after the frame completes
+            manager->process_pending_stage_change();
         }
 
         manager->get_current_stage()->destroy();
@@ -112,35 +122,33 @@ namespace artifact
         delete game;
     }
 
-    void Game::register_log_callback(int msgType, const char *message, const va_list args)
+    void Game::register_log_callback(int msgType, const char *message, va_list args)
     {
-        const auto logger = spdlog::get("game_logger");
         char formattedMessage[1024];
         vsnprintf(formattedMessage, sizeof(formattedMessage), message, args);
 
         switch (msgType)
         {
             case LOG_DEBUG:
-                logger->debug(formattedMessage);
+                SPDLOG_DEBUG(formattedMessage);
                 break;
             case LOG_INFO:
-                logger->info(formattedMessage);
+                SPDLOG_INFO(formattedMessage);
                 break;
             case LOG_WARNING:
-                logger->warn(formattedMessage);
+                SPDLOG_WARN(formattedMessage);
                 break;
             case LOG_ERROR:
-                logger->error(formattedMessage);
+                SPDLOG_ERROR(formattedMessage);
                 break;
             case LOG_FATAL:
-                logger->critical(formattedMessage);
+                SPDLOG_CRITICAL(formattedMessage);
                 break;
             case LOG_TRACE:
             default:
-                logger->trace(formattedMessage);
+                SPDLOG_TRACE(formattedMessage);
                 break;
         }
-        logger->flush(); // Explicit flush after each message
     }
 
 } // namespace artifact

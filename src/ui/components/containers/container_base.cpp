@@ -1,32 +1,55 @@
 #include "ui/components/containers/container_base.h"
+#include <cstring>
 #include <ranges>
+#include <string>
 
 void artifact::ContainerBase::draw() {}
+
 void artifact::ContainerBase::update(int mouse_x, int mouse_y) {}
-void artifact::ContainerBase::add_component(ComponentBase *component) { this->components[component->get_identifier()] = component; }
+
+void artifact::ContainerBase::add_component(ComponentBase *component) { this->components.push_back(std::unique_ptr<ComponentBase>(component)); }
+
 void artifact::ContainerBase::remove_component(const size_t index)
 {
     if (index < this->components.size())
     {
         const auto it = std::next(this->components.begin(), index);
-        this->components.erase(it->first);
+        this->components.erase(it);
     }
 }
-void artifact::ContainerBase::remove_component(const char *identifier) { this->components.erase(identifier); }
-void artifact::ContainerBase::remove_component(ComponentBase *component) { this->components.erase(component->get_identifier()); }
-std::vector<artifact::ComponentBase *> artifact::ContainerBase::entries()
+
+void artifact::ContainerBase::remove_component(const char *identifier)
 {
-    std::vector<ComponentBase *> components;
-    for (const auto component: this->components | std::views::values)
+
+    if (const auto it = std::ranges::find_if(components, [identifier](const std::unique_ptr<ComponentBase> &component) { return std::strcmp(component->get_identifier(), identifier) == 0; }); it != components.end())
     {
-        components.push_back(component);
+        components.erase(it);
     }
-    return components;
 }
-void artifact::ContainerBase::destroy()
+
+void artifact::ContainerBase::remove_component(ComponentBase *component)
 {
-    for (const ComponentBase *component: this->components | std::views::values)
+    if (const auto it = std::ranges::find_if(components, [component](const std::unique_ptr<ComponentBase> &comp) { return comp.get() == component; }); it != components.end())
     {
-        delete component;
+        components.erase(it);
     }
 }
+
+artifact::ComponentBase* artifact::ContainerBase::find_component(const char *identifier)
+{
+    if (const auto it = std::ranges::find_if(components, [identifier](const std::unique_ptr<ComponentBase> &component) 
+        { return std::strcmp(component->get_identifier(), identifier) == 0; }); 
+        it != components.end())
+    {
+        return it->get();
+    }
+    return nullptr;
+}
+
+void artifact::ContainerBase::clear_components()
+{
+    components.clear();
+}
+
+void artifact::ContainerBase::destroy() { components.clear(); }
+std::vector<std::unique_ptr<artifact::ComponentBase>> &artifact::ContainerBase::get_components() { return components; }

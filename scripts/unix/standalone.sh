@@ -12,8 +12,7 @@ fi
 # Configure project with CMake
 echo "Configuring project..."
 cmake -B bin/obj/$OS_ARCH/standalone -G Ninja -DCMAKE_BUILD_TYPE=Release \
-    -DPROFILE_NAME=standalone -DREMOVE_DEBUG_INFO=ON \
-    -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="$(pwd)/conan_provider.cmake"
+    -DPROFILE_NAME=standalone -DREMOVE_DEBUG_INFO=ON
 if [ $? -ne 0 ]; then
     echo
     echo "=== Error configuring Standalone configuration! ==="

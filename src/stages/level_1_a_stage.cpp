@@ -1,9 +1,13 @@
 
 #include "stages/level_1_a_stage.h"
 
+#include "entities/demon_bat_entity.h"
+#include "entities/roamer_entity.h"
+
 namespace artifact
 {
-    Level1AStage::Level1AStage() : PlayableStage("level_1a") {}
+    Level1AStage::Level1AStage() :
+        PlayableStage("level_1a") {}
     void Level1AStage::startup()
     {
         PlayableStage::startup();
@@ -12,19 +16,20 @@ namespace artifact
         SetMusicVolume(music, 0.15f);
         PlayMusicStream(music);
 
-        // Spawn enemies
-        // TODO: Spawn enemies
+        const auto [x, y] = get_spawn_position();
+        this->player = spawn_entity<PlayerEntity>(x, y);
 
         // Setup features
-        // TODO: Create end goal.
+        nextlvl_teleporter = new TeleporterFeature(this, {9123.4, -7}, Stages::LEVEL1B);
+        secret_teleporter = new TeleporterFeature(this, {-982.2, -153}, Stages::LEVEL1B);
 
         // Initialize Textures
         set_background("game/texture/stages/level_1a/background.png");
 
         // Create Colliders
-        float block_scale = 32 * 2.3;
-        float base_x = -150;
-        float base_y = 205;
+        constexpr float block_scale = 32 * 2.3;
+        constexpr float base_x = -150;
+        constexpr float base_y = 205;
 
         // Ground
         colliders.emplace_back(base_x - block_scale * 12, base_y - block_scale * 4, block_scale * 11, block_scale, true);
@@ -62,22 +67,91 @@ namespace artifact
         colliders.emplace_back(base_x + block_scale * 127.5, base_y - block_scale * 9, block_scale, block_scale * 7, true);
 
         // Killnet
-        colliders.emplace_back(-500, 500, block_scale * 150, block_scale, [&] { respawn(); });
+        colliders.emplace_back(-500, 500, block_scale * 150, block_scale, [&]
+                               { player->kill(); });
+    }
+    Vector2 Level1AStage::get_spawn_position() const { return {0, 139}; }
+    void Level1AStage::spawn_entities()
+    {
+        entities.erase(std::ranges::remove_if(entities, [this](const Entity *entity)
+                                              { return entity != player; })
+                               .begin(),
+                       entities.end());
+
+
+        // Spawn enemies
+
+        // First Gap
+        spawn_entity<RoamerEntity>(2067, 99, Vector2{2057, 67}, Vector2{3024, 67});
+        spawn_entity<RoamerEntity>(2131, 99, Vector2{2057, 67}, Vector2{3024, 67});
+        spawn_entity<RoamerEntity>(2195, 99, Vector2{2057, 67}, Vector2{3024, 67});
+        spawn_entity<RoamerEntity>(2259, 99, Vector2{2057, 67}, Vector2{3024, 67});
+        // Cliff Gap
+        spawn_entity<RoamerEntity>(3091, 25, Vector2{3091, -7}, Vector2{3751, -7});
+        spawn_entity<RoamerEntity>(3155, 25, Vector2{3091, -7}, Vector2{3751, -7});
+        spawn_entity<RoamerEntity>(3219, 25, Vector2{3091, -7}, Vector2{3751, -7});
+        spawn_entity<RoamerEntity>(3283, 25, Vector2{3091, -7}, Vector2{3751, -7});
+        // Small Gap
+        spawn_entity<RoamerEntity>(5183, -195, Vector2{5183, -227}, Vector2{5339, -227});
+
+        // First Demon Bat
+        spawn_entity<DemonBatEntity>(6000, -100);
+
+        spawn_entity<RoamerEntity>(6583, 25, Vector2{6583, -7}, Vector2{7182, -7});
+        spawn_entity<RoamerEntity>(6647, 25, Vector2{6583, -7}, Vector2{7182, -7});
+        spawn_entity<RoamerEntity>(6711, 25, Vector2{6583, -7}, Vector2{7182, -7});
+
+        // Second Demon Bat
+        spawn_entity<DemonBatEntity>(8400, -123);
+
+        // The end-gate killers
+        spawn_entity<RoamerEntity>(8578, 25, Vector2{8578, -7}, Vector2{9169, -7});
+        spawn_entity<RoamerEntity>(8642, 25, Vector2{8578, -7}, Vector2{9169, -7});
+        spawn_entity<RoamerEntity>(8706, 25, Vector2{8578, -7}, Vector2{9169, -7});
+        spawn_entity<RoamerEntity>(8770, 25, Vector2{8578, -7}, Vector2{9169, -7});
     }
     void Level1AStage::draw() const
     {
+        if (is_being_destroyed)
+            return;
         BeginMode2D(camera);
         PlayableStage::draw();
+        if (nextlvl_teleporter)
+            nextlvl_teleporter->draw();
+        if (secret_teleporter)
+            secret_teleporter->draw();
         EndMode2D();
+        PlayableStage::draw_ui();
     }
-    void Level1AStage::update(const float deltaTime)
+    void Level1AStage::update(const float delta_time)
     {
-        PlayableStage::update(deltaTime);
-        UpdateMusicStream(music);
+        if (is_being_destroyed)
+            return;
+        PlayableStage::update(delta_time);
+        if (nextlvl_teleporter)
+            nextlvl_teleporter->update(delta_time);
+        if (secret_teleporter)
+            secret_teleporter->update(delta_time);
+
+        if (music.stream.buffer)
+            UpdateMusicStream(music);
     }
     void Level1AStage::destroy()
     {
+        if (is_being_destroyed)
+            return;
         PlayableStage::destroy();
+        if (nextlvl_teleporter)
+        {
+            delete nextlvl_teleporter;
+            nextlvl_teleporter = nullptr;
+        }
+        if (secret_teleporter)
+        {
+            delete secret_teleporter;
+            secret_teleporter = nullptr;
+        }
+
         UnloadMusicStream(music);
     }
 } // namespace artifact

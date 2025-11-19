@@ -1,0 +1,186 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: # Manual trigger with parameters
+    inputs:
+      build_type:
+        description: 'Build Type (Release/Debug)'
+        required: true
+        default: 'Release'
+        type: choice
+        options:
+          - Release
+          - Debug
+      create_release:
+        description: 'Create GitHub Release'
+        required: true
+        default: false
+        type: boolean
+      release_type:
+        description: 'Release Type'
+        required: true
+        default: 'prerelease'
+        type: choice
+        options:
+          - prerelease
+          - release
+      custom_tag:
+        description: 'Custom Release Tag (leave empty for auto-generated)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  packages: write
+  deployments: write
+
+env:
+  BUILD_TYPE: ${{ github.event_name == 'workflow_dispatch' && inputs.build_type || 'Release' }}
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }}-${{ matrix.profile.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { name: "Windows Latest MinGW", os: windows-latest, cc: "gcc", cxx: "g++" }
+          - { name: "Ubuntu Latest GCC", os: ubuntu-latest, cc: "gcc-12", cxx: "g++-12" }
+          - { name: "macOS Latest Clang", os: macos-latest, cc: "clang", cxx: "clang++" }
+        profile:
+          - { name: "minimal", script_name: "minimal" }
+          - { name: "standalone", script_name: "standalone" }
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up MinGW
+        if: runner.os == 'Windows'
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
+
+      - name: Install Windows Dependencies
+        if: runner.os == 'Windows'
+        run: |
+          choco install mingw
+          choco install ninja
+          # Ensure libpthread is installed
+          if not exist C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\x86_64-w64-mingw32\lib\libpthread.dll.a (
+              echo "Error: libpthread.dll.a is missing"
+              exit 1
+          )
+
+      - name: Make Unix scripts executable
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          chmod +x scripts/unix/*.sh
+
+      - name: Verify Unix scripts are executable
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          if [ -d "scripts/unix" ]; then
+            for script in scripts/unix/*.sh; do
+              if [ -f "$script" ] && [ ! -x "$script" ]; then
+                echo "Error: $script is not executable"
+                exit 1
+              fi
+            done
+          fi
+          echo "All Unix scripts are correctly set as executable."
+
+      - name: Install Linux Dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            ninja-build \
+            gcc-12 \
+            g++-12 \
+            xorg-dev \
+            libglu1-mesa-dev
+
+      - name: Install macOS Dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install ninja
+
+      - name: Install Windows Dependencies
+        if: runner.os == 'Windows'
+        run: |
+          choco install ninja
+
+      - name: Setup environment variables (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          echo CC=${{ matrix.config.cc }}>> %GITHUB_ENV%
+          echo CXX=${{ matrix.config.cxx }}>> %GITHUB_ENV%
+
+      - name: Setup environment variables (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          echo "CC=${{ matrix.config.cc }}" >> $GITHUB_ENV
+          echo "CXX=${{ matrix.config.cxx }}" >> $GITHUB_ENV
+
+      - name: Build Project (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          call scripts\windows\${{ matrix.profile.script_name }}.bat
+
+      - name: Build Project (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          ./scripts/unix/${{ matrix.profile.script_name }}.sh
+
+      - name: Create directory for artifacts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            if (!fs.existsSync('artifacts')) {
+              fs.mkdirSync('artifacts', { recursive: true });
+            }
+
+      - name: Create artifact zip (Windows)
+        if: runner.os == 'Windows'
+        uses: thedoctor0/zip-release@0.7.5
+        with:
+          type: 'zip'
+          directory: 'bin/artifact_raylib/win/${{ matrix.profile.name }}'
+          filename: '../../../../artifacts/artifact-${{runner.os}}-${{ runner.arch }}.zip'
+          path: '.'
+
+      - name: Create artifact zip (Unix - macOS)
+        if: runner.os == 'macOS'
+        uses: thedoctor0/zip-release@0.7.5
+        with:
+          type: 'zip'
+          directory: 'bin/artifact_raylib/unix/${{ matrix.profile.name }}'
+          filename: '../../../../artifacts/artifact-macos-${{ runner.arch }}.zip'
+          path: '.'
+
+      - name: Create artifact zip (Unix - Linux)
+        if: runner.os == 'Linux'
+        uses: thedoctor0/zip-release@0.7.5
+        with:
+          type: 'zip'
+          directory: 'bin/artifact_raylib/unix/${{ matrix.profile.name }}'
+          filename: '../../../../artifacts/artifact-linux-${{ runner.arch }}.zip'
+          path: '.'
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact-${{ runner.os }}-${{ matrix.profile.name }}
+          path: artifacts/artifact-*.zip

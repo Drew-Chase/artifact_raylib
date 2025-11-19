@@ -3,7 +3,7 @@
 
 namespace artifact
 {
-    class VerticalListContainer final : public ListContainer
+    class VerticalListContainer : public ListContainer
     {
         bool has_scrollbar = false;
         float scroll_offset = 0.0f; // Current scroll position
@@ -15,6 +15,7 @@ namespace artifact
 
     public:
         VerticalListContainer(const char *identifier, Stage *owner, int x, int y, int width, int height, int gap = 0, int padding = 0, Color background_color = BLANK);
+        VerticalListContainer(const char *identifier, Stage *owner);
         void draw() override;
         void update(int mouse_x, int mouse_y) override;
         void auto_height() override;
@@ -22,5 +23,10 @@ namespace artifact
         int calculate_content_height();
         void set_scrollbar_width(int width) { scroll_width = width; }
         bool needs_scrollbar();
+        
+        /**
+         * @brief Automatically adjust both width and height based on content
+         */
+        void auto_size() override;
     };
 } // namespace artifact

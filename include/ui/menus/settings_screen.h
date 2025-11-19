@@ -1,9 +1,8 @@
 #pragma once
 #include <memory>
-
-
 #include "menu_base.h"
 #include "settings/display_settings.h"
+#include "settings/controls_settings.h"
 #include "ui/components/button_component.h"
 #include "ui/components/containers/horizontal_list_container.h"
 #include "ui/components/containers/vertical_list_container.h"
@@ -39,16 +38,15 @@ namespace artifact
         std::unique_ptr<ButtonComponent> save_apply_button;
         std::unique_ptr<ButtonComponent> back_button;
 
-        void setup_action_buttons();
-        void setup_settings_tabs();
-
         // Utility functions
-        void save_apply();
+        void save_apply() const;
 
     public:
         explicit SettingsScreen(Stage *owner);
+        ~SettingsScreen() override;
         void draw() override;
         void update(int mouse_x, int mouse_y) override;
         void destroy() override;
+        bool is_being_removed() const;
     };
 } // namespace artifact
