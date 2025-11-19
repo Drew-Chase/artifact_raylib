@@ -16,6 +16,7 @@ namespace artifact
         spawn_entities();
 
         level_open_overlay = new LevelOpenOverlay(this, 1.f);
+        level_open_overlay->pause(); // Don't start animation until first update
         pause_screen = std::make_unique<PauseScreen>(this);
         death_screen = std::make_unique<DeathScreen>(this);
     }
@@ -57,6 +58,13 @@ namespace artifact
         if (is_being_destroyed)
             return;
         Stage::update(delta_time);
+
+        // Start animation on first update frame after stage is fully loaded
+        if (is_first_frame)
+        {
+            level_open_overlay->play();
+            is_first_frame = false;
+        }
 
         level_open_overlay->update(delta_time);
         if (IsKeyPressed(KEY_ESCAPE))

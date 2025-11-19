@@ -13,6 +13,22 @@ artifact::StageManager::~StageManager()
         delete current_stage;
     }
 }
+void artifact::StageManager::request_stage_change(const Stages stage, const Vector2 position)
+{
+    pending_stage_change = true;
+    pending_stage = stage;
+    pending_position = position;
+}
+
+void artifact::StageManager::process_pending_stage_change()
+{
+    if (!pending_stage_change)
+        return;
+
+    load_stage(pending_stage, pending_position);
+    pending_stage_change = false;
+}
+
 artifact::Stage *artifact::StageManager::load_stage(const Stages stage, const Vector2 position)
 {
     // destroy the current stage

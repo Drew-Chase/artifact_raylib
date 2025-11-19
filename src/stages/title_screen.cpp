@@ -37,7 +37,7 @@ namespace artifact
                                                               []
                                                               {
                                                                   SPDLOG_INFO("Start button clicked!");
-                                                                  Game::get_instance()->get_stage_manager()->load_stage(Stages::LEVEL1A);
+                                                                  Game::get_instance()->get_stage_manager()->request_stage_change(Stages::LEVEL1A);
                                                               });
 
         auto settings_button = std::make_unique<ButtonComponent>("settings_button", this, button_width, button_height, "Settings Game",
@@ -65,7 +65,7 @@ namespace artifact
 
         // Add buttons to container
         button_container->add_component(start_button.release());
-        button_container->add_component(settings_button.release());
+        // button_container->add_component(settings_button.release());
         button_container->add_component(exit_button.release());
 
         button_container->auto_size();

@@ -85,10 +85,14 @@ namespace artifact
         game->display_settings->apply();
 
 #ifdef DEBUG
-        manager->load_stage(Stages::LEVEL1A);
+        // manager->request_stage_change(Stages::LEVEL1A);
+        manager->request_stage_change(Stages::TITLE_SCREEN);
 #else
-        manager->load_stage(Stages::TITLE_SCREEN);
+        manager->request_stage_change(Stages::TITLE_SCREEN);
 #endif
+
+        // Process the initial stage load immediately before entering game loop
+        manager->process_pending_stage_change();
 
         game->isRunning = true;
         while (!WindowShouldClose() && game->isRunning)
@@ -104,6 +108,9 @@ namespace artifact
             ClearBackground(BLACK);
             stage->draw();
             EndDrawing();
+
+            // Process any pending stage changes after the frame completes
+            manager->process_pending_stage_change();
         }
 
         manager->get_current_stage()->destroy();

@@ -46,7 +46,7 @@ namespace artifact
                                                                  { settings_screen = std::make_unique<SettingsScreen>(owner); });
 
         auto exit_button = std::make_unique<ButtonComponent>("exit_button", owner, button_width, button_height, "Exit to Main Menu", []
-                                                             { Game::get_instance()->get_stage_manager()->load_stage(Stages::TITLE_SCREEN); });
+                                                             { Game::get_instance()->get_stage_manager()->request_stage_change(Stages::TITLE_SCREEN); });
 
         // Configure button appearances
         resume_button->set_colors(button_normal_bg_color, button_hover_bg_color, button_pressed_bg_color, text_color);

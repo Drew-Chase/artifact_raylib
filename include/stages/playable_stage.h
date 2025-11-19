@@ -19,6 +19,7 @@ namespace artifact
         std::vector<Entity *> entities;
         std::vector<Collider> colliders;
         bool is_paused = false;
+        bool is_first_frame = true;
         virtual void draw_ui() const;
 
     public:

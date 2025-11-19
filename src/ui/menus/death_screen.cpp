@@ -56,7 +56,7 @@ namespace artifact
                 button_height,
                 "Exit to Main Menu",
                 []
-                { Game::get_instance()->get_stage_manager()->load_stage(Stages::TITLE_SCREEN); });
+                { Game::get_instance()->get_stage_manager()->request_stage_change(Stages::TITLE_SCREEN); });
 
         // Configure button appearances
         respawn_button->set_colors(button_normal_bg_color, button_hover_bg_color, button_pressed_bg_color, text_color);

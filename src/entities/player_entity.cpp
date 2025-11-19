@@ -607,7 +607,7 @@ namespace artifact
         if (lives <= 0)
         {
             destroy();
-            Game::get_instance()->get_stage_manager()->load_stage(Stages::TITLE_SCREEN);
+            Game::get_instance()->get_stage_manager()->request_stage_change(Stages::TITLE_SCREEN);
         } else
         {
             if (should_remove_life)

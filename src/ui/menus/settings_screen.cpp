@@ -12,9 +12,6 @@ namespace artifact
         MenuBase("settings_screen", owner)
     {
         display_settings = *Game::get_instance()->display_settings;
-        setup_action_buttons();
-        setup_settings_tabs();
-        setup_settings_container();
     }
 
     SettingsScreen::~SettingsScreen()

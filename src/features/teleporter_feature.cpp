@@ -61,7 +61,7 @@ namespace artifact
                 }
                 captured_player->set_teleporting(false);
                 if (destination_stage != Stages::NONE)
-                    Game::get_instance()->get_stage_manager()->load_stage(destination_stage, destination_position);
+                    Game::get_instance()->get_stage_manager()->request_stage_change(destination_stage, destination_position);
                 else
                     captured_player->set_position(destination_position.x, destination_position.y);
                 captured_player = nullptr;
