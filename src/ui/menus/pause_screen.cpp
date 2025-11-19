@@ -59,7 +59,7 @@ namespace artifact
 
         // Add buttons to container
         button_container->add_component(resume_button.release());
-        button_container->add_component(settings_button.release());
+        // button_container->add_component(settings_button.release());
         button_container->add_component(exit_button.release());
 
         button_container->auto_size();
